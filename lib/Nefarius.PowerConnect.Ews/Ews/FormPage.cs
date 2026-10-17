@@ -304,7 +304,7 @@ public sealed class FormPage
 
     private static string Normalize(string value)
     {
-        return value.Replace('\u00a0', ' ').Trim();
+        return value.Replace('\u00a0', ' ');
     }
 
     private static bool IsCheckable(FormField field)

@@ -20,34 +20,34 @@ public sealed class UserRepository
     public async Task<IReadOnlyList<IReadOnlyDictionary<string, string>>> ListAsync(CancellationToken cancellationToken = default)
     {
         FormPage page = await _client.GetFormAsync("/config/sec_db.htm", cancellationToken).ConfigureAwait(false);
-        string? queried = page.Query("rlAAALocalUserName");
-        string level = page.Query("rlAAALocalUserPrivilage") ?? "";
-        List<Dictionary<string, string>> users = new List<Dictionary<string, string>>();
+        string? queried = page.Query("rlAAALocalUserName")?.Trim();
+        List<string> names = new List<string>();
         foreach (SelectOption option in page.Options("rlAAALocalUserName$select"))
         {
-            if (string.IsNullOrWhiteSpace(option.Text))
+            string name = option.Text.Trim();
+            if (name.Length == 0)
             {
                 continue;
             }
 
-            Dictionary<string, string> user = new Dictionary<string, string>
-            {
-                ["name"] = option.Text.Trim()
-            };
-            if (string.Equals(option.Text.Trim(), queried, StringComparison.Ordinal))
-            {
-                user["level"] = level;
-            }
-
-            users.Add(user);
+            names.Add(name);
         }
 
-        if (users.Count == 0 && page.Query("rlAAALocalUserName") is string current && current.Length > 0)
+        if (names.Count == 0 && queried is string current && current.Length > 0)
         {
+            names.Add(current);
+        }
+
+        List<Dictionary<string, string>> users = new List<Dictionary<string, string>>();
+        foreach (string name in names)
+        {
+            FormPage userPage = string.Equals(name, queried, StringComparison.Ordinal)
+                ? page
+                : await _client.GetFormAsync(UserPage(name), cancellationToken).ConfigureAwait(false);
             users.Add(new Dictionary<string, string>
             {
-                ["name"] = current,
-                ["level"] = page.Query("rlAAALocalUserPrivilage") ?? ""
+                ["name"] = name,
+                ["level"] = userPage.Query("rlAAALocalUserPrivilage") ?? ""
             });
         }
 
@@ -65,8 +65,7 @@ public sealed class UserRepository
         bool create,
         CancellationToken cancellationToken = default)
     {
-        string url = "/config/sec_db.htm?Query:rlAAALocalUserName=" + Uri.EscapeDataString(name);
-        FormPage page = await _client.GetFormAsync(create ? "/config/sec_db.htm" : url, cancellationToken).ConfigureAwait(false);
+        FormPage page = await _client.GetFormAsync(create ? "/config/sec_db.htm" : UserPage(name), cancellationToken).ConfigureAwait(false);
         Dictionary<string, string> mutations = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
             ["rlAAALocalUserName$query"] = name,
@@ -95,9 +94,7 @@ public sealed class UserRepository
             throw new SwitchException("Refusing to delete the user that is logged in (" + sessionUser + ").");
         }
 
-        FormPage page = await _client.GetFormAsync(
-            "/config/sec_db.htm?Query:rlAAALocalUserName=" + Uri.EscapeDataString(name),
-            cancellationToken).ConfigureAwait(false);
+        FormPage page = await _client.GetFormAsync(UserPage(name), cancellationToken).ConfigureAwait(false);
         ChangePlan plan = new ChangePlan();
         plan.Add(FormChange.Post(
             _client,
@@ -111,6 +108,24 @@ public sealed class UserRepository
             destructive: false));
         return plan;
     }
+
+    private static string UserPage(string name)
+    {
+        return "/config/sec_db.htm?Query:rlAAALocalUserName=" + Uri.EscapeDataString(name);
+    }
+}
+
+/// <summary>Create, update, or delete one RADIUS server row.</summary>
+public enum RadiusRowAction
+{
+    /// <summary>Post the <c>$add</c> fields with create-and-go status.</summary>
+    Create,
+
+    /// <summary>Post the <c>$query</c> fields with active status.</summary>
+    Update,
+
+    /// <summary>Post the <c>$query</c> fields with destroy status.</summary>
+    Delete
 }
 
 /// <summary>RADIUS server rows.</summary>
@@ -137,15 +152,24 @@ public sealed class RadiusRepository
         int? authPort,
         int? timeout,
         int? retries,
-        bool delete,
+        RadiusRowAction action,
         CancellationToken cancellationToken = default)
     {
-        FormPage page = await GetAsync(cancellationToken).ConfigureAwait(false);
-        string suffix = delete ? "$query" : "$add";
+        string path = action == RadiusRowAction.Create
+            ? "/config/radius_params.htm"
+            : "/config/radius_params.htm?Query:rlRadiusServerInetAddress=" + Uri.EscapeDataString(address);
+        FormPage page = await _client.GetFormAsync(path, cancellationToken).ConfigureAwait(false);
+        string suffix = action == RadiusRowAction.Create ? "$add" : "$query";
+        string status = action switch
+        {
+            RadiusRowAction.Delete => "6",
+            RadiusRowAction.Create => "4",
+            _ => "1"
+        };
         Dictionary<string, string> mutations = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
             ["rlRadiusServerInetAddress" + suffix] = address,
-            ["rlRadiusServerInetRowStatus" + suffix] = delete ? "6" : "4"
+            ["rlRadiusServerInetStatus" + suffix] = status
         };
         if (key != null)
         {
@@ -154,7 +178,7 @@ public sealed class RadiusRepository
 
         if (authPort.HasValue)
         {
-            mutations["rlRadiusServerInetAuthPort" + suffix] = MibValues.Number(authPort.Value);
+            mutations["rlRadiusServerInetAuthPortNumber" + suffix] = MibValues.Number(authPort.Value);
         }
 
         if (timeout.HasValue)
@@ -167,13 +191,19 @@ public sealed class RadiusRepository
             mutations["showRetries"] = MibValues.Number(retries.Value);
         }
 
+        string verb = action switch
+        {
+            RadiusRowAction.Delete => "Delete",
+            RadiusRowAction.Create => "Add",
+            _ => "Update"
+        };
         ChangePlan plan = new ChangePlan();
         plan.Add(FormChange.Post(
             _client,
-            (delete ? "Delete" : "Set") + " RADIUS server " + address,
+            verb + " RADIUS server " + address,
             page,
             mutations,
-            destructive: delete));
+            destructive: action == RadiusRowAction.Delete));
         return plan;
     }
 }

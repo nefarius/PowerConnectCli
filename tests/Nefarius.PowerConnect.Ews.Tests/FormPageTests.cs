@@ -50,6 +50,16 @@ public sealed class FormPageTests
     }
 
     [Fact]
+    public void SurroundingSpacesSurviveAndNonBreakingSpacesBecomeSpaces()
+    {
+        const string html = "<form><input name=\"note$query\" value=\"  keep&nbsp;me  \"></form>";
+        FormPage page = FormPage.Parse(html);
+
+        Assert.Equal("  keep me  ", page.Query("note"));
+        Assert.Contains(page.BuildSubmission(null), pair => pair.Key == "note$query" && pair.Value == "  keep me  ");
+    }
+
+    [Fact]
     public void EnabledTextareaUsesItsContent()
     {
         const string html = "<form><textarea name=\"note$query\">line one</textarea><textarea name=\"locked$query\" disabled value=\"hidden\">body</textarea></form>";

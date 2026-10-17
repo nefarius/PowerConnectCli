@@ -7,7 +7,10 @@ using Nefarius.PowerConnect.Ews.Changes;
 using Nefarius.PowerConnect.Ews.Ews;
 using Nefarius.PowerConnect.Ews.Ports;
 using Nefarius.PowerConnect.Ews.Qos;
+using Nefarius.PowerConnect.Ews.Security;
 using Nefarius.PowerConnect.Ews.Snapshot;
+
+using Spectre.Console;
 
 RootCommand root = new("pc28xx drives a Dell PowerConnect 28xx web UI. Writes are shown and applied only after confirmation.");
 CliHost.AddGlobals(root);
@@ -383,7 +386,7 @@ Bind(Add(diag, "transceiver", "Show transceiver diagnostics"), async (device, se
 
 Command users = Add(root, "users", "Local users");
 Argument<string> userNameArg = new("name") { Description = "User name" };
-Option<string?> userPassword = new("--user-password") { Description = "User password" };
+Option<bool> userPassword = new("--user-password") { Description = "Read the new password from a hidden prompt, or from stdin when input is not a terminal" };
 Option<int?> level = new("--level") { Description = "Privilege level" };
 Bind(Add(users, "list", "List users"), async (device, session, token) =>
 {
@@ -391,9 +394,9 @@ Bind(Add(users, "list", "List users"), async (device, session, token) =>
     return 0;
 });
 BindParse(Add(users, "add", "Add a user", userNameArg, userPassword, level), async (device, session, token, parse) =>
-    await Apply(device, session, await device.Users.PlanUpsertAsync(parse.GetValue(userNameArg)!, parse.GetValue(userPassword), parse.GetValue(level), true, token).ConfigureAwait(false)).ConfigureAwait(false));
+    await Apply(device, session, await device.Users.PlanUpsertAsync(parse.GetValue(userNameArg)!, ReadUserPassword(parse.GetValue(userPassword)), parse.GetValue(level), true, token).ConfigureAwait(false)).ConfigureAwait(false));
 BindParse(Add(users, "set", "Update a user", userNameArg, userPassword, level), async (device, session, token, parse) =>
-    await Apply(device, session, await device.Users.PlanUpsertAsync(parse.GetValue(userNameArg)!, parse.GetValue(userPassword), parse.GetValue(level), false, token).ConfigureAwait(false)).ConfigureAwait(false));
+    await Apply(device, session, await device.Users.PlanUpsertAsync(parse.GetValue(userNameArg)!, ReadUserPassword(parse.GetValue(userPassword)), parse.GetValue(level), false, token).ConfigureAwait(false)).ConfigureAwait(false));
 BindParse(Add(users, "delete", "Delete a user", userNameArg), async (device, session, token, parse) =>
     await Apply(device, session, await device.Users.PlanDeleteAsync(parse.GetValue(userNameArg)!, device.SessionUser, token).ConfigureAwait(false)).ConfigureAwait(false));
 
@@ -409,11 +412,11 @@ Bind(Add(radius, "list", "List RADIUS settings"), async (device, session, token)
     return 0;
 });
 BindParse(Add(radius, "add", "Add a RADIUS server", radiusAddress, radiusKey, authPort, radiusTimeout, retries), (device, session, token, parse) =>
-    RadiusPlan(device, session, token, parse, false));
+    RadiusPlan(device, session, token, parse, RadiusRowAction.Create));
 BindParse(Add(radius, "set", "Update a RADIUS server", radiusAddress, radiusKey, authPort, radiusTimeout, retries), (device, session, token, parse) =>
-    RadiusPlan(device, session, token, parse, false));
+    RadiusPlan(device, session, token, parse, RadiusRowAction.Update));
 BindParse(Add(radius, "delete", "Delete a RADIUS server", radiusAddress), (device, session, token, parse) =>
-    RadiusPlan(device, session, token, parse, true));
+    RadiusPlan(device, session, token, parse, RadiusRowAction.Delete));
 
 Command snmp = Add(root, "snmp", "SNMP");
 Option<string?> authTraps = new("--auth-traps") { Description = "on or off" };
@@ -716,7 +719,7 @@ static Dictionary<string, string> Fields(FormPage page)
             continue;
         }
 
-        if (field.Name.Contains("password", StringComparison.OrdinalIgnoreCase))
+        if (ConfigSnapshot.IsSensitive(field.Name))
         {
             values[field.Name] = "***";
             continue;
@@ -733,7 +736,32 @@ static Task<int> Apply(SwitchDevice device, CliSession session, ChangePlan plan)
     return CliHost.Apply(device, session, plan);
 }
 
-async Task<int> RadiusPlan(SwitchDevice device, CliSession session, CancellationToken token, ParseResult parse, bool delete)
+static string? ReadUserPassword(bool requested)
+{
+    if (!requested)
+    {
+        return null;
+    }
+
+    string password;
+    if (AnsiConsole.Profile.Capabilities.Interactive && !Console.IsInputRedirected)
+    {
+        password = AnsiConsole.Prompt(new TextPrompt<string>("User password:").Secret());
+    }
+    else
+    {
+        password = Console.ReadLine() ?? "";
+    }
+
+    if (password.Length == 0)
+    {
+        throw new FormatException("User password was not provided.");
+    }
+
+    return password;
+}
+
+async Task<int> RadiusPlan(SwitchDevice device, CliSession session, CancellationToken token, ParseResult parse, RadiusRowAction action)
 {
     return await Apply(device, session, await device.Radius.PlanAsync(
         parse.GetValue(radiusAddress)!,
@@ -741,7 +769,7 @@ async Task<int> RadiusPlan(SwitchDevice device, CliSession session, Cancellation
         parse.GetValue(authPort),
         parse.GetValue(radiusTimeout),
         parse.GetValue(retries),
-        delete,
+        action,
         token).ConfigureAwait(false)).ConfigureAwait(false);
 }
 

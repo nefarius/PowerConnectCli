@@ -156,7 +156,8 @@ public sealed class ConfigSnapshot
         return true;
     }
 
-    private static bool IsSensitive(string name)
+    /// <summary>True for password, RADIUS key, and SNMP community field names.</summary>
+    public static bool IsSensitive(string name)
     {
         return name.Contains("password", StringComparison.OrdinalIgnoreCase) ||
                name.Contains("CommunityString", StringComparison.OrdinalIgnoreCase) ||
