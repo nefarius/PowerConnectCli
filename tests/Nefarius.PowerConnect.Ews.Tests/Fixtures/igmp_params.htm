@@ -1,0 +1,125 @@
+
+
+<html>
+
+<head>
+<script>
+if (top.DeviceType && top.DeviceType == 1)
+{
+document.write("<title>Multicast Global Parameters</title>");
+}
+else
+{
+document.write("<title>Multicast Global Parameters</title>");
+}
+</script>
+
+
+<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
+<!--
+if(top.location==self.location )
+{
+var refStr=self.location + " ";
+var ind=0;
+refStr.toLowerCase();
+ind=refStr.indexOf("config");
+var locationStr=refStr.substring(0,ind);
+if (opener)
+{
+if (opener.opener)
+{
+if(opener.opener.top.location==opener.opener.location)
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+else
+{
+if(opener.top.location==opener.location)
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+}
+else
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+//-->
+</SCRIPT>
+
+
+<script src="../js/globalFunctions.js"></script>
+<link rel="stylesheet" href="../device/style.css" type="text/css">
+<script language="JavaScript">
+<!-- Beginng of JavaScript Applet
+if(top.MonitorMode) {
+document.write("<link rel='stylesheet' href='../device/monitorMode.css' type='text/css'>")
+}
+function formSubmit(){
+document.IgmpParamsForm.submit();
+}
+// --End of Java code -->
+</script>
+</head>
+<body bgcolor="#FFFFFF" leftmargin="15" onload="setScreenMonitorState();">
+<script language="JavaScript">top.Draw_Header(document.title);</script>
+
+<FORM METHOD='POST' name="IgmpParamsForm"  ACTION="/config/igmp_params.htm"   >
+<INPUT  Type="HIDDEN" Name="restoreUrl" SIZE=256   value="">
+
+<table id="igmp_params__tbl" border="0" cellspacing="0" cellpadding="0" width="100%">
+<script language="JavaScript">
+top.Draw_TableTop(2);top.Draw_TableHeader();
+</script>
+<tr>
+<td nowrap style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd" width="50%">Bridge Multicast Filtering</td>
+<td nowrap class="data-area-canvas-odd">
+
+<SELECT  NAME=rlMacMulticastEnable SIZE=1
+ >
+
+<OPTION value=1> Enable
+
+<OPTION value=2 selected> Disable
+
+</select>
+
+
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas">IGMP Snooping Status</td>
+<td nowrap class="data-area-canvas">
+
+<SELECT  NAME=rlIgmpSnoopEnable SIZE=1
+ >
+
+<OPTION value=1> Enable
+
+<OPTION value=2 selected> Disable
+
+</select>
+
+
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<script language="JavaScript">top.Draw_TableBottom(2)</script>
+</table><br>
+<div class="management-only">
+<script language="JavaScript">top.Draw_ButtonApply("formSubmit")</script>
+</div>
+
+</form>
+</body>
+</html>

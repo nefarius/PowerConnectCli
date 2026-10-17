@@ -1,0 +1,669 @@
+
+
+<html>
+<head>
+
+<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
+<!--
+if(top.location==self.location )
+{
+var refStr=self.location + " ";
+var ind=0;
+refStr.toLowerCase();
+ind=refStr.indexOf("config");
+var locationStr=refStr.substring(0,ind);
+if (opener)
+{
+if (opener.opener)
+{
+if(opener.opener.top.location==opener.opener.location)
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+else
+{
+if(opener.top.location==opener.location)
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+}
+else
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+//-->
+</SCRIPT>
+
+<title>RADIUS Settings</title>
+<link rel="stylesheet" href="../device/style.css" type="text/css">
+<script src="../js/globalFunctions.js"></script>
+<script language="JavaScript">
+<!-- Beginng of JavaScript Applet
+var defAuthPortNo = "";
+if(top.MonitorMode) {
+document.write("<link rel='stylesheet' href='../device/monitorMode.css' type='text/css'>")
+}
+function selectQueryIndex() {
+var addressValue;
+var selectList;
+selectList = document.getElementById("idAddressSelect");
+addressValue = selectList.value;
+var i=1;
+while (formele["rlRadiusServerInetAddress$repeat?"+i]!=null) {
+if (formele["rlRadiusServerInetAddress$repeat?"+i].value == addressValue) {
+break;
+} else {
+i++;
+}
+}
+var newFilter = "radius_params.htm?Query:rlRadiusServerInetAddress=";
+newFilter += addressValue;
+newFilter += "@rlRadiusServerInetAuthPortNumber="
+newFilter += formele["rlRadiusServerInetAuthPortNumber$repeat?"+i].value;
+newFilter += "@rlRadiusServerInetAcctPortNumber="
+newFilter += formele["rlRadiusServerInetAcctPortNumber$repeat?"+i].defaultValue;
+document.location.href = newFilter;
+}
+function fillIpAddressList() {
+var ipAddressesList = document.getElementById("ipAddressesList");
+var AddressSelect = document.getElementById("idAddressSelect");
+var i;
+var opt;
+for(i=0; i<ipAddressesList.options.length; i++) {
+opt = new Option();
+opt.text = opt.value = ipAddressesList.options[i].text;
+AddressSelect.options[i] = opt;
+if (formele["rlRadiusServerInetAddress$query"].value == opt.text) {
+AddressSelect.options[i].selected = true;
+}
+}
+}
+function initializeForm() {
+var ipList = document.getElementById("ipAddressesList");
+if (ipList.options.length == 0) {
+disableControls("singleEntryControls");
+}
+}
+function flipDefault ( checkboxID, textID, defaultID ) {
+var box = document.getElementById(checkboxID);
+var text = document.getElementById(textID);
+if ( box.checked ) {
+disableTextControl(text);
+}
+else {
+if(text.value == "") {
+text.value = document.getElementById(defaultID).value;
+}
+enableTextControl(text);
+}
+}
+function enableTextControl(control) {
+switch (control.type) {
+case "text":
+case "file":
+control.style.backgroundColor = "#FFF";
+break;
+}
+control.disabled = false;
+}
+function disableTextControl(control) {
+switch (control.type) {
+case "text":
+case "file":
+control.style.backgroundColor = "#CCC";
+break;
+}
+control.disabled = true;
+}
+function disableControls(containerId) {
+var container = document.getElementById(containerId);
+var fieldTypes = ["input", "select", "textarea", "button"];
+if (container == null) {
+throw new Error("There is no element with id: " + containerId);
+} else {
+var fields;
+var i;
+for (var j = 0; j < fieldTypes.length; ++j) {
+fields = container.getElementsByTagName(fieldTypes[j]);
+i = fields.length;
+while (i-- > 0) {
+disableTextControl(fields[i]);
+}
+}
+}
+}
+function enableControls(containerId) {
+var container = document.getElementById(containerId);
+var fieldTypes = ["input", "select", "textarea", "button"];
+if (container == null) {
+throw new Error("There is no element with id: " + containerId);
+} else {
+var fields;
+var i;
+for (var j = 0; j < fieldTypes.length; ++j) {
+fields = container.getElementsByTagName(fieldTypes[j]);
+i = fields.length;
+while (i-- > 0) {
+enableTextControl(fields[i]);
+}
+}
+}
+}
+function validateInt( control , min, max, destControl) {
+var value = parseInt(control.value);
+if ( control.value != ""){
+if ( !checkInteger( control.value ) ){
+alert("'"+control.value+"' is not integer value");
+control.focus();
+return false;
+} else {
+if (value < min || value > max) {
+alert("'"+control.value+"' must lay inside range [" + min + "," + max + "]");
+control.focus();
+return false;
+}
+}
+}
+else{
+alert("Blank value is not allowed");
+control.focus();
+return false;
+}
+destControl.value = value;
+return true;
+}
+function validateIP( control, destControl){
+if ( control.value != ""){
+if ( !checkIpAddress(control.value, false) ){
+alert("'"+control.value+"' is not valid IP address");
+control.focus();
+return false;
+}
+}
+else{
+alert("Blank value is not allowed");
+control.focus();
+return false;
+}
+destControl.value = control.value;
+return true;
+}
+function initEntryValue(entryValue, defaultValue, checkBoxId, textFieldId) {
+var checkBox = document.getElementById(checkBoxId);
+var textField = document.getElementById(textFieldId);
+if (entryValue == defaultValue) {
+checkBox.checked = true;
+disableTextControl(textField);
+} else {
+checkBox.checked = false;
+enableTextControl(textField);
+textField.value = entryValue;
+}
+}
+function setValues(suffix) {
+var ipList = document.getElementById("ipAddressesList");
+if (ipList.options.length != 0) {
+var textControls = ["serverPriorityText","serverAuthPortNumberText","numberOfRetriesText","timeoutText","deadTimeText"];
+var textServerControls = ["rlRadiusServerInetPriority","rlRadiusServerInetAuthPortNumber","rlRadiusServerInetRetries","rlRadiusServerInetTimeout","rlRadiusServerInetDeadtime"];
+var ranges = [Array(0,65535),Array(0,65535),Array(1,10),Array(1,30),Array(0,2000)];
+var textDefaultValues = ["", "", "0", "0", "2001"];
+var textDefaultChecked = [false,false,document.getElementById("defaultRetriesNumberCheck").checked, document.getElementById("defaultTimeoutCheck").checked,document.getElementById("defaultDeadTimeCheck").checked];
+var elem;
+var ctrl;
+for (var i=0; i<5; i++) {
+elem = document.getElementById(textControls[i]);
+ctrl = formele[textServerControls[i] + suffix];
+if(textDefaultChecked[i]) {
+ctrl.value = textDefaultValues[i];
+} else {
+if(!validateInt(elem, ranges[i][0], ranges[i][1], ctrl)) {
+return false;
+}
+}
+}
+ctrl = formele["rlRadiusServerInetKey" + suffix];
+if(document.getElementById("defaultKeyStringCheck").checked) {
+formele["rlRadiusServerInetUseGlobalDefaultKey" + suffix].value = "1";
+} else {
+ctrl.value = document.getElementById("keyStringText").value;
+formele["rlRadiusServerInetUseGlobalDefaultKey" + suffix].value = "2";
+}
+ctrl = formele["rlRadiusServerInetSource" + suffix];
+if(document.getElementById("defaultSourceIpCheck").checked) {
+ctrl.value = "255.255.255.255";
+} else {
+elem = document.getElementById("sourceIpAddressText");
+if(!validateIP(elem, ctrl)) {
+return false;
+}
+}
+}
+elem = document.getElementById("defaultTimeoutText");
+ctrl = formele["rlRadiusGlobalDefaultTimeout"];
+if(!validateInt(elem, 1, 30, ctrl)) {
+return false;
+}
+elem = document.getElementById("defaultRetriesText");
+ctrl = formele["rlRadiusGlobalDefaultRetries"];
+if(!validateInt(elem, 1, 10, ctrl)) {
+return false;
+}
+elem = document.getElementById("defaultDeadTimeText");
+ctrl = formele["rlRadiusGlobalDefaultDeadtime"];
+if(!validateInt(elem, 0, 2000, ctrl)) {
+return false;
+}
+formele["rlRadiusGlobalDefaultKey"].value = document.getElementById("defaultKeyText").value;
+elem = document.getElementById("defaultSourceIpText");
+ctrl = formele["rlRadiusGlobalDefaultSource"];
+if(!validateIP(elem, ctrl)) {
+return false;
+}
+return true;
+}
+function formSubmit() {
+var suffix;
+var ipList = document.getElementById("ipAddressesList");
+if (ipList.options.length != 0) {
+if (defAuthPortNo != document.getElementById("serverAuthPortNumberText").value) {
+suffix="$add";
+enableControls("addControls");
+enableControls("queryKeyControls");
+formele["rlRadiusServerInetStatus$query"].value = "6";
+} else {
+suffix="$query";
+enableControls("queryControls");
+}
+} else {
+suffix="$query";
+}
+if (!setValues(suffix)) {
+return;
+}
+enableControls("vtControls");
+enableControls("scalarControls");
+document.radiusParamForm.submit();
+}
+function pageRefresh()
+{
+document.location.href = "../config/radius_params.htm";
+}
+function updatePattern()
+{
+var addressSelect=document.getElementById("idAddressSelect");
+if(isIPv4(addressSelect.options[addressSelect.selectedIndex].text))
+document.getElementById("patternHolder").innerHTML="&nbsp(X.X.X.X)"
+else
+document.getElementById("patternHolder").innerHTML="&nbsp(X:X:X:X::X)"
+}
+function isIPv4(str)
+{
+if(str.split(".").length==4)
+return true;
+else
+return false;
+}
+function writeSourceIPAddress()
+{
+if(formele["rlRadiusServerInetSource$query"].value=="255.255.255.255")
+document.write("Default")
+else
+document.write(formele["rlRadiusServerInetSource$query"].value);
+}
+// --End of Java code -->
+</script>
+</head>
+<body bgcolor="#FFFFFF" leftmargin="15" onload="initializeForm();setScreenMonitorState();">
+<FORM METHOD='POST' id="serverControls" name="radiusParamForm"  ACTION="/config/radius_params.htm"   >
+<div id="vtControls">
+<INPUT  Type="HIDDEN" Name="restoreUrl" SIZE=256   value="">
+<INPUT  TYPE="HIDDEN" NAME="errorCollector"   value="" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=editRadiusVT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rlRadiusServerInetTable$VT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rlRadiusServerInetAddress$VT SIZE=128   value="Type=13;Access=2;NumOfEnumerations=0">
+<INPUT  Type=HIDDEN Name=rlRadiusServerInetAuthPortNumber$VT SIZE=128   value="Type=0;Access=2;NumOfEnumerations=0;Range0=[0,65535]">
+<INPUT  Type=HIDDEN Name=rlRadiusServerInetAcctPortNumber$VT SIZE=128   value="Type=0;Access=2;NumOfEnumerations=0;Range0=[0,65535]">
+<INPUT  Type=HIDDEN Name=rlRadiusServerInetTimeout$VT SIZE=128   value="Type=0;Access=2;NumOfEnumerations=0;Range0=[0,30];Default value=0">
+<INPUT  Type=HIDDEN Name=rlRadiusServerInetRetries$VT SIZE=128   value="Type=0;Access=2;NumOfEnumerations=0;Range0=[0,10];Default value=0">
+<INPUT  Type=HIDDEN Name=rlRadiusServerInetDeadtime$VT SIZE=128   value="Type=0;Access=2;NumOfEnumerations=0;Range0=[0,2001];Default value=2001">
+<INPUT  Type=HIDDEN Name=rlRadiusServerInetUseGlobalDefaultKey$VT SIZE=128   value="Type=0;Access=2;NumOfEnumerations=2;Range0=[1,2];Default value=1">
+<INPUT  Type=HIDDEN Name=rlRadiusServerInetKey$VT SIZE=130   value="Type=100;Access=2;NumOfEnumerations=0;Range0=[0,128];Default value=">
+<INPUT  Type=HIDDEN Name=rlRadiusServerInetSource$VT SIZE=128   value="Type=13;Access=2;NumOfEnumerations=0;Default value=255.255.255.255">
+<INPUT  Type=HIDDEN Name=rlRadiusServerInetPriority$VT SIZE=128   value="Type=0;Access=2;NumOfEnumerations=0;Range0=[0,65535];Default value=0">
+<INPUT  Type=HIDDEN Name=rlRadiusServerInetStatus$VT SIZE=128   value="Type=0;Access=2;NumOfEnumerations=6;Range0=[1,6];Default value=4">
+<INPUT  Type=HIDDEN Name=editRadiusVT$endVT   value="OK" SIZE="20" MAXLENGTH="20">
+</div>
+
+<div id="queryControls">
+<INPUT  type=hidden Name=editRadiusVT$query   value=" " SIZE="20" MAXLENGTH="20">
+<div id="queryKeyControls">
+<INPUT  TYPE="hidden" NAME=rlRadiusServerInetAddress$query   value=" " SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE="hidden" NAME=rlRadiusServerInetAcctPortNumber$query   value=" " SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE="hidden" NAME=rlRadiusServerInetAuthPortNumber$query   value=" " SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=rlRadiusServerInetStatus$query   value=" " SIZE="20" MAXLENGTH="20">
+</div>
+<INPUT  TYPE="hidden" NAME=rlRadiusServerInetUseGlobalDefaultKey$query   value=" " SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE="hidden" NAME=rlRadiusServerInetPriority$query   value=" " SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE="hidden" NAME=rlRadiusServerInetRetries$query   value=" " SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=rlRadiusServerInetTimeout$query   value=" " SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=rlRadiusServerInetDeadtime$query   value=" " SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=rlRadiusServerInetKey$query   value=" " SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=rlRadiusServerInetSource$query   value=" " SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=editRadiusVT$endQuery   value="OK" SIZE="20" MAXLENGTH="20">
+</div>
+<div id="addControls">
+<INPUT  TYPE=HIDDEN NAME=rlRadiusServerInetAddress$add    value="" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlRadiusServerInetAuthPortNumber$add    value="0" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlRadiusServerInetAcctPortNumber$add    value="0" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlRadiusServerInetRetries$add    value="0" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlRadiusServerInetTimeout$add    value="0" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=rlRadiusServerInetDeadtime$add    value="0" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlRadiusServerInetKey$add    value="" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE="hidden" NAME=rlRadiusServerInetUseGlobalDefaultKey$add   value="0" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlRadiusServerInetSource$add    value="" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlRadiusServerInetPriority$add    value="0" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlRadiusServerInetStatus$add  disabled   value="0" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=editRadiusVT$endAdd  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+</div>
+<div id="scalarControls">
+<INPUT  TYPE="hidden" NAME="rlRadiusGlobalDefaultTimeout"   value="3" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE="hidden" NAME="rlRadiusGlobalDefaultRetries"   value="3" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE="hidden" NAME="rlRadiusGlobalDefaultDeadtime"   value="0" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE="hidden" NAME="rlRadiusGlobalDefaultKey"   value="" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE="hidden" NAME="rlRadiusGlobalDefaultSource"   value="0.0.0.0" SIZE="20" MAXLENGTH="20">
+<SELECT  id="ipAddressesList" Name=rlRadiusServerInetAddress$select size="1" style="display:none"
+ RpGetType=complex >
+</select>
+
+</div>
+</form>
+<script language="JavaScript">
+disableControls("serverControls");
+var formele = document.radiusParamForm.elements;
+top.radiusMenuIndex=1;
+</script>
+<script language="JavaScript">top.Draw_Header(document.title);</script>
+<div align="right">
+<table cellspacing="0" cellpadding="0" border="0">
+<tr>
+<div class="management-only" id="addButtonDiv">
+<td class="management-only" style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/lbutton.gif"></td>
+<td valign="middle" align="center" class="data-area-button-management-only">
+<a href="javascript:void(0)" class="management-only" onclick="javascript:window.open('new_radius_server.htm','', 'width=850, height=600, left=50, top=50, scrollbars=yes, resizable=yes');"
+title='Add a RADIUS Server'>&nbsp;&nbsp;Add&nbsp;&nbsp;</a>
+</td>
+<td class="management-only" style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/rbutton.gif"></td>
+</div>
+<td style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/lbutton.gif"></td>
+<td valign="middle" align="center" class="data-area-button">
+<a href="javascript:void(0)" onclick="javascript:window.open('radius_host.htm','', 'width=850, height=600, left=50, top=50, scrollbars=yes, resizable=yes');"
+title='Show RADIUS Servers List'>Show All</a>
+</td>
+<td style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/rbutton.gif"></td>
+<td style="width: 14px; height: 25px"></td>
+</tr>
+</table>
+</div>
+<br>
+<table id="singleEntryControls" border="0" cellspacing="0" cellpadding="0" width="100%">
+<script language="JavaScript">
+top.Draw_TableTop(3);
+</script>
+<tr>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas" width="35%"></td>
+<td class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td style="height: 1px; width: 10px" class="data-area-canvas"></td>
+<td colspan="3" style="height: 1px" class="data-area-separator"></td>
+<td style="height: 1px" class="data-area-canvas"></td>
+<td style="height: 1px; width: 5px"></td>
+</tr>
+<tr>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas-odd" width="35%">IP Address</td>
+<td class="data-area-canvas-odd" valign="top">
+<select id="idAddressSelect" onChange="selectQueryIndex()" class="monitorEnabled">
+<option></option>
+</select>
+<script type="text/javascript">
+fillIpAddressList();
+</script>
+</td>
+<td class="data-area-canvas-odd">&nbsp;</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas">Priority&nbsp;(0-65535)</td>
+<td class="data-area-canvas" valign="top">
+<input type="text" id="serverPriorityText" size="25">
+<script type="text/javascript">
+document.getElementById("serverPriorityText").value = formele["rlRadiusServerInetPriority$query"].value;
+</script>
+</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas-odd">Authentication Port&nbsp;(0-65535)</td>
+<td class="data-area-canvas-odd" valign="top">
+<input type="text" id="serverAuthPortNumberText" size="25">
+<script type="text/javascript">
+defAuthPortNo = formele["rlRadiusServerInetAuthPortNumber$query"].value;
+document.getElementById("serverAuthPortNumberText").value = defAuthPortNo;
+</script>
+</td>
+<td class="data-area-canvas-odd">&nbsp;</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas">Number of Retries&nbsp;(1-10)</td>
+<td class="data-area-canvas" valign="top">
+<input type="text" id="numberOfRetriesText" name="showRetries" size="25">
+</td>
+<td class="data-area-canvas">
+<input type="checkbox" id="defaultRetriesNumberCheck" name="retriescb" onclick="flipDefault('defaultRetriesNumberCheck', 'numberOfRetriesText', 'defaultRetriesText')">Use Default
+</td>
+<script type="text/javascript">
+var retriesValue = formele["rlRadiusServerInetRetries$query"].value;
+initEntryValue(retriesValue, "0", "defaultRetriesNumberCheck", "numberOfRetriesText");
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas-odd">Timeout for Reply&nbsp;(1-30)</td>
+<td class="data-area-canvas-odd" valign="top">
+<input type="text" id="timeoutText" name="showTimeout" size="25">&nbsp;(Sec)
+</td>
+<td class="data-area-canvas-odd">
+<input type="checkbox" id="defaultTimeoutCheck" name="timeoutcb" onclick="flipDefault('defaultTimeoutCheck', 'timeoutText', 'defaultTimeoutText')">Use Default
+</td>
+<script type="text/javascript">
+var timeoutValue = formele["rlRadiusServerInetTimeout$query"].value;
+initEntryValue(timeoutValue, "0", "defaultTimeoutCheck", "timeoutText");
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas">Dead Time&nbsp;(0-2000)</td>
+<td class="data-area-canvas" valign="top">
+<input type="text" id="deadTimeText" name="showDeadtime" size="25">&nbsp;(Min)
+</td>
+<td class="data-area-canvas">
+<input type="checkbox" id="defaultDeadTimeCheck" name="deadtimecb" onclick="flipDefault('defaultDeadTimeCheck', 'deadTimeText', 'defaultDeadTimeText')">Use Default
+</td>
+<script type="text/javascript">
+var deadTimeValue = formele["rlRadiusServerInetDeadtime$query"].value;
+initEntryValue(deadTimeValue, "2001", "defaultDeadTimeCheck", "deadTimeText");
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas-odd">Key String&nbsp;(0-128 Characters)</td>
+<td class="data-area-canvas-odd" valign="top">
+<nobr><input type="text" id="keyStringText" name="showKeyString" size="25" maxlength="128">&nbsp;(Alpha Numeric)</nobr>
+</td>
+<td class="data-area-canvas-odd">
+<input type="checkbox" id="defaultKeyStringCheck" name="keystringcb" onclick="flipDefault('defaultKeyStringCheck', 'keyStringText', 'defaultKeyText')">Use Default
+</td>
+<script type="text/javascript">
+var useDefault = (formele["rlRadiusServerInetUseGlobalDefaultKey$query"].value == "1");
+document.getElementById("defaultKeyStringCheck").checked = useDefault;
+if (useDefault) {
+disableTextControl(document.getElementById("keyStringText"));
+} else {
+document.getElementById("keyStringText").value = formele["rlRadiusServerInetKey$query"].value;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas">Source IP Address</td>
+<td class="data-area-canvas" valign="top">
+<input type="text" id="sourceIpAddressText" name="showIP" size="25" maxlength="128"><span id="patternHolder">&nbsp;(X.X.X.X)</span>
+</td>
+<td class="data-area-canvas" width="25%">
+<input type="checkbox" id="defaultSourceIpCheck" name="sourceipcb" onclick="flipDefault('defaultSourceIpCheck', 'sourceIpAddressText', 'defaultSourceIpText')">Use default
+</td>
+<script type="text/javascript">
+var sourceIpValue = formele["rlRadiusServerInetSource$query"].value;
+initEntryValue(sourceIpValue, "255.255.255.255", "defaultSourceIpCheck", "sourceIpAddressText");
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<script type="text/javascript">
+top.Draw_TableBottom(3)
+</script>
+</table>
+<br>
+<table border="0" cellspacing="0" cellpadding="0" width="100%">
+<script language="JavaScript">
+top.Draw_TableTop(2);
+</script>
+<tr>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas" width="35%"><b>Default Parameters</b></td>
+<td class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td style="height: 1px; width: 10px" class="data-area-canvas"></td>
+<td colspan="2" style="height: 1px" class="data-area-separator"></td>
+<td style="height: 1px" class="data-area-canvas"></td>
+<td style="height: 1px; width: 5px"></td>
+</tr>
+<tr>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas-odd">Default Retries&nbsp;(1-10)</td>
+<td class="data-area-canvas-odd">
+<input type="text" id="defaultRetriesText" size="25" maxlength="255">
+<script type="text/javascript">
+document.getElementById("defaultRetriesText").value = formele["rlRadiusGlobalDefaultRetries"].value;
+</script>
+</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas">Default Timeout for Reply&nbsp;(1-30)</td>
+<td class="data-area-canvas">
+<input type="text" id="defaultTimeoutText" size="25" maxlength="255"> (Sec)
+<script type="text/javascript">
+document.getElementById("defaultTimeoutText").value = formele["rlRadiusGlobalDefaultTimeout"].value;
+</script>
+</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas-odd">Default Dead Time&nbsp;(0-2000)</td>
+<td class="data-area-canvas-odd">
+<input type="text" id="defaultDeadTimeText" size="25" maxlength="255"> (Min)
+<script type="text/javascript">
+document.getElementById("defaultDeadTimeText").value = formele["rlRadiusGlobalDefaultDeadtime"].value;
+</script>
+</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas">Default Key String&nbsp;(0-128 Characters)</td>
+<td class="data-area-canvas">
+<input type="text" id="defaultKeyText" size="25" maxlength="128">
+<script type="text/javascript">
+document.getElementById("defaultKeyText").value = formele["rlRadiusGlobalDefaultKey"].value;
+</script>
+</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas-odd">Source IP Address</td>
+<td class="data-area-canvas-odd">
+<input type="text" id="defaultSourceIpText" size="25"> (X.X.X.X)
+<script type="text/javascript">
+document.getElementById("defaultSourceIpText").value = formele["rlRadiusGlobalDefaultSource"].value;
+</script>
+</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<script type="text/javascript">
+top.Draw_TableBottom(2);
+</script>
+</table>
+<br>
+<div class="management-only">
+
+<div align="center"><table id="apply_tbl" cellspacing="0" cellpadding="0" border="0"><tr>
+<td nowrap nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/lbutton.gif"></td>
+<td nowrap nowrap valign="middle" align="center" class="data-area-button"><a href="javascript:preSubmit();">Apply Changes</a></td>
+<td nowrap nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/rbutton.gif"></td>
+</tr></table></div><br>
+<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
+<!--
+if(document.forms[0] && document.forms[0].elements.length<=1000)
+{
+for(i=0;(document.forms[0] && i<document.forms[0].elements.length);i++)
+{
+if(document.forms[0] && document.forms[0].elements[i].type=="select-one")
+if(document.forms[0] && document.forms[0].elements[i].length==0)
+document.forms[0].elements[i].style.width="70px";
+}
+}
+//-->
+</SCRIPT>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,327 @@
+
+
+<html>
+
+<head>
+<title>Management Security - Local User Database</title>
+
+
+<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
+<!--
+if(top.location==self.location )
+{
+var refStr=self.location + " ";
+var ind=0;
+refStr.toLowerCase();
+ind=refStr.indexOf("config");
+var locationStr=refStr.substring(0,ind);
+if (opener)
+{
+if (opener.opener)
+{
+if(opener.opener.top.location==opener.opener.location)
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+else
+{
+if(opener.top.location==opener.location)
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+}
+else
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+//-->
+</SCRIPT>
+
+
+<link rel="stylesheet" href="../device/style.css" type="text/css">
+<script src="../js/globalFunctions.js"></script>
+<script language="JavaScript">
+<!-- Beginng of JavaScript Applet
+if(top.MonitorMode)
+{
+document.write("<link rel='stylesheet' href='../device/monitorMode.css' type='text/css'>")
+}
+var isPasswordChanged=false;
+var passwordMinVal=0;
+function formSubmit()
+{
+var formele=document.secDBForm.elements;
+if (formele["rlAAALocalUserName$select"].options.length>0)
+{
+if (formele["rlAAALocalUserPassword$text"].value==formele["rlAAALocalUserPassword$confirm"].value)
+{
+if( isPasswordChanged )
+formele["rlAAALocalUserPassword$query"].value="$"+formele["rlAAALocalUserPassword$text"].value
+else
+formele["rlAAALocalUserPassword$query"].disabled = true;
+if (formele["removeUser"].checked==true)
+{
+formele["rlAAALocalHostStatus$query"].value=6;
+}
+else
+{
+formele["rlAAALocalUserPrivilage$query"].value=formele["rlAAALocalUserPrivilage$select"].options[formele["rlAAALocalUserPrivilage$select"].selectedIndex].text;
+}
+disableHtml();
+formele["restoreUrl"].value="";
+document.secDBForm.submit();
+}
+else
+{
+alert("Password and Confirm Password must be identical!");
+return false;
+}
+}
+}
+function disableHtml()
+{
+var formele=document.secDBForm.elements;
+formele["rlAAALocalUserName$select"].disabled=true;
+formele["rlAAALocalUserPrivilage$select"].disabled=true;
+formele["rlAAALocalUserPassword$text"].disabled=true;
+formele["rlAAALocalUserPassword$confirm"].disabled=true;
+formele["removeUser"].disabled=true;
+}
+function checkPasswordValidity()
+{
+var formele=document.secDBForm.elements;
+e=window.event;
+var fldName=e.srcElement.name;
+var val=formele[fldName].value;
+if ( val=="" || val=="\t" || val==" " || val=="\n")
+{
+alert("You must supply a Password!");
+}
+else if (val.length>64)
+{
+alert ("Password must be up to 64 characters!");
+}
+else if ( (fldName.indexOf("confirm")==0) && (val!=formele["rlAAALocalUserPassword$text"].value) )
+{
+alert ("Password and Confirm Password must be identical!");
+}
+}
+function selectQuery(theName)
+{
+document.location.href="sec_db.htm?Query:rlAAALocalUserName="+adjustStringToQuery(theName);
+}
+function updateScreen()
+{
+var formele=document.secDBForm.elements;
+if (formele["rlAAALocalUserName$select"].options.length==0)
+{
+formele["rlAAALocalUserName$select"].disabled=true;
+formele["rlAAALocalUserPrivilage$select"].disabled=true;
+formele["rlAAALocalUserPassword$text"].value="";
+formele["rlAAALocalUserPassword$text"].disabled=true;
+formele["rlAAALocalUserPassword$confirm"].value="";
+formele["rlAAALocalUserPassword$confirm"].disabled=true;
+formele["removeUser"].disabled=true;
+}
+else indexSign("rlAAALocalUserName$select");
+}
+function displayPasswordRange()
+{
+document.write("Password ("+passwordMinVal+"-64 Characters)");
+}
+function checkPasswordValidation(fieldName)
+{
+checkValidation('Password','',fieldName,true,'STRING',passwordMinVal,64);
+}
+// --End of Java code -->
+</script>
+</head>
+<body bgcolor="#FFFFFF" leftmargin="15" onload="setScreenMonitorState();">
+<script language="JavaScript">top.Draw_Header(document.title);</script>
+<FORM METHOD='POST' name="secDBForm"  ACTION="/config/sec_db.htm"   >
+
+<div align="right">
+<table id="sec_db_buttons_tbl" cellspacing="0" cellpadding="0" border="0">
+<tr>
+<div class="management-only" id="addButtonDiv">
+<td nowrap style="width: 14px; height: 25px" class="management-only">
+<img style="width: 14px; height: 25px" src="../Images/lbutton.gif"></td>
+<td nowrap valign="middle" align="center" class="data-area-button-management-only">
+<a href="javascript:void(0)" onclick="javascript:window.open('add_user_name.htm','', 'width=850, height=600, left=50, top=50, scrollbars=yes, resizable=yes');"
+onMouseover="showtip(this,event,'Add User Name')" onMouseout="hidetip()">&nbsp;&nbsp;Add&nbsp;&nbsp;</a></td>
+<td nowrap class="management-only" style="width: 14px; height: 25px">
+<img style="width: 14px; height: 25px" src="../Images/rbutton.gif"></td>
+</div>
+<td nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/lbutton.gif"></td>
+<td nowrap valign="middle" align="center" class="data-area-button"><a href="javascript:void(0)" onclick="javascript:window.open('auth_table.htm','', 'width=850, height=600, left=50, top=50, scrollbars=yes, resizable=yes');"
+onMouseover="showtip(this,event,'Show Local User Table')" onMouseout="hidetip()">Show
+All</a></td>
+<td nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/rbutton.gif"></td>
+<td nowrap style="width: 14px; height: 25px"></td>
+</tr>
+</table>
+</div>
+<br>
+
+<INPUT  TYPE="HIDDEN" NAME="errorCollector"   value="" SIZE="20" MAXLENGTH="20"><INPUT  Type="HIDDEN" Name="restoreUrl" SIZE=256   value="">
+
+<INPUT  Type=HIDDEN Name=LocalUserTable   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rlAAALocalUserTable$VT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rlAAALocalUserName$VT size=128   value="Type=100;Access=2;NumOfEnumerations=0;Range0=[1,20]">
+<INPUT  Type=HIDDEN Name=rlAAALocalHostStatus$VT size=128   value="Type=0;Access=2;NumOfEnumerations=6;Range0=[1,6];Default value=4">
+<INPUT  Type=HIDDEN Name=rlAAALocalUserPassword$VT size=256   value="Type=100;Access=2;NumOfEnumerations=0;Range0=[0,160]">
+<INPUT  Type=HIDDEN Name=rlAAALocalUserPrivilage$VT size=128   value="Type=0;Access=2;NumOfEnumerations=0;Range0=[1,15];Default value=1">
+<INPUT  Type=HIDDEN Name=LocalUserTable$endVT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=Hidden NAME=rlAAAMinPasswordLength$Scalar disabled   value="0" SIZE="20" MAXLENGTH="20">
+<script>
+formele=document.secDBForm.elements;
+passwordMinVal = formele["rlAAAMinPasswordLength$Scalar"].value;
+</script>
+<script>var formele=document.secDBForm.elements;
+</script>
+<INPUT  type=hidden Name=LocalUserTable$query   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlAAALocalUserName$query   value="admin" SIZE="20" MAXLENGTH="20">
+
+<table id="sec_db_tbl" border="0" cellspacing="0" cellpadding="0" width="100%">
+<tr>
+<td valign="bottom"><img style="width: 10px; height: 10px" src="../Images/tl.gif"></td>
+<td colspan="2" width="100%" class="data-area-canvas"><font style="font-size: 8px">&nbsp;</font></td>
+<td valign="bottom"><img style="width: 10px; height: 10px" src="../Images/tr.gif"></td>
+<td style="width: 5px"></td>
+</tr>
+<script language="JavaScript">
+top.Draw_TableHeader();
+</script>
+<tr>
+<td nowrap style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd">User Name</td>
+<td nowrap class="data-area-canvas-odd">
+
+<SELECT  Name=rlAAALocalUserName$select size="1" class="monitorEnabled" onChange="selectQuery(this.options[this.selectedIndex].text)"
+ RpGetType=complex >
+<OPTION  value=0>admin
+</select>
+
+
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px"></td>
+</tr>
+<tr>
+<td nowrap style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas">Access Level&nbsp;
+</td>
+<td nowrap class="data-area-canvas">
+
+<INPUT  TYPE=HIDDEN NAME=rlAAALocalUserPrivilage$query   value="15" SIZE="20" MAXLENGTH="20">
+
+<select id="rlAAALocalUserPrivilage$select" name="rlAAALocalUserPrivilage$select" size="1">
+<option value=1>1</option>
+<option value=15>15</option>
+</select>
+<script language="javaScript">
+var formObj=document.secDBForm;
+indexSign("rlAAALocalUserPrivilage$select");
+</script>
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px"></td>
+</tr>
+<tr>
+<td nowrap style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd">
+<script>displayPasswordRange(); </script>
+</td>
+<td nowrap class="data-area-canvas-odd">
+
+<INPUT  TYPE=hidden NAME="rlAAALocalUserPassword$query" size=256   value="#00000000000000000000000000000000">
+
+<input type="password" name="rlAAALocalUserPassword$text" maxlength="64" size="20" onBlur="checkPasswordValidation(this.name)"
+onChange="isPasswordChanged=true;" onfocus="this.select()">
+<script language="javaScript">
+var formele=document.secDBForm.elements;
+formele["rlAAALocalUserPassword$text"].value=formele["rlAAALocalUserPassword$query"].value
+</script>
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px"></td>
+</tr>
+<tr>
+<td nowrap style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas">Confirm Password</td>
+<td nowrap class="data-area-canvas">
+<input type="password" name="rlAAALocalUserPassword$confirm" maxlength="64" size="20"
+onBlur="checkPasswordValidation(this.name)" onfocus="this.select()">
+<script language="javaScript">
+var formele=document.secDBForm.elements;
+formele["rlAAALocalUserPassword$confirm"].value=formele["rlAAALocalUserPassword$query"].value
+</script>
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px"></td>
+</tr>
+<tr>
+<td nowrap><img width="10px" height="10px" src="../Images/bl.gif"></td>
+<td nowrap colspan="2" width="100%" class="data-area-canvas"><font style="font-size: 8px">&nbsp;</font></td>
+<td nowrap><img width="10px" height="10px" src="../Images/br.gif"></td>
+<td nowrap style="width: 25px"></td>
+</tr>
+</table>
+<br>
+<table id="sec_db_remove_tbl" border="0" cellspacing="0" cellpadding="0" width="100%">
+<script language="JavaScript">
+top.Draw_TableTop(2);
+</script>
+<tr>
+<td nowrap style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd" valign="top" width="48%"><b>Remove</b></td>
+<td nowrap class="data-area-canvas-odd" width="48%">
+<input type="checkbox" name="removeUser">
+
+<INPUT  TYPE=HIDDEN NAME=rlAAALocalHostStatus$query   value="1" SIZE="20" MAXLENGTH="20">
+
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 25px"></td>
+</tr>
+
+<INPUT  type=hidden Name=LocalUserTable$endQuery   value="OK" SIZE="20" MAXLENGTH="20">
+
+<script language="javaScript">
+updateScreen();
+</script>
+<script language="JavaScript">top.Draw_TableBottom(2)</script>
+</table>
+<br>
+<div class="management-only">
+
+
+<div align="center"><table id="apply_tbl" cellspacing="0" cellpadding="0" border="0"><tr>
+<td nowrap nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/lbutton.gif"></td>
+<td nowrap nowrap valign="middle" align="center" class="data-area-button"><a href="javascript:preSubmit();">Apply Changes</a></td>
+<td nowrap nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/rbutton.gif"></td>
+</tr></table></div><br>
+<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
+<!--
+if(document.forms[0] && document.forms[0].elements.length<=1000)
+{
+for(i=0;(document.forms[0] && i<document.forms[0].elements.length);i++)
+{
+if(document.forms[0] && document.forms[0].elements[i].type=="select-one")
+if(document.forms[0] && document.forms[0].elements[i].length==0)
+document.forms[0].elements[i].style.width="70px";
+}
+}
+//-->
+</SCRIPT>
+
+</div>
+</form>
+</body>
+</html>

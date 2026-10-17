@@ -1,0 +1,190 @@
+
+
+<html>
+<head>
+<title>VLAN Port Settings</title>
+<link rel="stylesheet" href="../device/style.css" type="text/css">
+<script src="../js/globalFunctions.js"></script>
+<script src="../js/common_methods.js"></script>
+<script language="JavaScript">
+<!-- Beginng of JavaScript Applet
+if(top.MonitorMode) {
+document.write("<link rel='stylesheet' href='../device/monitorMode.css' type='text/css'>")
+}
+if(top.MonitorMode) {
+document.write("<link rel='stylesheet' href='../device/monitorMode.css' type='text/css'>")
+}
+function openShowAllPage(){
+window.open("vlan_port_table.htm?[vlanPortTable]partialKey:From-rlPhdPortsIfIndex=0-Counter-12[vlanTable]partialKey:From-dot1qVlanIndex=0-Counter-12[uiTable]partialKey:From-rlPhdPortsIfIndex=0-Counter-12","", "width=850, height=600, left=50, top=50, scrollbars=yes, resizable=yes");
+}
+function selectInterface() {
+var portIndex = getInteface();
+var queryStr = "vlan_iterface.htm?[dot1qPortVlanTableVT]Query:dot1dBasePort=" + portIndex;
+document.location.href = queryStr;
+}
+function getInteface() {
+var portSelect = document.getElementById("portSelect");
+return (getPortNumberFromName(portSelect.options[portSelect.selectedIndex].text));
+}
+function selectChosenInterface() {
+var portIndex = parseInt(vlanInterfaceForm.elements["dot1dBasePort$query"].value);
+var portSelect = document.getElementById("portSelect");
+var i=0;
+while (portSelect.options[i].value != portIndex) {
+i++;
+}
+portSelect.selectedIndex = i
+}
+function showPVID() {
+var pvidText = document.getElementById("pvidText");
+pvidText.value = vlanInterfaceForm.elements["dot1qPvid$query"].value;
+}
+function displayFrameType() {
+var combo = document.getElementById("frameTypeSelect");
+combo.value = vlanInterfaceForm.elements["dot1qPortAcceptableFrameTypes$query"].value;
+}
+function displayFiltering() {
+var combo = document.getElementById("filteringSelect");
+combo.value = vlanInterfaceForm.elements["dot1qPortIngressFiltering$query"].value;
+}
+function changeFrameType() {
+var combo = document.getElementById("frameTypeSelect");
+vlanInterfaceForm.elements["dot1qPortAcceptableFrameTypes$query"].value = combo.value;
+}
+function changeFiltering() {
+var combo = document.getElementById("filteringSelect");
+vlanInterfaceForm.elements["dot1qPortIngressFiltering$query"].value = combo.value;
+}
+function formSubmit(){
+var pvidCtrl = document.getElementById("pvidText");
+var val = pvidCtrl.value;
+if ( !checkInteger( val ) )
+{
+alert("The '" + val + "' must be an integer");
+return;
+}
+var pvid = parseInt(val);
+if(isNaN(pvid) || pvid < 1 || pvid > 4095) {
+alert("Please enter a valid value for PVID");
+pvidCtrl.select();
+return;
+}
+vlanInterfaceForm.elements["dot1qPvid$query"].value = pvidCtrl.value;
+vlanInterfaceForm.submit();
+}
+// --End of Java code -->
+</script>
+</head>
+<body bgcolor="#ffffff" leftmargin="15" onload="setScreenMonitorState();">
+<FORM METHOD='POST'  ACTION="/config/vlan_iterface.htm" name="vlanInterfaceForm"   >
+<INPUT  type="hidden" name="restoreUrl" size="256"   value="">
+<INPUT  type="hidden" name="errorCollector"   value="" SIZE="20" MAXLENGTH="20">
+<INPUT  type="hidden" name="dot1qPortVlanTableVT"   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  type="hidden" name=dot1qPortVlanTable$VT size="128"   value="OK">
+<INPUT  type="hidden" Name=dot1dBasePort$VT size="128"   value="Type=0;Access=1;NumOfEnumerations=0;Range0=[1,65535]">
+<INPUT  type="hidden" Name=dot1qPvid$VT size="128"   value="Type=7;Access=2;NumOfEnumerations=0;Range0=[-2147483648,2147483647];Default value=1">
+<INPUT  type="hidden" Name=dot1qPortAcceptableFrameTypes$VT size="128"   value="Type=0;Access=2;NumOfEnumerations=2;Range0=[1,2];Default value=1">
+<INPUT  type="hidden" Name=dot1qPortIngressFiltering$VT size="128"   value="Type=0;Access=2;NumOfEnumerations=2;Range0=[1,2];Default value=1">
+<INPUT  type="hidden" name=dot1qPortVlanTableVT$endVT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  type="hidden" name=dot1qPortVlanTableVT$query   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  type="hidden" name=dot1dBasePort$query   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type="hidden" name=dot1qPvid$query   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type="hidden" name=dot1qPortAcceptableFrameTypes$query   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type="hidden" name=dot1qPortIngressFiltering$query   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type="hidden" name=dot1qPortVlanTableVT$endQuery   value="OK" SIZE="20" MAXLENGTH="20">
+</form>
+<script language="JavaScript">
+top.Draw_Header(document.title);
+</script>
+<div align="right">
+<table cellspacing="0" cellpadding="0" border="0">
+<tr>
+<td style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../images/lbutton.gif" width="14" height="25"></td>
+<td valign="middle" align="center" class="data-area-button">
+<a href="javascript:void(0)" onclick="openShowAllPage();" onMouseover="showtip(this,event,'Show Static MAC Address Table')"
+onMouseout="hidetip()">Show All </a>
+</td>
+<td style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../images/rbutton.gif" width="14" height="25"></td>
+<td style="width: 14px; height: 25px"></td>
+</tr>
+</table>
+</div>
+<br>
+<div align="right">
+<table border="0" cellspacing="0" cellpadding="0" width="100%">
+<script language="JavaScript">
+top.Draw_TableTop(2);
+top.Draw_TableHeader();
+</script>
+<tr>
+<td style="WIDTH: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas-odd" width="40%">Port</td>
+<td class="data-area-canvas-odd">
+<select id="portSelect" onChange="selectInterface();" class="monitorEnabled">
+</select>&nbsp;&nbsp;
+<script language="JavaScript">
+var portSelect = document.getElementById("portSelect");
+addPortsListToSelectBox(portSelect, 1, "n", "", "", true);
+</script>
+<script language="JavaScript">
+selectChosenInterface();
+</script>
+</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="WIDTH: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td style="WIDTH: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas">PVID&nbsp;(1-4095)</td>
+<td class="data-area-canvas">
+<input size="16" maxlength="4" id="pvidText">
+<script language="JavaScript">
+showPVID();
+</script>
+</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="WIDTH: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td style="WIDTH: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas-odd">Frame Type</td>
+<td class="data-area-canvas-odd">
+<select id="frameTypeSelect" onChange="changeFrameType();">
+<option value="2">Admit Tag Only</option>
+<option value="1">Admit All</option>
+</select>
+<script language="JavaScript">
+displayFrameType();
+</script>
+</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="WIDTH: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td style="WIDTH: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas">Ingress Filtering</td>
+<td class="data-area-canvas">
+<select id="filteringSelect" onChange="changeFiltering();">
+<option value="1">Enable</option>
+<option value="2">Disable</option>
+</select>
+<script language="JavaScript">
+displayFiltering();
+</script>
+</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="WIDTH: 15px">&nbsp;</td>
+</tr>
+<script language="JavaScript">
+top.Draw_TableBottom(2)
+</script>
+</table>
+<br>
+<div class="management-only">
+<script language="JavaScript">
+top.Draw_ButtonApply("formSubmit")
+</script>
+</div>
+</div>
+</body>
+</html>

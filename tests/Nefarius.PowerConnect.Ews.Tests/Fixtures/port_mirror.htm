@@ -1,0 +1,325 @@
+
+
+<html>
+
+<head>
+<title>Port Mirroring</title>
+
+<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
+<!--
+if(top.location==self.location )
+{
+var refStr=self.location + " ";
+var ind=0;
+refStr.toLowerCase();
+ind=refStr.indexOf("config");
+var locationStr=refStr.substring(0,ind);
+if (opener)
+{
+if (opener.opener)
+{
+if(opener.opener.top.location==opener.opener.location)
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+else
+{
+if(opener.top.location==opener.location)
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+}
+else
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+//-->
+</SCRIPT>
+
+
+<link rel="stylesheet" href="../device/style.css" type="text/css">
+<script src="../js/globalFunctions.js"></script>
+<script language="JavaScript">
+<!-- Beginng of JavaScript Applet
+if(top.MonitorMode) {
+document.write("<link rel='stylesheet' href='../device/monitorMode.css' type='text/css'>")
+}
+top.FirstTd=0;
+win_class = "port_mirror"; opener_top = top; listWindow(opener_top, win_class);
+var currIndex=0;
+var rawNo=1;
+FieldsToCheck = new Array(5);
+FieldsToCheck[ 0] = "portCopySource$repeat";
+FieldsToCheck[ 1] = "portCopyDest$repeat";
+FieldsToCheck[ 2] = "portCopyDirection$repeat";
+FieldsToCheck[ 3] = "portCopyStatus$repeat";
+FieldsToCheck[ 4] = "PortMirror$endRepeat";
+function formSubmit()
+{
+disableHtml();
+DisableUnchanged(document.portMirrorForm,"portCopySource$repeat",FieldsToCheck);
+document.portMirrorForm.submit();
+}
+function ChangeStatus(rawNo)
+{
+formele=document.portMirrorForm.elements;
+var CurrentRaw=rawNo;
+CurrentBox="CBox_"+CurrentRaw;
+if (formele[CurrentBox].checked==true)
+formele["portCopyStatus$repeat?"+CurrentRaw].value=6;
+else
+formele["portCopyStatus$repeat?"+CurrentRaw].value=1;
+}
+function checkPort()
+{
+formele=document.portMirrorForm.elements;
+e=window.event;
+var fldName=e.srcElement.name;
+if (!isPresentPort(formele[fldName].value))
+{
+str=formele[fldName].value+" is not a valid port.";
+alert(str);
+formele[fldName].focus();
+}
+}
+function loopIndex(index){
+currIndex=index;
+}
+function disableHtml()
+{
+formelem=document.portMirrorForm.elements;
+for (i=1;i<currIndex+1;i++)
+{
+formelem["CBox_"+i].disabled=true;
+}
+formelem["rlPhDPortsIfIndex$select"].disabled=true;
+}
+function DisplayPortCopyStatus(ind)
+{
+var value = document.portMirrorForm.elements["portCopyStatus$repeat?"+ind].value;
+var StatusText = "";
+switch(value)
+{
+case "1":
+StatusText = "active";
+break;
+case "2":
+StatusText = "notInService";
+break;
+case "3":
+StatusText = "notReady";
+break;
+case "4":
+StatusText = "createAndGo";
+break;
+case "5":
+StatusText = "createAndWait";
+break;
+case "6":
+StatusText = "destroy";
+break;
+default:
+}
+document.write(StatusText);
+}
+function DisplayPortCopySource(ind)
+{
+var value = document.portMirrorForm.elements["portCopySource$repeat?"+ind].value;
+var SourceText = "";
+SourceText = getPortNameFromNumber(value);
+document.write(SourceText);
+}
+function submitQuery()
+{
+var selectName = document.portMirrorForm.elements["rlPhDPortsIfIndex$select"];
+var newFilter="port_mirror.htm?[PortMirror]Filter:portCopyDest=";
+newFilter+=selectName.options[selectName.selectedIndex].value;
+filterString=newFilter;
+top.portCopyDest = selectName.options[selectName.selectedIndex].value;
+document.location.href=filterString;
+}
+function indexSign(){
+var i=0;
+formele=document.forms[0].elements;
+selectName=formele["rlPhDPortsIfIndex$select"];
+var restore_url = formele["restoreUrl"].value;
+var place = restore_url.indexOf("=");
+var if_index = restore_url.substring(place + 1);
+while (selectName.options[i]!=null)
+{
+if (selectName.options[i].value == if_index)
+{
+selectName.selectedIndex=i;
+break;
+}
+i++;
+}
+}
+function activateFilter(){
+var formele=document.portMirrorForm.elements;
+var dest_port = formele["portCopyDest$query"].value;
+var newFilter="port_mirror.htm?[PortMirror]Filter:portCopyDest=";
+if (!isNaN(parseInt(dest_port)))
+{
+newFilter += dest_port;
+top.portCopyDest = dest_port;
+}
+else
+{
+newFilter += "1";
+top.portCopyDest = 1;
+}
+document.location.href=newFilter;
+}
+function checkHref()
+{
+var restore_url = document.portMirrorForm.restoreUrl.value;
+if (restore_url.indexOf("[PortMirror]Filter") != -1)
+return true;
+return false;
+}
+function checkFirstFilter()
+{
+if (!checkHref())
+{
+return activateFilter();
+}
+}
+function fillDestinationPortSelect() {
+var formele=document.portMirrorForm.elements;
+var newOption;
+var destPortSelect = formele["rlPhDPortsIfIndex$select"];
+var destPort = document.getElementsByName("portCopyDest$repeat?1")[0];
+if (destPort) {
+var val = getPortNameFromNumber(destPort.value);
+newOption = new Option(val, destPort.value);
+destPortSelect.options[0] = newOption;
+top.portCopyDest = destPort.value;
+} else {
+addPresentPortsSelectionList(document.portMirrorForm,'rlPhDPortsIfIndex$select',1,'n');
+indexSign();
+}
+}
+// --End of Java code -->
+</script>
+</head>
+<body bgcolor="#FFFFFF" leftmargin="15" onload="setScreenMonitorState();">
+
+<FORM METHOD='POST' name="portMirrorForm"   ACTION="/config/port_mirror.htm"  >
+<INPUT  Type="HIDDEN" Name="restoreUrl" SIZE=256   value="Filter:(ifOperStatus!=6)">
+<INPUT  TYPE="HIDDEN" NAME="errorCollector"   value="" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=QueryPortMirror   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=portCopyTable$VT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=portCopySource$VT SIZE=128   value="Type=0;Access=1;NumOfEnumerations=0;Range0=[1,2147483647]">
+<INPUT  Type=HIDDEN Name=portCopyDest$VT SIZE=128   value="Type=0;Access=1;NumOfEnumerations=0;Range0=[1,2147483647]">
+<INPUT  Type=HIDDEN Name=portCopyDirection$VT SIZE=128   value="Type=0;Access=2;NumOfEnumerations=3;Range0=[1,3];Default value=3">
+<INPUT  Type=HIDDEN Name=portCopyStatus$VT SIZE=128   value="Type=0;Access=2;NumOfEnumerations=6;Range0=[1,6]">
+<INPUT  Type=HIDDEN Name=QueryPortMirror$endVT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=QueryPortMirror$query disabled   value=" " SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=portCopySource$query disabled   value=" " SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=portCopyDest$query disabled   value=" " SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=QueryPortMirror$endQuery disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<script>
+checkFirstFilter();
+</script>
+
+<INPUT  Type=HIDDEN Name=PortMirror   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=portCopyTable$VT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=portCopySource$VT SIZE=128   value="Type=0;Access=1;NumOfEnumerations=0;Range0=[1,2147483647]">
+<INPUT  Type=HIDDEN Name=portCopyDest$VT SIZE=128   value="Type=0;Access=1;NumOfEnumerations=0;Range0=[1,2147483647]">
+<INPUT  Type=HIDDEN Name=portCopyDirection$VT SIZE=128   value="Type=0;Access=2;NumOfEnumerations=3;Range0=[1,3];Default value=3">
+<INPUT  Type=HIDDEN Name=portCopyStatus$VT SIZE=128   value="Type=0;Access=2;NumOfEnumerations=6;Range0=[1,6]">
+<INPUT  Type=HIDDEN Name=ifOperStatus$VT SIZE=128   value="Type=0;Access=1;NumOfEnumerations=7;Range0=[1,7]">
+<INPUT  Type=HIDDEN Name=PortMirror$endVT   value="OK" SIZE="20" MAXLENGTH="20">
+
+<script language="JavaScript">top.Draw_Header(document.title);</script>
+<div align="right" class="management-only" id="addButtonDiv">
+<table cellspacing="0" cellpadding="0" border="0" ID="Table1">
+<tr>
+<td nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/lbutton.gif"></td>
+<td nowrap valign="middle" align="center" class="data-area-button"><a href="javascript:void(0)" onclick="javascript:window.open('add_source_port.htm','', 'width=850, height=600, left=50, top=50, scrollbars=yes, resizable=yes');" title='Add Source Port to the Selected Dest. Port'>&nbsp;&nbsp;Add&nbsp;&nbsp;</a></td>
+<td nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/rbutton.gif"></td>
+<td nowrap style="width: 14px; height: 25px"></td>
+</tr>
+</table>
+</div>
+<br>
+<table border="0" cellspacing="0" cellpadding="0" width="100%" ID="Table2">
+<script language="JavaScript">
+top.Draw_TableTop(2);top.Draw_TableHeader();
+</script>
+<tr>
+<td nowrap style="width: 10px; height: 24px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd" width="50%">Destination Port</td>
+<td nowrap class="data-area-canvas-odd">
+<select name="rlPhDPortsIfIndex$select" onChange="submitQuery()" ID="Select1" class="monitorEnabled"><option>0</option></select>
+<script language="JavaScript">
+</script>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<script language="JavaScript">top.Draw_TableBottom(2)</script>
+</table><br>
+<span id="pagetitle" class="data-area-page-title">Source Ports</span><br><br>
+<table border="0" cellspacing="0" cellpadding="0" width="100%" ID="Table3">
+<script language="JavaScript">
+top.Draw_TableTop(5);
+</script>
+<tr>
+<td nowrap style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td nowrap align="left" class="data-area-canvas"><b>Source Port</b></td>
+<td nowrap align="left" class="data-area-canvas"><b>Type</b></td>
+<td nowrap align="left" class="data-area-canvas"><b>Status</b></td>
+<td nowrap align="left" class="data-area-canvas"><b>Remove</b></td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="height: 1px; width: 10px" class="data-area-canvas"></td>
+<td nowrap colspan="5" style="height: 1px" class="data-area-separator"></td>
+<td nowrap style="height: 1px" class="data-area-canvas"></td>
+<td nowrap style="height: 1px; width: 5px"></td>
+</tr>
+
+
+
+<script language="JavaScript">top.Draw_TableBottom(5);</script>
+</table>
+<br>
+<script language="JavaScript">
+fillDestinationPortSelect();
+</script>
+
+<div class="management-only">
+
+<div align="center"><table id="apply_tbl" cellspacing="0" cellpadding="0" border="0"><tr>
+<td nowrap nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/lbutton.gif"></td>
+<td nowrap nowrap valign="middle" align="center" class="data-area-button"><a href="javascript:preSubmit();">Apply Changes</a></td>
+<td nowrap nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/rbutton.gif"></td>
+</tr></table></div><br>
+<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
+<!--
+if(document.forms[0] && document.forms[0].elements.length<=1000)
+{
+for(i=0;(document.forms[0] && i<document.forms[0].elements.length);i++)
+{
+if(document.forms[0] && document.forms[0].elements[i].type=="select-one")
+if(document.forms[0] && document.forms[0].elements[i].length==0)
+document.forms[0].elements[i].style.width="70px";
+}
+}
+//-->
+</SCRIPT>
+
+</div>
+</form>
+</body>
+</html>

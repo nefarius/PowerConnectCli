@@ -1,0 +1,285 @@
+
+
+
+<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
+<!--
+if(top.location==self.location )
+{
+var refStr=self.location + " ";
+var ind=0;
+refStr.toLowerCase();
+ind=refStr.indexOf("config");
+var locationStr=refStr.substring(0,ind);
+if (opener)
+{
+if (opener.opener)
+{
+if(opener.opener.top.location==opener.opener.location)
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+else
+{
+if(opener.top.location==opener.location)
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+}
+else
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+//-->
+</SCRIPT>
+
+<html>
+<head>
+<title>Storm Control</title>
+<script src="../js/globalFunctions.js"></script>
+<link rel="stylesheet" href="../device/style.css" type="text/css">
+<script language="JavaScript">
+<!-- Beginng of JavaScript Applet
+if(top.MonitorMode) {
+document.write("<link rel='stylesheet' href='../device/monitorMode.css' type='text/css'>")
+}
+function formSubmit() {
+if ( MBytesToBits() )
+{
+disableHTML();
+document.portBProtectConfigForm.submit();
+}
+}
+function disableHTML() {
+var formele=document.portBProtectConfigForm.elements;
+formele["dot1dBasePort$select"].disabled=true;
+formele["broadcastMode$select"].disabled=true;
+formele["rlStormCtrlBroadcastEnable"].disabled=true;
+formele["rlStormCtrlBroadcastRate"].disabled=true;
+}
+function selectPort() {
+var selectName=document.portBProtectConfigForm.elements["dot1dBasePort$select"];
+var newFilter="port_bprotect.htm?Query:dot1dBasePort=";
+newFilter+=parseInt(selectName.options[selectName.selectedIndex].text);
+document.location.href=newFilter;
+}
+function countBroadcastPcktsClick() {
+var formele=document.portBProtectConfigForm.elements;
+if (formele["rlStormCtrlBroadcastEnable"].checked==true) {
+formele["rlStormCtrlBroadcastEnable$query"].value=1;
+formele["rlStormCtrlSetDefaultBroadcastEnable$query"].disabled=true;
+} else {
+formele["rlStormCtrlBroadcastEnable$query"].value=2;
+formele["rlStormCtrlBroadcastEnable$query"].disabled=true;
+formele["rlStormCtrlSetDefaultBroadcastEnable$query"].value=1;
+}
+}
+function selectBroadcastMode() {
+var formele=document.portBProtectConfigForm.elements;
+if (formele["broadcastMode$select"].selectedIndex==0) {
+formele["rlStormCtrlMulticastEnable$query"].value=1;
+formele["rlStormCtrlSetDefaultMulticastEnable$query"].disabled=true;
+formele["rlStormCtrlUnknownUnicastEnable$query"].value=1;
+formele["rlStormCtrlSetDefaultUnknownUnicastEnable$query"].disabled=true;
+} else {
+if (formele["broadcastMode$select"].selectedIndex==1) {
+formele["rlStormCtrlMulticastEnable$query"].value=1;
+formele["rlStormCtrlSetDefaultMulticastEnable$query"].disabled=true;
+formele["rlStormCtrlUnknownUnicastEnable$query"].disabled=true;
+formele["rlStormCtrlSetDefaultUnknownUnicastEnable$query"].value=1;
+} else {
+formele["rlStormCtrlMulticastEnable$query"].disabled=true;
+formele["rlStormCtrlSetDefaultMulticastEnable$query"].value=1;
+formele["rlStormCtrlUnknownUnicastEnable$query"].disabled=true;
+formele["rlStormCtrlSetDefaultUnknownUnicastEnable$query"].value=1;
+}
+}
+}
+function setBroadcastMode() {
+var formele=document.portBProtectConfigForm.elements;
+if(formele["rlStormCtrlMulticastEnable$query"].value==1) {
+var unknownUnicastEnable = (formele["rlStormCtrlUnknownUnicastEnable$query"].value == 1);
+formele["broadcastMode$select"].selectedIndex = unknownUnicastEnable ? 0 : 1;
+} else {
+formele["broadcastMode$select"].selectedIndex = 2;
+}
+}
+function openShowAll() {
+window.open('port_bprotect_table.htm','', 'width=850, height=600, left=50, top=50, scrollbars=yes, resizable=yes');
+}
+function MakeChecked() {
+var formele=document.portBProtectConfigForm.elements;
+formele["rlStormCtrlBroadcastEnable"].checked = (formele["rlStormCtrlBroadcastEnable$query"].value == 1) ? true : false;
+}
+function MBytesToBits() {
+var result = true;
+var formele=document.portBProtectConfigForm.elements;
+if(formele["rlStormCtrlBroadcastRate"].value !== "") {
+var val = new Number(formele["rlStormCtrlBroadcastRate"].value);
+var vls = formele["rlStormCtrlBroadcastRate"].value;
+var val_less_than_3dot5 = (val < 3.5);
+if (!val_less_than_3dot5 && (val == 3.5)) {
+if (vls.indexOf(".5") < 0)
+val_less_than_3dot5 = true;
+}
+var val_grtr_than_1000 = (val > 1000);
+if (!val_grtr_than_1000 && (val == 1000)) {
+var tmp = vls.split(".");
+if (tmp.length > 1) {
+if (parseInt(tmp[1]) > 0)
+val_grtr_than_1000 = true;
+}
+}
+if (isNaN(val) || val_less_than_3dot5) {
+result = false;
+alert("The value should not be less than 3.5");
+} else if (val_grtr_than_1000) {
+result = false;
+alert("The value should not be greater than 1000");
+}
+var rate = Math.round(val *1000);
+formele["rlStormCtrlBroadcastRate$query"].value = rate;
+} else {
+formele["rlStormCtrlBroadcastRate"].value = formele["rlStormCtrlBroadcastRate$query"].value/( 1000);
+}
+return result;
+}
+// --End of Java code -->
+</script>
+</head>
+<body bgcolor="#ffffff" leftmargin="15" onload="setScreenMonitorState();">
+<script language="JavaScript">
+top.Draw_Header(document.title);
+</script>
+<FORM METHOD='POST' name="portBProtectConfigForm"  ACTION="/config/port_bprotect.htm"   >
+<INPUT  Type="HIDDEN" Name="restoreUrl" SIZE=256   value="[stormCtrlGlobalTable]Query:dot1dBasePort=1">
+<INPUT  TYPE="HIDDEN" NAME="errorCollector"   value="" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=stormCtrlTable   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rlStormCtrlTable   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=dot1dBasePort$VT SIZE=128   value="Type=0;Access=1;NumOfEnumerations=0;Range0=[1,65535]">
+<INPUT  Type=HIDDEN Name=rlStormCtrlBroadcastEnable$VT SIZE=128   value="Type=0;Access=2;NumOfEnumerations=2;Range0=[1,2];Default value=2">
+<INPUT  Type=HIDDEN Name=rlStormCtrlBroadcastRate$VT SIZE=128   value="Type=7;Access=2;NumOfEnumerations=0;Range0=[-2147483648,2147483647];Default value=0">
+<INPUT  Type=HIDDEN Name=rlStormCtrlSetDefaultBroadcastEnable$VT SIZE=128   value="Type=0;Access=2;NumOfEnumerations=2;Range0=[1,2];Default value=2">
+<INPUT  Type=HIDDEN Name=rlStormCtrlMulticastEnable$VT SIZE=128   value="Type=0;Access=2;NumOfEnumerations=2;Range0=[1,2];Default value=2">
+<INPUT  Type=HIDDEN Name=rlStormCtrlSetDefaultMulticastEnable$VT SIZE=128   value="Type=0;Access=2;NumOfEnumerations=2;Range0=[1,2];Default value=2">
+<INPUT  Type=HIDDEN Name=rlStormCtrlUnknownUnicastEnable$VT SIZE=128   value="Type=0;Access=2;NumOfEnumerations=2;Range0=[1,2];Default value=2">
+<INPUT  Type=HIDDEN Name=rlStormCtrlSetDefaultUnknownUnicastEnable$VT SIZE=128   value="Type=0;Access=2;NumOfEnumerations=2;Range0=[1,2];Default value=2">
+<INPUT  Type=HIDDEN Name=stormCtrlTable$endVT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=stormCtrlTable$query SIZE=128   value="OK">
+<INPUT  TYPE=HIDDEN NAME=dot1dBasePort$query SIZE=128   value="1">
+<INPUT  TYPE=HIDDEN NAME=rlStormCtrlSetDefaultBroadcastEnable$query SIZE=128   value="2">
+<INPUT  TYPE=HIDDEN NAME=rlStormCtrlMulticastEnable$query SIZE=128   value="2">
+<INPUT  TYPE=HIDDEN NAME=rlStormCtrlSetDefaultMulticastEnable$query SIZE=128   value="2">
+<INPUT  TYPE=HIDDEN NAME=rlStormCtrlUnknownUnicastEnable$query SIZE=128   value="2">
+<INPUT  TYPE=HIDDEN NAME=rlStormCtrlSetDefaultUnknownUnicastEnable$query SIZE=128   value="2">
+<INPUT  TYPE=hidden NAME="rlStormCtrlBroadcastEnable$query"    value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=rlStormCtrlBroadcastRate$query    value="3500" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=stormCtrlTable$endQuery SIZE=128   value="OK">
+<div align="right">
+<table id="port_bprotect_buttons_tbl" cellspacing="0" cellpadding="0" border="0">
+<tr>
+<td nowrap width="14" height="25"><img style="WIDTH: 14px; HEIGHT: 25px" src="../Images/lbutton.gif"></td>
+<td nowrap valign="middle" align="center" class="data-area-button"><a href="#" style="TEXT-DECORATION:underline" tabindex="1" onclick="openShowAll()"
+title='Show All Storm Control Settings Table '>Show All</a></td>
+<td nowrap width="14" height="25"><img style="WIDTH: 14px; HEIGHT: 25px" src="../Images/rbutton.gif"></td>
+<td nowrap width="14" height="25"></td>
+</tr>
+</table>
+</div>
+<br>
+<table id="port_bprotect_tbl" border="0" cellspacing="0" cellpadding="0" width="100%">
+<script language="JavaScript">
+top.Draw_TableTop(2);
+</script>
+<tr>
+<td nowrap class="data-area-canvas" width="10">&nbsp;</td>
+<td nowrap colspan="2" class="data-area-tab-header">&nbsp;</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap width="15"></td>
+</tr>
+<tr>
+<td class="data-area-canvas" width="10" height="1"></td>
+<td colspan="2" class="data-area-separator" height="1"></td>
+<td class="data-area-canvas" height="1"></td>
+<td width="5" height="1"></td>
+</tr>
+<tr>
+<td nowrap class="data-area-canvas" width="10">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd" width="40%">Port</td>
+<td nowrap class="data-area-canvas-odd">
+<select Name="dot1dBasePort$select" size="1" onChange="selectPort1Index('stormCtrlTable')"
+tabindex="3" class="monitorEnabled">
+<option selected>0</option>
+</select>
+<script language="javaScript">
+formObj=document.portBProtectConfigForm;
+addPresentPortsSelectionList(formObj,"dot1dBasePort$select","","n");
+</script>
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap width="15">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap class="data-area-canvas" width="10" height="24">&nbsp;</td>
+<td nowrap class="data-area-canvas">Broadcast Control</td>
+<td nowrap class="data-area-canvas">
+<input type="checkbox" name="rlStormCtrlBroadcastEnable" onClick="countBroadcastPcktsClick()"
+tabindex="4">
+<script>
+MakeChecked();
+</script>
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap width="15">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap class="data-area-canvas" width="10">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd">Mode</td>
+<td nowrap class="data-area-canvas-odd">
+<select name="broadcastMode$select" onChange="selectBroadcastMode()">
+<option value="0" selected>Unknown Unicast, Multicast &amp; Broadcast</option>
+<option value="1">Multicast &amp; Broadcast</option>
+<option value="2">Broadcast Only</option>
+</select>
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap width="15">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap class="data-area-canvas" width="10">&nbsp;</td>
+<td nowrap class="data-area-canvas">Rate Threshold&nbsp;(3.5-1000M)</td>
+<td nowrap class="data-area-canvas">
+<input type="text" name="rlStormCtrlBroadcastRate" tabindex="5"> (Kbits/Sec)
+<script>
+MBytesToBits();
+</script>
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap width="15">&nbsp;</td>
+</tr>
+<script language="javaScript">
+portSign("dot1dBasePort$select");
+setBroadcastMode();
+top.Draw_TableBottom(2)
+</script>
+</table>
+<br>
+<div align="center" class="management-only">
+<table id="apply_tbl" cellspacing="0" cellpadding="0" border="0">
+<tr>
+<td nowrap width="14" height="25"><img style="WIDTH: 14px; HEIGHT: 25px" src="../Images/lbutton.gif"></td>
+<td nowrap valign="middle" align="center" class="data-area-button"><a href="javascript:formSubmit();">Apply
+Changes</a></td>
+<td nowrap width="14" height="25"><img style="WIDTH: 14px; HEIGHT: 25px" src="../Images/rbutton.gif"></td>
+</tr>
+</table>
+</div>
+<br>
+</FORM>
+</body>
+</html>

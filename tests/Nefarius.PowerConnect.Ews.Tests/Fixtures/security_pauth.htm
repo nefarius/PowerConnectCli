@@ -1,0 +1,923 @@
+
+
+
+<html>
+<head>
+<script>
+var iniGuest = 0;
+if (top.DeviceType && top.DeviceType == 1)
+{
+document.write("<title>Port Based Authentication</title>");
+}
+else
+{
+document.write("<title>Port Based Authentication</title>");
+}
+</script>
+
+
+<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
+<!--
+if(top.location==self.location )
+{
+var refStr=self.location + " ";
+var ind=0;
+refStr.toLowerCase();
+ind=refStr.indexOf("config");
+var locationStr=refStr.substring(0,ind);
+if (opener)
+{
+if (opener.opener)
+{
+if(opener.opener.top.location==opener.opener.location)
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+else
+{
+if(opener.top.location==opener.location)
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+}
+else
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+//-->
+</SCRIPT>
+
+
+<link rel="stylesheet" href="../device/style.css" type="text/css">
+<script src="../js/globalFunctions.js"></script>
+<script language="JavaScript">
+<!-- Beginng of JavaScript Applet
+if(top.MonitorMode) {
+document.write("<link rel='stylesheet' href='../device/monitorMode.css' type='text/css'>")
+}
+var methodsArray=["Deny","RADIUS","None"];
+var numOfMethodsInUse=2;
+var numOfOptionalMethods=5;
+var isIE = (navigator.appName.indexOf("Microsoft") != -1);
+function formSubmit()
+{
+formele=document.securityPortAuthForm.elements;
+if(formele["dot1xAuthReAuthEnabled$query"].value == 1)
+{
+formele["dot1xAuthReAuthEnabled$query2"].value = 1;
+formele["securityPortAuthTable$query2"].disabled = false;
+formele["dot1xPaePortNumber$query2"].disabled = false;
+formele["dot1xAuthReAuthEnabled$query2"].disabled = false;
+formele["securityPortAuthTable$endQuery2"].disabled = false;
+}
+if(formele["dot1xAuthAuthControlledPortControl$query"].value == 3)
+{
+formele["dot1xAuthAuthControlledPortControl$query2"].value = 3;
+formele["securityPortAuthTable$query2"].disabled = false;
+formele["dot1xPaePortNumber$query2"].disabled = false;
+formele["dot1xAuthAuthControlledPortControl$query2"].disabled = false;
+formele["securityPortAuthTable$endQuery2"].disabled = false;
+}
+handleMethods();
+setReauthenticateValue();
+formele["rldot1xAuthenticationPortMethod$query"].value = formele["AuthenType$select"].value;
+if(!checkAuthType())return false;
+formele["rldot1xRadiusAttrVlanIdEnabled$query"].value = formele["rldot1xRadiusAttrVlanIdEnabled$select"].value;
+disableHtml();
+formele=document.securityPortAuthForm.elements;
+document.securityPortAuthForm.submit();
+}
+function disableHtml(){
+formelem=document.securityPortAuthForm.elements;
+if(!isChanged(formelem["dot1xAuthAuthControlledPortControl$query"]))
+formelem["dot1xAuthAuthControlledPortControl$query"].disabled=true;
+if(!isChanged(formelem["dot1xAuthReAuthEnabled$query"]))
+formelem["dot1xAuthReAuthEnabled$query"].disabled=true;
+if(!isChanged(formelem["dot1xAuthReAuthPeriod$query"]))
+formelem["dot1xAuthReAuthPeriod$query"].disabled=true;
+if(!isChanged(formelem["dot1xPaePortReauthenticate$query"]))
+formelem["dot1xPaePortReauthenticate$query"].disabled=true;
+formelem["reauthenticateCBox"].disabled=true;
+if(!isChanged(formelem["dot1xAuthServerTimeout$query"]))
+formelem["dot1xAuthServerTimeout$query"].disabled=true;
+if(!isChanged(formelem["dot1xAuthTxPeriod$query"]))
+formelem["dot1xAuthTxPeriod$query"].disabled=true;
+if(!isChanged(formelem["dot1xAuthQuietPeriod$query"]))
+formelem["dot1xAuthQuietPeriod$query"].disabled=true;
+if(!isChanged(formelem["dot1xAuthSuppTimeout$query"]))
+formelem["dot1xAuthSuppTimeout$query"].disabled=true;
+if(!isChanged(formelem["dot1xAuthMaxReq$query"]))
+formelem["dot1xAuthMaxReq$query"].disabled=true;
+formelem["rldot1xRadiusAttrVlanIdEnabled$query"].disabled=false;
+formelem["rldot1xRadiusAttrVlanIdEnabled$select"].disabled=true;
+formelem["methods$select"].disabled=true;
+formelem["dot1qVlanIndex$select"].disabled=true;
+formelem["rldot1xGuestVlanPorts$select"].disabled=true;
+formelem["enableGuestVlan$select"].disabled=true;
+formelem["rldot1xAuthenticationPortMethod$query"].disabled=false;
+formelem["dot1xPaePortNumber$query"].value=formelem["dot1xPaePortNumber$select"].value;
+formelem["dot1xPaePortNumber$query"].value = formelem["dot1xPaePortNumber$select"].value;
+formelem["dot1xPaePortNumber$query"].disabled=false;
+formelem["dot1xPaePortNumber$select"].disabled = true;
+formelem["AuthenType$select"].disabled=true;
+}
+function checkAuthType()
+{
+formele=document.securityPortAuthForm.elements;
+if((formele["dot1xAuthReAuthEnabled$query"].value == 2) && (formele["AuthenType$select"].value != 1))
+{
+alert("To enable MAC Authentication, Periodic Reauthentication needs to be enabled first.")
+return false;
+}
+if ( (formele["AuthenType$select"].value != 1) &&
+(formele["dot1xAuthReAuthEnabled$query"].value == 2) )
+{
+alert("To disable Periodic Reauthentication, you need to disable MAC-Authentication also.")
+return false;
+}
+if ( ((formele["AuthenType$select"].value == 1) && (formele["rldot1xAuthenticationPortMethod$query"].value != 1)) &&
+(formele["dot1xAuthAuthControlledPortControl$query"].value != 3))
+{
+alert("To disable MAC Authentication, Port Control needs to be set to Force Authorized first." );
+return false;
+} else
+if ( ((formele["AuthenType$select"].value != 1) && (formele["rldot1xAuthenticationPortMethod$query"].value == 1)) &&
+(formele["dot1xAuthAuthControlledPortControl$query"].value != 3))
+{
+alert("To enable MAC Authentication, Port Control needs to be set to Force Authorized first." )
+return false;
+}
+if((formele["rldot1xRadiusAttrVlanIdEnabled$query"].value == "2" && formele["dot1xAuthAuthControlledPortControl$query1"].value != 3
+&& formele["rldot1xRadiusAttrVlanIdEnabled$select"].value == "1") || (formele["rldot1xRadiusAttrVlanIdEnabled$query"].value == "1" &&
+formele["dot1xAuthAuthControlledPortControl$query1"].value != "3" && formele["rldot1xRadiusAttrVlanIdEnabled$select"].value == "2"))
+{
+alert("Dynamic Vlan Assignment is allowed only in Forced Authorized mode. \nPlease change to Forced Authorized mode first and apply your changes.");
+return false;
+}
+return true;
+}
+function isChanged()
+{
+return true;
+}
+function selectIndex(){
+var interfaceValue;
+var selectList;
+var formelem=document.securityPortAuthForm.elements;
+selectList=formelem["dot1xPaePortNumber$select"];
+interfaceValue = selectList[selectList.selectedIndex].value;
+var newFilter="security_pauth.htm?[securityPortAuthTable]Query:dot1xPaePortNumber=";
+newFilter+=interfaceValue;
+newFilter+='[AuthenPortTable]Query:dot1xPaePortNumber=';
+newFilter+=interfaceValue;
+newFilter+='[MethodListTable]Filter:rlAAAEapMethodListName="';
+newFilter+=adjustStringToFilter(formelem["rlAAAEapCurrentMethodList"].value)+'"';
+filterString=newFilter;
+disableQuery();
+document.location.href=filterString;
+}
+function disableQuery(){
+formelem=document.securityPortAuthForm.elements;
+formelem["dot1xAuthAuthControlledPortControl$query"].disabled=true;
+formelem["rldot1xRadiusAttrVlanIdEnabled$query"].disabled=true;
+formelem["dot1xAuthReAuthEnabled$query"].disabled=true;
+formelem["dot1xAuthReAuthPeriod$query"].disabled=true;
+formelem["dot1xPaePortReauthenticate$query"].disabled=true;
+formelem["rldot1xAuthenticationPortMethod$query"].disabled=false;
+formelem["dot1xAuthServerTimeout$query"].disabled=true;
+formelem["dot1xAuthTxPeriod$query"].disabled=true;
+formelem["dot1xAuthQuietPeriod$query"].disabled=true;
+formelem["dot1xAuthSuppTimeout$query"].disabled=true;
+formelem["dot1xAuthMaxReq$query"].disabled=true;
+formelem["reauthenticateCBox"].disabled=true;
+}
+function setCbox(){
+var formelem = document.securityPortAuthForm.elements;
+var hiddenValue = formelem["dot1xPaePortReauthenticate$query"].value;
+if(hiddenValue==1)
+formelem["reauthenticateCBox"].checked=true;
+else
+formelem["reauthenticateCBox"].checked=false;
+}
+function setReauthenticateValue(){
+var formelem = document.securityPortAuthForm.elements;
+if(formelem["reauthenticateCBox"].checked==true){
+if(formelem["dot1xPaePortReauthenticate$query"].defaultValue!=1);
+formelem["dot1xPaePortReauthenticate$query"].value=1;
+}
+else{
+if(formelem["dot1xPaePortReauthenticate$query"].defaultValue!=2);
+formelem["dot1xPaePortReauthenticate$query"].value=2;
+}
+}
+function displayCurrentPortControl(){
+var formelem = document.securityPortAuthForm.elements;
+var portStatus = formelem["ifOperStatus$query"].value;
+var currentPortControlValue = formelem["dot1xAuthAuthControlledPortStatus$query"].value;
+if(portStatus==1){
+switch(parseInt(currentPortControlValue)){
+case 1:
+document.write("Authorized");
+break;
+case 2:
+document.write("Unauthorized");
+break;
+default:
+document.write("Undefined");
+break;
+}
+}
+else{
+document.write("*");
+}
+}
+function indexSign(){
+var formelem=document.securityPortAuthForm.elements;
+var hiddenPortValue = formelem["dot1xPaePortNumber$query"].value;
+var selectName=formelem["dot1xPaePortNumber$select"];
+selectName.value = hiddenPortValue;
+}
+function openShowAllWindow(){
+var formele=document.securityPortAuthForm.elements;
+if(top.Units==true){
+window.open('authen_table.htm?Filter:((rlPhdPortsModuleNumber='+formele["rlPhdPortsModuleNumber$q"].value+')&&(ifOperStatus!=6))','', 'width=850, height=600, left=50, top=50, scrollbars=yes, resizable=yes');
+}
+else{
+window.open('authen_table.htm?Filter:(ifOperStatus!=6)','', 'width=850, height=600, left=50, top=50, scrollbars=yes, resizable=yes');
+}
+}
+function displayMethodList(){
+var formelem=document.securityPortAuthForm.elements;
+var MethodNameObj = formelem["rlAAAEapMethodListName$repeat?1"];
+if(MethodNameObj){
+var field1, field2, field3;
+var field1Str, field2Str, field3Str;
+field1 = formelem["rlAAAEapMethodType1$repeat?1"].value;
+field2 = formelem["rlAAAEapMethodType2$repeat?1"].value;
+field3 = formelem["rlAAAEapMethodType3$repeat?1"].value;
+switch(parseInt(field1)){
+case 0:
+field1Str = "Denny";
+break;
+case 1:
+field1Str = "RADIUS";
+break;
+case 2:
+field1Str = "Succeed";
+break;
+default:
+field1Str = "Unknown Method";
+break;
+}
+switch(parseInt(field2)){
+case 0:
+field2Str = "Denny";
+break;
+case 1:
+field2Str = "RADIUS";
+break;
+case 2:
+field2Str = "Succeed";
+break;
+default:
+field2Str = "Unknown Method";
+break;
+}
+if(field1Str=="RADIUS" && field2Str=="Denny")
+document.write("RADIUS");
+else{
+if(field1Str=="RADIUS" && field2Str=="Succeed")
+document.write("RADIUS, None");
+else{
+if(field1Str=="Succeed" && field2Str=="RADIUS")
+document.write("None");
+else{
+if(field1Str=="Succeed" && field2Str=="Denny")
+document.write("None");
+else
+document.write("Unknown Method");
+}
+}
+}
+}
+}
+var methodsStr="";
+function buildSelectedMethodStr()
+{
+var fldStartName="rlAAAEapMethodType";
+var fldEndName="$repeat?1";
+var formele=document.securityPortAuthForm.elements;
+for (i=1; i<=numOfMethodsInUse; i++)
+{
+fldName=fldStartName+i+fldEndName;
+if (formele[fldName].value!="0")
+{
+methodsStr+=methodsArray[formele[fldName].value]+", ";;
+}
+else break;
+}
+methodsStr=methodsStr.slice(0,(methodsStr.length)-2);
+}
+function getMethodIndexFromName(methodName)
+{
+switch (methodName)
+{
+case "Deny": return 0; break;
+case "RADIUS": return 1; break;
+case "None": return 2; break;
+}
+}
+function handleMethods()
+{
+var formele=document.securityPortAuthForm.elements;
+var selObj=formele["methods$select"];
+if (methodsStr!=selObj.options[selObj.selectedIndex].text)
+{
+formele["rlAAAEapMethodListName$repeat?1"].disabled=false;
+formele["MethodListTable$endRepeat?1"].disabled=false;
+var methodListStr=selObj.options[selObj.selectedIndex].text;
+var methodListArr=sliceString(methodListStr,", ");
+var fldStartName="rlAAAEapMethodType";
+var fldEndName="$repeat?1";
+for (i=0; i<methodListArr.length; i++)
+{
+fldName=fldStartName+(i+1)+fldEndName;
+formele[fldName].value=getMethodIndexFromName(methodListArr[i]);
+formele[fldName].disabled=false;
+}
+for (;i<numOfMethodsInUse; i++)
+{
+fldName=fldStartName+(i+1)+fldEndName;
+formele[fldName].disabled=false;
+formele[fldName].value="0";
+}
+}
+formele["methods$select"].disabled=true;
+}
+function SetGuestSelectedVlan()
+{
+var formele = document.securityPortAuthForm.elements;
+var length = formele["dot1qVlanIndex$select"].length;
+var currVlan;
+var guestVlan = formele["rldot1xGuestVlanVID$scalar"].value;
+formele["dot1qVlanIndex$select"].options[formele["dot1qVlanIndex$select"].length] = new Option('None',0);
+for (var i=0; i<length; i++)
+{
+currVlan = formele["dot1qVlanIndex$select"].options[i].text;
+if (currVlan == '1')
+{
+if (isIE)
+formele["dot1qVlanIndex$select"].remove(i);
+else
+formele["dot1qVlanIndex$select"][i]=null;
+}
+if ((guestVlan == 0)&&(currVlan == 'None'))
+{
+formele["dot1qVlanIndex$select"].selectedIndex = i;
+break;
+}
+else if (currVlan == guestVlan)
+{
+iniGuest=guestVlan;
+formele["dot1qVlanIndex$select"].selectedIndex = i;
+break;
+}
+}
+}
+function selectGuestVlan()
+{
+var formele = document.securityPortAuthForm.elements;
+var currVlan = formele["dot1qVlanIndex$select"].options[formele["dot1qVlanIndex$select"].selectedIndex].text;
+if (currVlan == 'None')
+formele["rldot1xGuestVlanVID$scalar"].value = 0;
+else
+formele["rldot1xGuestVlanVID$scalar"].value = currVlan;
+}
+function SetGuestVlanPortStatus()
+{
+var formele = document.securityPortAuthForm.elements;
+var currPort = formele["dot1xPaePortNumber$query"].value;
+var portLIst = octetToBitsAsChars(formele["rldot1xGuestVlanPorts$scalar"].value);
+if (portLIst.charAt(currPort-1) == '1')
+formele["rldot1xGuestVlanPorts$select"].selectedIndex = 1;
+else
+formele["rldot1xGuestVlanPorts$select"].selectedIndex = 0;
+}
+function SetGuestVlanPort()
+{
+var formele = document.securityPortAuthForm.elements;
+var currPort = formele["dot1xPaePortNumber$select"].options[formele["dot1xPaePortNumber$select"].selectedIndex].value;
+var portLIst = octetToBitsAsChars(formele["rldot1xGuestVlanPorts$scalar"].value);
+var beginPortString = portLIst.slice(0,currPort-1);
+var endPortString = portLIst.slice(currPort,portLIst.length);
+if (formele["rldot1xGuestVlanPorts$select"].selectedIndex == 1)
+portLIst = beginPortString+'1'+endPortString;
+else
+portLIst = beginPortString+'0'+endPortString;
+formele["rldot1xGuestVlanPorts$scalar"].value = bitsAsCharsToOctet(portLIst);
+}
+function SetGuestVlan()
+{
+var formele = document.securityPortAuthForm.elements;
+formele["rldot1xGuestVlanVID$scalar"].value = formele["rldot1xGuestVlanVID$select"].value;
+}
+function GetGuestVlan()
+{
+var formele = document.securityPortAuthForm.elements;
+if(formele["rldot1xGuestVlanVID$scalar"].value != 0)
+{
+formele["enableGuestVlan$select"].value = 1
+}
+}
+function initVlanAssignmentStatus()
+{
+var formele = document.securityPortAuthForm.elements;
+formele["rldot1xRadiusAttrVlanIdEnabled$select"].value = formele["rldot1xRadiusAttrVlanIdEnabled$query"].value;
+}
+function setAuthTypeSelect()
+{
+var formele = document.securityPortAuthForm.elements;
+formele["AuthenType$select"].value = formele["rldot1xAuthenticationPortMethod$query"].value;
+}
+function VlanList()
+{
+var formele = document.securityPortAuthForm.elements;
+var formele = document.securityPortAuthForm.elements;
+if(formele["dot1qVlanIndex$select"].options.length>1){
+if(formele["enableGuestVlan$select"].value==1){
+formele["rldot1xGuestVlanVID$scalar"].value = formele["dot1qVlanIndex$select"].options[0].text;
+}
+else{
+formele["rldot1xGuestVlanVID$scalar"].value = 0
+}
+}
+else{
+alert("There are no VLAN created by user");
+formele["enableGuestVlan$select"].value = 2;
+}
+}
+// --End of Java code -->
+</script>
+</head>
+<body bgcolor="#FFFFFF" leftmargin="15" onload="setScreenMonitorState();">
+
+<FORM METHOD='POST' name="securityPortAuthForm"  ACTION="/config/security_pauth.htm"  >
+<INPUT  Type="HIDDEN" Name="restoreUrl" SIZE=256   value="[securityPortAuthTable]Query:dot1xPaePortNumber=1[AuthenPortTable]Query:dot1xPaePortNumber=1[MethodListTable]Filter:rlAAAEapMethodListName='default'">
+<INPUT  TYPE="HIDDEN" NAME="errorCollector"   value="" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME="rlAAAEapCurrentMethodList" disable   value="default" SIZE="20" MAXLENGTH="20">
+
+<script language="JavaScript">
+if(document.securityPortAuthForm.elements["restoreUrl"].value==""){
+document.location.href='../config/security_pauth.htm?[securityPortAuthTable]Query:dot1xPaePortNumber='+parseInt(top.firstPresentPort)+'[AuthenPortTable]Query:dot1xPaePortNumber='+parseInt(top.firstPresentPort)+'[MethodListTable]Filter:rlAAAEapMethodListName="'+adjustStringToFilter(document.securityPortAuthForm.elements["rlAAAEapCurrentMethodList"].value)+'"';
+}
+</script>
+<script language="JavaScript">top.Draw_Header(document.title);</script>
+<div align="right"><table cellspacing="0" cellpadding="0" border="0">
+<tr>
+<td style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/lbutton.gif"></td>
+<td valign="middle" align="center" class="data-area-button"><a href="javascript:void(0)" onclick="javascript:openShowAllWindow()" onMouseover="showtip(this,event,'Show Authentication Table')"
+onMouseout="hidetip()">Show All</a></td>
+<td style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/rbutton.gif"></td>
+<td style="width: 14px; height: 25px"></td>
+</tr>
+</table>
+</div>
+<br>
+
+<INPUT  Type=HIDDEN Name=securityPortAuthTable   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=dot1xPaePortTable$VT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=dot1xPaePortNumber$VT SIZE=128   value="Type=0;Access=1;NumOfEnumerations=0;Range0=[1,2147483647]">
+<INPUT  Type=HIDDEN Name=dot1xAuthSessionUserName$VT SIZE=128   value="Type=2;Access=1;NumOfEnumerations=0;Range0=[0,160]">
+<INPUT  Type=HIDDEN Name=dot1xAuthAuthControlledPortControl$VT SIZE=128   value="Type=0;Access=2;NumOfEnumerations=3;Range0=[1,3];Default value=3">
+<INPUT  Type=HIDDEN Name=dot1xAuthAuthControlledPortStatus$VT SIZE=128   value="Type=0;Access=1;NumOfEnumerations=2;Range0=[1,2]">
+<INPUT  Type=HIDDEN Name=dot1xAuthReAuthEnabled$VT SIZE=128   value="Type=0;Access=2;NumOfEnumerations=2;Range0=[1,2];Default value=2">
+<INPUT  Type=HIDDEN Name=dot1xAuthReAuthPeriod$VT SIZE=128   value="Type=7;Access=2;NumOfEnumerations=0;Range0=[300,-1];Default value=3600">
+<INPUT  Type=HIDDEN Name=dot1xPaePortReauthenticate$VT SIZE=128   value="Type=0;Access=2;NumOfEnumerations=2;Range0=[1,2];Default value=2">
+<INPUT  Type=HIDDEN Name=dot1xAuthServerTimeout$VT SIZE=128   value="Type=7;Access=2;NumOfEnumerations=0;Range0=[1,65535];Default value=30">
+<INPUT  Type=HIDDEN Name=dot1xAuthTxPeriod$VT SIZE=128   value="Type=7;Access=2;NumOfEnumerations=0;Range0=[1,65535];Default value=30">
+<INPUT  Type=HIDDEN Name=dot1xAuthQuietPeriod$VT SIZE=128   value="Type=7;Access=2;NumOfEnumerations=0;Range0=[0,65535];Default value=60">
+<INPUT  Type=HIDDEN Name=dot1xAuthSuppTimeout$VT SIZE=128   value="Type=7;Access=2;NumOfEnumerations=0;Range0=[1,65535];Default value=30">
+<INPUT  Type=HIDDEN Name=dot1xAuthMaxReq$VT SIZE=128   value="Type=7;Access=2;NumOfEnumerations=0;Range0=[1,10];Default value=2">
+<INPUT  Type=HIDDEN Name=ifOperStatus$VT SIZE=128   value="Type=0;Access=1;NumOfEnumerations=7;Range0=[1,7]">
+<INPUT  Type=HIDDEN Name=rldot1xAuthenticationPortMethod$VT SIZE=128   value="Type=0;Access=2;NumOfEnumerations=3;Range0=[1,3];Default value=1">
+<INPUT  Type=HIDDEN Name=rldot1xRadiusAttrVlanIdEnabled$VT SIZE=128   value="Type=0;Access=2;NumOfEnumerations=2;Range0=[1,2]">
+<INPUT  Type=HIDDEN Name=securityPortAuthTable$endVT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=MethodListTable   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rlAAAEapMethodListTable$VT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rlAAAEapMethodListName$VT SIZE=128   value="Type=100;Access=2;NumOfEnumerations=0;Range0=[3,20]">
+<INPUT  Type=HIDDEN Name=rlAAAEapMethodType1$VT SIZE=128   value="Type=0;Access=2;NumOfEnumerations=3;Range0=[0,2];Default value=0">
+<INPUT  Type=HIDDEN Name=rlAAAEapMethodType2$VT SIZE=128   value="Type=0;Access=2;NumOfEnumerations=3;Range0=[0,2];Default value=0">
+<INPUT  Type=HIDDEN Name=rlAAAEapMethodType3$VT SIZE=128   value="Type=0;Access=2;NumOfEnumerations=3;Range0=[0,2];Default value=0">
+<INPUT  Type=HIDDEN Name=rlAAAEapMethodType4$VT SIZE=128   value="Type=0;Access=2;NumOfEnumerations=3;Range0=[0,2];Default value=0">
+<INPUT  Type=HIDDEN Name=rlAAAEapMethodType5$VT SIZE=128   value="Type=0;Access=2;NumOfEnumerations=3;Range0=[0,2];Default value=0">
+<INPUT  Type=HIDDEN Name=MethodListTable$endVT   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlAAAEapMethodListName$repeat?1  disabled   value="default" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlAAAEapMethodType1$repeat?1  disabled   value="0" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlAAAEapMethodType2$repeat?1  disabled   value="0" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlAAAEapMethodType3$repeat?1  disabled   value="0" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlAAAEapMethodType4$repeat?1  disabled   value="0" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlAAAEapMethodType5$repeat?1  disabled   value="0" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=MethodListTable$endRepeat?1  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+</tr> </table>
+<script>
+buildSelectedMethodStr();
+</script>
+
+
+
+<table name="security_port_auth_Tbl" id="security_port_auth_Tbl_id" border="0" cellspacing="0"
+cellpadding="0" width="100%">
+<script language="JavaScript">top.Draw_TableTop(2);</script>
+<tr>
+<td nowrap style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas"><b>Global Parameters</b></td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px"></td>
+</tr>
+<tr>
+<td nowrap style="height: 1px; width: 10px" class="data-area-canvas"><img style="width: 1px; height: 1px" src=""></td>
+<td nowrap colspan="2" style="height: 1px" class="data-area-separator"><img style="width: 1px; height: 1px" src=""></td>
+<td nowrap style="height: 1px" class="data-area-canvas"><img style="width: 1px; height: 1px" src=""></td>
+<td nowrap style="height: 1px; width: 5px"><img style="width: 1px; height: 1px" src=""></td>
+</tr>
+<tr>
+<td style="width: 10px;height:24px;" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas-odd" width="45%">Port Based Authentication State</td>
+<td class="data-area-canvas-odd">
+
+<SELECT  NAME=dot1xPaeSystemAuthControl$select SIZE=1
+ >
+
+<OPTION value=1> Enable
+
+<OPTION value=2 selected> Disable
+
+</select>
+
+
+</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td style="width: 10px;height:24px;" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas" width="45%">Authentication Method</td>
+<td class="data-area-canvas">
+<select name="methods$select">
+<option>
+RADIUS, None
+<option>
+RADIUS
+<option>
+None
+</select>
+</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<script language="JavaScript">
+formObj=document.securityPortAuthForm;
+selName="methods$select";
+if (methodsStr!="")
+{
+for (var i=0; i<formObj.elements[selName].options.length; i++)
+{
+if (formObj.elements[selName].options[i].text==methodsStr)
+{
+formObj.elements[selName].options[i].selected=true;
+break;
+}
+}
+}
+else
+formObj.elements[selName].options[1].selected=true;
+</script>
+
+<INPUT  type=hidden NAME=securityPortAuthTable$current   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=securityPortAuthTable$query2 disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=dot1xAuthAuthControlledPortControl$query2 disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1xPaePortNumber$query2 disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1xAuthReAuthEnabled$query2 disabled   value="2" SIZE="20" MAXLENGTH="20"><INPUT  type=hidden Name=securityPortAuthTable$endQuery2 disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  type=hidden NAME=securityPortAuthTable$current disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=securityPortAuthTable$query   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1xPaePortNumber$query   value="1" SIZE="20" MAXLENGTH="20">
+<tr>
+<td style="width: 10px;height:24px;" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas-odd" width="45%">Guest VLAN</td>
+<td class="data-area-canvas-odd">
+<INPUT  TYPE=Hidden NAME=rldot1xGuestVlanVID$scalar   value="0" SIZE="20" MAXLENGTH="20">
+
+<select name="enableGuestVlan$select" onChange="VlanList()">
+<option value="1">Enable</option>
+<option value="2" selected>Disable</option>
+</select>
+<script>
+</script>
+</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+
+<td style="width: 10px;height:24px;" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas" width="45%">VLAN List</td>
+<td class="data-area-canvas">
+
+<SELECT  Name=dot1qVlanIndex$select size="1" onChange="selectGuestVlan()"
+ RpGetType=complex >
+<OPTION  value=0>1
+<OPTION  value=1>20
+<OPTION  value=2>30
+</select>
+
+
+<script language="JavaScript">SetGuestSelectedVlan();</script>
+</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<script>top.Draw_TableBottom(2);</script>
+</table>
+<br>
+<table id="security_pauth_inner_tbl" border="0" cellspacing="0" cellpadding="0" width="100%">
+<script language="JavaScript">top.Draw_TableTop(2);</script>
+<tr>
+<td nowrap style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas"><b>Interface Parameters</b></td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px"></td>
+</tr>
+<tr>
+<td nowrap style="height: 1px; width: 10px" class="data-area-canvas"><img style="width: 1px; height: 1px" src=""></td>
+<td nowrap colspan="2" style="height: 1px" class="data-area-separator"><img style="width: 1px; height: 1px" src=""></td>
+<td nowrap style="height: 1px" class="data-area-canvas"><img style="width: 1px; height: 1px" src=""></td>
+<td nowrap style="height: 1px; width: 5px"><img style="width: 1px; height: 1px" src=""></td>
+</tr>
+<tr>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas-odd" width="45%">Interface</td>
+<td class="data-area-canvas-odd">
+<select name="dot1xPaePortNumber$select" onChange="selectIndex();" class="monitorEnabled">
+<option></option>
+</select>
+<script language="JavaScript">addPresentPortsSelectionList(document.securityPortAuthForm,'dot1xPaePortNumber$select','','n');</script>
+</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td style="width: 10px;height:24px;" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas">User Name</td>
+<td class="data-area-canvas">
+
+<INPUT  TYPE=hidden NAME=String$add   value="OK" SIZE="20" MAXLENGTH="20">
+&nbsp;
+<INPUT  TYPE=hidden NAME=Default$add   value="OK" SIZE="20" MAXLENGTH="20">
+
+</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas-odd">Admin Interface Control</td>
+<td class="data-area-canvas-odd">
+
+<INPUT  TYPE="hidden" NAME="dot1xAuthAuthControlledPortControl$query1" disabled   value="3" SIZE="20" MAXLENGTH="20">
+<SELECT  NAME="dot1xAuthAuthControlledPortControl$query" SIZE="1"
+ >
+
+<OPTION value=2> Auto
+
+<OPTION value=3 selected> Authorized
+
+<OPTION value=1> Unauthorized
+
+</select>
+</select>
+
+
+</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td style="width: 10px;height:24px;" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas">Current Interface Control</td>
+<td class="data-area-canvas">
+
+<INPUT  TYPE=hidden NAME=ifOperStatus$query disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=dot1xAuthAuthControlledPortStatus$query disabled   value="1" SIZE="20" MAXLENGTH="20">
+
+<script>displayCurrentPortControl();</script>
+</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td class="data-area-canvas" width="10" height="24">&nbsp;</td>
+<td class="data-area-canvas-odd" width="45%">Authentication Type</td>
+<td class="data-area-canvas-odd">
+<INPUT  TYPE=HIDDEN NAME="rldot1xAuthenticationPortMethod$query" disabled   value="1" SIZE="20" MAXLENGTH="20">
+<select name="AuthenType$select" size="1" ID="Select10">
+<option value="1" selected>802.1x Only</option>
+<option value="3">MAC Only</option>
+<option value="2">802.1x &amp; MAC</option>
+</select>
+<script>setAuthTypeSelect();</script>
+</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td width="15">&nbsp;</td>
+</tr>
+<tr>
+<td class="data-area-canvas" width="10" height="24">&nbsp;</td>
+<td class="data-area-canvas" width="45%">Dynamic VLAN Assignment</td>
+<td class="data-area-canvas">
+<INPUT  TYPE=HIDDEN NAME=rldot1xRadiusAttrVlanIdEnabled$query   value="2" SIZE="20" MAXLENGTH="20">
+<select name="rldot1xRadiusAttrVlanIdEnabled$select" ID="Select6">
+<option value="2" selected>Disable</option>
+<option value="1">Enable</option>
+</select>
+<script>initVlanAssignmentStatus();</script>
+</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td width="15">&nbsp;</td>
+</tr>
+<tr>
+<td style="width: 10px;height:24px;" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas-odd" width="45%">Guest VLAN</td>
+<td class="data-area-canvas-odd">
+
+
+<select name="rldot1xGuestVlanPorts$select" onChange="SetGuestVlanPort()">
+<option>
+Disable<option>
+Enable</select>
+</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas">Periodic Reauthentication
+</td>
+<td class="data-area-canvas">
+
+<SELECT  NAME="dot1xAuthReAuthEnabled$query" SIZE="1"
+ >
+
+<OPTION value=1> Enable
+
+<OPTION value=2 selected> Disable
+
+</select>
+
+
+</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas-odd">Reauthentication Period (300-4294967295)</td>
+<td class="data-area-canvas-odd">
+
+<INPUT  TYPE=text NAME=dot1xAuthReAuthPeriod$query maxlength=10 onblur=checkValidation('','','','','INT','300','4294967295')   value="3600">
+
+&nbsp;(Sec)</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td style="width: 10px; height: 25px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas">Reauthenticate Now</td>
+<td class="data-area-canvas">
+
+<INPUT  TYPE=hidden NAME=dot1xPaePortReauthenticate$query   value="2" SIZE="20" MAXLENGTH="20">
+
+<input type="checkbox" name="reauthenticateCBox">
+<script>
+setCbox();
+</script>
+</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px; height: 25px">&nbsp;</td>
+</tr>
+<tr>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas-odd">Authentication Server Timeout (1-65535)</td>
+<td class="data-area-canvas-odd">
+
+<INPUT  TYPE=text NAME=dot1xAuthServerTimeout$query onblur=checkValidation()   value="30" SIZE="20" MAXLENGTH="20">
+
+&nbsp;(Sec)
+</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas">Resending EAP Identity Request (30-65535)</td>
+<td class="data-area-canvas">
+
+<INPUT  TYPE=text NAME=dot1xAuthTxPeriod$query onblur=checkValidation('','','dot1xAuthTxPeriod$query',false,'int',30,65535)   value="30" SIZE="20" MAXLENGTH="20">
+
+&nbsp;(Sec)
+</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas-odd">Quiet Period (0-65535)</td>
+<td class="data-area-canvas-odd">
+
+<INPUT  TYPE=text NAME=dot1xAuthQuietPeriod$query onblur=checkValidation()   value="60" SIZE="20" MAXLENGTH="20">
+
+&nbsp;(Sec)
+</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas">Supplicant Timeout (1-65535)</td>
+<td class="data-area-canvas">
+
+<INPUT  TYPE=text NAME=dot1xAuthSuppTimeout$query onblur=checkValidation()   value="30" SIZE="20" MAXLENGTH="20">
+
+&nbsp;(Sec)
+</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas-odd">Max EAP Requests (1-10)</td>
+<td class="data-area-canvas-odd">
+
+<INPUT  TYPE=text NAME=dot1xAuthMaxReq$query onblur=checkValidation()   value="2" SIZE="20" MAXLENGTH="20">
+
+&nbsp;
+</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+
+<INPUT  type=hidden Name=securityPortAuthTable$endQuery   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=Hidden NAME=rldot1xGuestVlanPorts$scalar   value="000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=Hidden NAME=rldot1xGuestVlanPorts$default disabled   value="000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000" SIZE="20" MAXLENGTH="20">
+<script language="JavaScript">top.Draw_TableBottom(2)</script>
+</table>
+<br>
+<script language="javaScript">
+SetGuestVlanPortStatus();
+indexSign();
+GetGuestVlan();
+</script>
+<INPUT  Type=HIDDEN Name=rlPhdPorts   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rlPhdPortsTable$VT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rlPhdPortsIfIndex$VT SIZE=128   value="Type=0;Access=1;NumOfEnumerations=0;Range0=[-2147483648,2147483647]">
+<INPUT  TYPE=HIDDEN NAME=rlPhdPortsModuleNumber$VT SIZE=128   value="Type=0;Access=1;NumOfEnumerations=0;Range0=[-2147483648,2147483647]">
+<INPUT  Type=HIDDEN Name=rlPhdPorts$endVT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=rlPhdPorts$q   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN NAME=rlPhdPortsIfIndex$q disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN NAME=rlPhdPortsModuleNumber$q disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=rlPhdPorts$eq   value="OK" SIZE="20" MAXLENGTH="20">
+
+<div class="management-only">
+
+<div align="center"><table id="apply_tbl" cellspacing="0" cellpadding="0" border="0"><tr>
+<td nowrap nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/lbutton.gif"></td>
+<td nowrap nowrap valign="middle" align="center" class="data-area-button"><a href="javascript:preSubmit();">Apply Changes</a></td>
+<td nowrap nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/rbutton.gif"></td>
+</tr></table></div><br>
+<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
+<!--
+if(document.forms[0] && document.forms[0].elements.length<=1000)
+{
+for(i=0;(document.forms[0] && i<document.forms[0].elements.length);i++)
+{
+if(document.forms[0] && document.forms[0].elements[i].type=="select-one")
+if(document.forms[0] && document.forms[0].elements[i].length==0)
+document.forms[0].elements[i].style.width="70px";
+}
+}
+//-->
+</SCRIPT>
+
+</div>
+</form>
+</body>
+</html>

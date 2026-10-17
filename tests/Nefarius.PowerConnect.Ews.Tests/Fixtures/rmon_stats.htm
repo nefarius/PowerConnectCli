@@ -1,0 +1,493 @@
+
+
+<html>
+<head>
+<title>RMON Statistics Group</title>
+
+<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
+<!--
+if(top.location==self.location )
+{
+var refStr=self.location + " ";
+var ind=0;
+refStr.toLowerCase();
+ind=refStr.indexOf("config");
+var locationStr=refStr.substring(0,ind);
+if (opener)
+{
+if (opener.opener)
+{
+if(opener.opener.top.location==opener.opener.location)
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+else
+{
+if(opener.top.location==opener.location)
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+}
+else
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+//-->
+</SCRIPT>
+
+<link rel="stylesheet" href="../device/style.css" type="text/css">
+<script src="../js/globalFunctions.js"></script>
+<script language="JavaScript">
+<!-- Beginng of JavaScript Applet
+if(top.MonitorMode) {
+document.write("<link rel='stylesheet' href='../device/monitorMode.css' type='text/css'>")
+}
+var x, inInterval = false, expr = "inInterval=true;location.reload();";
+function submitQuery(){
+if (inInterval) return;
+var interfaceValue;
+var selectList;
+var formele=document.rmonStatForm.elements;
+selectList = formele["PortTrunkSelect"][0].checked ? formele["rlPhdPortsIfIndex$select"] : selectList=formele["dot3adAggIndex$select"];
+interfaceValue = selectList[selectList.selectedIndex].value;
+formele["etherStatsIndex$query"].value = interfaceValue;
+var newFilter="rmon_stats.htm?Query:etherStatsIndex=";
+newFilter+=formele["etherStatsIndex$query"].value;
+filterString=newFilter;
+disableHtml();
+disableQuery();
+document.location.href=filterString;
+}
+function disableHtml() {
+var formele=document.rmonStatForm.elements;
+formele["PortTrunkSelect"][0].disabled=true;
+formele["PortTrunkSelect"][1].disabled=true;
+formele["rlPhdPortsIfIndex$select"].disabled=true;
+formele["dot3adAggIndex$select"].disabled=true;
+formele["refreshRate$select"].disabled=true;
+}
+function disableQuery() {
+formele=document.rmonStatForm.elements;
+formele["etherStatsIndex$query"].disabled=true;
+}
+function changeEtherlikeRefreshRate(){
+var rateList = document.rmonStatForm.elements["refreshRate$select"];
+var selectedRate = rateList[rateList.selectedIndex].value;
+top.statRmonRefreshRate=selectedRate;
+if((!inInterval) && (selectedRate == 0)) {
+clearInterval(x);
+} else {
+x=setInterval(expr,(top.statRmonRefreshRate)*1000);
+}
+}
+function selectRate() {
+var rateList = document.rmonStatForm.elements["refreshRate$select"];
+var i=0;
+while (i<5) {
+if (top.statRmonRefreshRate == rateList.options[i].value) {
+rateList.options[i].selected = true;
+break;
+}
+i=i+1;
+}
+if((!inInterval) && (top.statRmonRefreshRate != 0)) {
+var x=setInterval(expr,(top.statRmonRefreshRate)*1000);
+}
+}
+function disableTrunkList() {
+var formele=document.rmonStatForm.elements;
+formele["dot3adAggIndex$select"].disabled=true;
+formele["rlPhdPortsIfIndex$select"].disabled=false;
+formele["PortTrunkSelect"][0].checked = true;
+formele["PortTrunkSelect"][1].checked = false;
+}
+function disablePortList() {
+var formele=document.rmonStatForm.elements;
+formele["rlPhdPortsIfIndex$select"].disabled=true;
+formele["dot3adAggIndex$select"].disabled=false;
+formele["PortTrunkSelect"][0].checked = false;
+formele["PortTrunkSelect"][1].checked = true;
+}
+function indexSign() {
+var i=0;
+var formele=document.rmonStatForm.elements;
+formele["PortTrunkSelect"][0].checked=false;
+formele["PortTrunkSelect"][1].checked=false;
+selectName=formele["dot3adAggIndex$select"];
+while (selectName.options[i]!=null) {
+if (selectName.options[i].value == formele["etherStatsIndex$query"].value) {
+selectName.selectedIndex=i;
+formele["rlPhdPortsIfIndex$select"].selectedIndex=0;
+formele["PortTrunkSelect"][1].checked=true;
+formele["rlPhdPortsIfIndex$select"].disabled=true;
+break;
+}
+i++;
+}
+i=0;
+if(formele["PortTrunkSelect"][1].checked == false) {
+selectName=formele["rlPhdPortsIfIndex$select"];
+while (selectName.options[i]!=null) {
+if (selectName.options[i].value == formele["etherStatsIndex$query"].value) {
+selectName.selectedIndex=i;
+formele["dot3adAggIndex$select"].selectedIndex=0;
+formele["PortTrunkSelect"][0].checked=true;
+formele["dot3adAggIndex$select"].disabled=true;
+break;
+}
+i++;
+}
+}
+if ((formele["PortTrunkSelect"][1].checked == false)&&(formele["PortTrunkSelect"][0].checked == false)) {
+formele["PortTrunkSelect"][0].checked=true;
+formele["dot3adAggIndex$select"].disabled=true;
+formele["dot3adAggIndex$select"].selectedIndex=0;
+formele["rlPhdPortsIfIndex$select"].selectedIndex=0;
+}
+}
+function ask(){
+var z=confirm("This operation will clear the Interface Statistics, the EtherLike Statistics and the RMON Statistics for the selected Interface");
+if (z) {
+clearStatistics();
+}
+}
+function clearStatistics(){
+var formelem=document.rmonStatForm.elements;
+var selectedList,selectedInterface;
+var bitString=new String();
+var bitOctetString,bitNum;
+if(formelem["PortTrunkSelect"][0].checked == true){
+selectedList = formelem["rlPhdPortsIfIndex$select"];
+}
+else{
+selectedList = formelem["dot3adAggIndex$select"];
+}
+bitNum = parseInt(selectedList[selectedList.selectedIndex].value);
+for(i=1; i<=top.actualNumberOfPorts; i++){
+if( i != bitNum )
+bitString += "0";
+else
+bitString += "1";
+}
+for(i=top.actualNumberOfPorts+1;i<top.trunkFirstIndex;i++){
+bitString += "0";
+}
+for(i=1; i<=top.NumberOfTrunks; i++){
+if( (i+top.trunkFirstIndex-1) != bitNum )
+bitString += "0";
+else
+bitString += "1";
+}
+bitOctetString = bitsAsCharsToOctet(bitString);
+formelem["rlIfClearPortMibCounters"].value=bitOctetString;
+disableHtml();
+document.rmonStatForm.submit();
+}
+// --End of Java code -->
+</script>
+</head>
+<body bgcolor="#FFFFFF" leftmargin="15" onload="setScreenMonitorState();">
+<script language="JavaScript">
+top.Draw_Header(document.title);
+</script>
+<FORM METHOD='POST' name="rmonStatForm"  ACTION="/config/rmon_stats.htm"  >
+<INPUT  Type="HIDDEN" Name="restoreUrl" SIZE=256   value="Query:etherStatsIndex=1">
+<INPUT  TYPE="HIDDEN" NAME="statRmonErrorCollector"   value="" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE="HIDDEN" Name=rlIfClearPortMibCounters SIZE=256   value="">
+<INPUT  Type=HIDDEN Name=rmonStats   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=etherStatsTable$VT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=etherStatsIndex$VT SIZE=128   value="Type=0;Access=1;NumOfEnumerations=0;Range0=[1,65535]">
+<INPUT  Type=HIDDEN Name=etherStatsDropEvents$VT SIZE=128   value="Type=6;Access=1;NumOfEnumerations=0;Range0=[-2147483648,2147483647]">
+<INPUT  Type=HIDDEN Name=etherStatsOctets$VT SIZE=128   value="Type=6;Access=1;NumOfEnumerations=0;Range0=[-2147483648,2147483647]">
+<INPUT  Type=HIDDEN Name=etherStatsPkts$VT SIZE=128   value="Type=6;Access=1;NumOfEnumerations=0;Range0=[-2147483648,2147483647]">
+<INPUT  Type=HIDDEN Name=etherStatsBroadcastPkts$VT SIZE=128   value="Type=6;Access=1;NumOfEnumerations=0;Range0=[-2147483648,2147483647]">
+<INPUT  Type=HIDDEN Name=etherStatsMulticastPkts$VT SIZE=128   value="Type=6;Access=1;NumOfEnumerations=0;Range0=[-2147483648,2147483647]">
+<INPUT  Type=HIDDEN Name=etherStatsCRCAlignErrors$VT SIZE=128   value="Type=6;Access=1;NumOfEnumerations=0;Range0=[-2147483648,2147483647]">
+<INPUT  Type=HIDDEN Name=etherStatsUndersizePkts$VT SIZE=128   value="Type=6;Access=1;NumOfEnumerations=0;Range0=[-2147483648,2147483647]">
+<INPUT  Type=HIDDEN Name=etherStatsOversizePkts$VT SIZE=128   value="Type=6;Access=1;NumOfEnumerations=0;Range0=[-2147483648,2147483647]">
+<INPUT  Type=HIDDEN Name=etherStatsFragments$VT SIZE=128   value="Type=6;Access=1;NumOfEnumerations=0;Range0=[-2147483648,2147483647]">
+<INPUT  Type=HIDDEN Name=etherStatsJabbers$VT SIZE=128   value="Type=6;Access=1;NumOfEnumerations=0;Range0=[-2147483648,2147483647]">
+<INPUT  Type=HIDDEN Name=etherStatsCollisions$VT SIZE=128   value="Type=6;Access=1;NumOfEnumerations=0;Range0=[-2147483648,2147483647]">
+<INPUT  Type=HIDDEN Name=etherStatsPkts64Octets$VT SIZE=128   value="Type=6;Access=1;NumOfEnumerations=0;Range0=[-2147483648,2147483647]">
+<INPUT  Type=HIDDEN Name=etherStatsPkts65to127Octets$VT SIZE=128   value="Type=6;Access=1;NumOfEnumerations=0;Range0=[-2147483648,2147483647]">
+<INPUT  Type=HIDDEN Name=etherStatsPkts128to255Octets$VT SIZE=128   value="Type=6;Access=1;NumOfEnumerations=0;Range0=[-2147483648,2147483647]">
+<INPUT  Type=HIDDEN Name=etherStatsPkts256to511Octets$VT SIZE=128   value="Type=6;Access=1;NumOfEnumerations=0;Range0=[-2147483648,2147483647]">
+<INPUT  Type=HIDDEN Name=etherStatsPkts512to1023Octets$VT SIZE=128   value="Type=6;Access=1;NumOfEnumerations=0;Range0=[-2147483648,2147483647]">
+<INPUT  Type=HIDDEN Name=etherStatsPkts1024to1518Octets$VT SIZE=128   value="Type=6;Access=1;NumOfEnumerations=0;Range0=[-2147483648,2147483647]">
+<INPUT  Type=HIDDEN Name=rmonStats$endVT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=rmonStats$query   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=etherStatsIndex$query   value="1" SIZE="20" MAXLENGTH="20">
+<table id="rmon_stats_interface_tbl" border="0" cellspacing="0" cellpadding="0" width="100%">
+<script language="JavaScript">
+top.Draw_TableTop(2);
+top.Draw_TableHeader();
+</script>
+<tr>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap width="50%" class="data-area-canvas-odd">Interface</td>
+<td nowrap width="50%" class="data-area-canvas-odd">
+<input type="radio" id=radioPort name="PortTrunkSelect" class="monitorEnabled" value="1" onClick="disableTrunkList(); submitQuery();">
+Port&nbsp;&nbsp;
+<select name="rlPhdPortsIfIndex$select" onChange="submitQuery()" class="monitorEnabled"> <option></option></select>
+<script language="JavaScript">
+addPresentPortsSelectionList(document.rmonStatForm,'rlPhdPortsIfIndex$select','','n');
+</script>
+&nbsp;&nbsp;
+<input type="radio" id=radioTrunk name="PortTrunkSelect" value="2" class="monitorEnabled" onClick="disablePortList(); submitQuery();">
+LAG&nbsp;&nbsp;
+<SELECT  Name=dot3adAggIndex$select size="1" class="monitorEnabled" onChange="submitQuery()"
+ RpGetType=complex >
+<OPTION  value=0>1000
+<OPTION  value=1>1001
+<OPTION  value=2>1002
+<OPTION  value=3>1003
+<OPTION  value=4>1004
+<OPTION  value=5>1005
+<OPTION  value=6>1006
+<OPTION  value=7>1007
+</select>
+
+<script>
+changeTrunkListText("dot3adAggIndex$select");
+</script>
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap width="50%" class="data-area-canvas">Refresh Rate</td>
+<td nowrap width="50%" class="data-area-canvas">
+<select id="refreshRate$select_Id" name="refreshRate$select" size=1 onChange="changeEtherlikeRefreshRate();">
+<option value="15">15 Sec</option>
+<option value="30">30 Sec</option>
+<option value="60">60 Sec</option>
+<option value="0">No Refresh</option>
+</select>
+</td>
+<script language="JavaScript">
+selectRate();
+</script>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+</tr>
+<script language="JavaScript">
+top.Draw_TableBottom(2);
+</script>
+</table>
+<br>
+<script language=javaScript>
+indexSign();
+</script>
+<table id="rmon_stats_received_tbl" border="0" cellspacing="0" cellpadding="0" width="100%">
+<script language="JavaScript">
+top.Draw_TableTop(2);
+top.Draw_TableHeader();
+</script>
+<tr>
+<td nowrap class="data-area-canvas" style="height: 24px">&nbsp;</td>
+<td nowrap width=50% class="data-area-canvas-odd">Dropped packets</td>
+<td nowrap width=50% class="data-area-canvas-odd">
+
+1211
+
+&nbsp;
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap class="data-area-canvas" style="height: 24px">&nbsp;</td>
+<td nowrap width=50% class="data-area-canvas">Received Bytes (Octets)</td>
+<td nowrap width=50% class="data-area-canvas">
+1439464855
+&nbsp;
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap class="data-area-canvas" style="height: 24px">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd">Received Packets</td>
+<td nowrap class="data-area-canvas-odd">
+1090141
+&nbsp;
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap class="data-area-canvas" style="height: 24px">&nbsp;</td>
+<td nowrap class="data-area-canvas">Broadcast Packets Received</td>
+<td nowrap class="data-area-canvas">
+31411
+&nbsp;
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap class="data-area-canvas" style="height: 24px">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd">Multicast Packets Received</td>
+<td nowrap class="data-area-canvas-odd">
+3585
+&nbsp;
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+</tr>
+<script language="JavaScript">
+top.Draw_TableBottom(2);
+</script>
+</table>
+<br>
+<table id="rmon_stats_crcErrs_tbl" border="0" cellspacing="0" cellpadding="0" width="100%">
+<script language="JavaScript">
+top.Draw_TableTop(2);top.Draw_TableHeader();
+</script>
+<tr>
+<td nowrap class="data-area-canvas" style="height: 24px">&nbsp;</td>
+<td nowrap width=50% class="data-area-canvas-odd">CRC&Align Errors</td>
+<td nowrap width=50% class="data-area-canvas-odd">
+0
+&nbsp;
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap class="data-area-canvas" style="height: 24px">&nbsp;</td>
+<td nowrap class="data-area-canvas">Undersize Packets</td>
+<td nowrap class="data-area-canvas">
+0
+&nbsp;
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap class="data-area-canvas" style="height: 24px">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd">Oversize Packets</td>
+<td nowrap class="data-area-canvas-odd">
+0
+&nbsp;
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap class="data-area-canvas" style="height: 24px">&nbsp;</td>
+<td nowrap class="data-area-canvas">Fragments</td>
+<td nowrap class="data-area-canvas">
+0
+&nbsp;
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap class="data-area-canvas" style="height: 24px">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd">Jabbers</td>
+<td nowrap class="data-area-canvas-odd">
+0
+&nbsp;
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap class="data-area-canvas" style="height: 24px">&nbsp;</td>
+<td nowrap class="data-area-canvas">Collisions</td>
+<td nowrap class="data-area-canvas">
+<INPUT  TYPE=HIDDEN NAME=etherStatsCollisions$query   value="0" SIZE="20" MAXLENGTH="20">
+<script type="text/javascript">
+if (!document.getElementById("radioTrunk").checked) {
+document.write(document.rmonStatForm.elements["etherStatsCollisions$query"].value);
+} else {
+document.write("N/A");
+}
+</script>
+&nbsp;
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+</tr>
+<script language="JavaScript">
+top.Draw_TableBottom(2);
+</script>
+</table>
+<br>
+<table id="rmon_stats_frames_tbl" border="0" cellspacing="0" cellpadding="0" width="100%">
+<script language="JavaScript">
+top.Draw_TableTop(2);
+top.Draw_TableHeader();
+</script>
+<tr>
+<td nowrap class="data-area-canvas" style="height: 24px">&nbsp;</td>
+<td nowrap width=50% class="data-area-canvas-odd">Frames of 64 Bytes</td>
+<td nowrap width=50% class="data-area-canvas-odd">
+25657
+&nbsp;
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap class="data-area-canvas" style="height: 24px">&nbsp;</td>
+<td nowrap class="data-area-canvas">Frames of 65 to 127 Bytes</td>
+<td nowrap class="data-area-canvas">
+92069
+&nbsp;
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap class="data-area-canvas" style="height: 24px">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd">Frames of 128 to 255 Bytes</td>
+<td nowrap class="data-area-canvas-odd">
+5245
+&nbsp;
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap class="data-area-canvas" style="height: 24px">&nbsp;</td>
+<td nowrap class="data-area-canvas">Frames of 256 to 511 Bytes</td>
+<td nowrap class="data-area-canvas">
+20877
+&nbsp;
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap class="data-area-canvas" style="height: 24px">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd">Frames of 512 to 1023 Bytes</td>
+<td nowrap class="data-area-canvas-odd">
+2832
+&nbsp;
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap class="data-area-canvas" style="height: 24px">&nbsp;</td>
+<td nowrap class="data-area-canvas">Frames of 1024 to MAX Bytes</td>
+<td nowrap class="data-area-canvas">
+943461
+&nbsp;
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<INPUT  type=hidden Name=rmonStats$endQuery   value="OK" SIZE="20" MAXLENGTH="20">
+</tr>
+<script language="JavaScript">
+top.Draw_TableBottom(2)
+</script>
+</table>
+<br>
+<table id="stat_etherlike_reset_tbl" align="center">
+<tr>
+<td nowrap>
+<div align="center" class="management-only">
+<table cellspacing="0" cellpadding="0" border="0">
+<tr>
+<td nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/lbutton.gif"></td>
+<td nowrap valign="middle" align="center" class="data-area-button"><a href="javascript:ask();">Reset All Counters</a></td>
+<td nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/rbutton.gif"></td>
+</tr>
+</table></div></td>
+</tr>
+</table>
+</form>
+</body>
+</html>

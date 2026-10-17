@@ -1,0 +1,284 @@
+
+
+<html>
+<head>
+
+<script>
+if(top.DeviceType && top.DeviceType==1)
+{
+document.write("<title>Interface Settings</title>");
+}
+else
+{
+document.write("<title>Interface Settings</title>");
+}
+</script>
+<link rel="stylesheet" href="../device/style.css" type="text/css">
+<script src="../js/globalFunctions.js"></script>
+<script language="JavaScript">
+<!-- Beginng of JavaScript Applet
+if(top.MonitorMode) {
+document.write("<link rel='stylesheet' href='../device/monitorMode.css' type='text/css'>")
+}
+FieldsToCheck = new Array(3);
+FieldsToCheck[ 0] = "rlQosEfQueueId$repeat";
+FieldsToCheck[ 1] = "rlQosEfState$repeat";
+FieldsToCheck[ 2] = "EfManageVT$endRepeat";
+var formele;
+var numOfQueues=4;
+function formSubmit()
+{
+if ((formele["rlIfIndex$query"].value==top.queryNA)||(formele["rlIfIndex$query"].value=="")||(formele["rlIfIndex$query"].value=="0"))
+{
+formele["rlIfIndex$query"].value = top.rlIfIndex;
+formele["rlIfType$query"].value = 2;
+formele["rlQosIfPolicyMapStatus$query"].value = 4;
+}
+else
+formele["rlQosIfPolicyMapStatus$query"].value = 1;
+selectList=formele["dot1dPortDefaultUserPriority$select"];
+formele["dot1dPortDefaultUserPriority$query"].value = selectList.selectedIndex;
+if (formele["QosIfTrustActive"].checked)
+formele["rlQosIfTrustActive$query"].value = 1;
+else
+formele["rlQosIfTrustActive$query"].value = 2;
+disableHtml();
+document.cosqosInterfaceForm.submit();
+}
+function submitQuery()
+{
+selectList=formele["port"];
+interfaceValue = selectList[selectList.selectedIndex].value;
+top.rlIfType = 2;
+top.rlIfIndex = interfaceValue;
+var newFilter="cosqos_interface.htm?Query:rlIfIndex=";
+newFilter+=interfaceValue;
+newFilter+="@rlIfType=2";
+document.location.href=newFilter;
+}
+function ifIndexSign()
+{
+if (formele["rlIfIndex$query"].value!=top.queryNA)
+{
+if (formele["rlIfIndex$query"].value>=parseInt(top.trunkFirstIndex))
+{
+formele["PortTrunkVlan"][1].checked=true;
+formele["port"].disabled=true;
+formele["trunk"].disabled=false;
+formele["trunk"].selectedIndex=(parseInt(formele["rlIfIndex$query"].value)-parseInt(top.trunkFirstIndex));
+}
+else
+{
+formele["PortTrunkVlan"][0].checked=true;
+formele["port"].disabled=false;
+formele["trunk"].disabled=true;
+i=0;
+while (formele["port"].options[i].value!=parseInt(formele["rlIfIndex$query"].value))
+i++;
+formele["port"].selectedIndex=i;
+}
+}
+}
+function selectInterface()
+{
+portIndex=getInteface();
+top.rlIfType = 2;
+top.rlIfIndex = portIndex;
+if (checkEntry(portIndex))
+{
+var queryStr="cosqos_interface.htm?[IfPolicyVT]Query:rlIfType=2@rlIfIndex="+portIndex;
+document.location.href=queryStr;
+}
+else
+{
+addEntry1(portIndex);
+}
+}
+function disableHtml(){
+formele=document.cosqosInterfaceForm.elements;
+formele["port"].disabled=true;
+formele["trunk"].disabled=true;
+formele["PortTrunkVlan"][0].disabled=true;
+formele["PortTrunkVlan"][1].disabled=true;
+formele["QosIfTrustActive"].disabled=true;
+formele["dot1dPortDefaultUserPriority$select"].disabled=true;
+}
+function indexSign()
+{
+var i=0;
+if (formele["rlIfIndex$query"].value==top.queryNA)
+{
+formele["rlIfIndex$query"].value = top.rlIfIndex;
+formele["rlIfType$query"].value = top.rlIfType;
+}
+selectName=formele["port"];
+selectName.selectedIndex=(parseInt(formele["rlIfIndex$query"].value)-1);
+}
+function cBoxQosIfTrustActive()
+{
+formele["QosIfTrustActive"].checked = (formele["rlQosIfTrustActive$query"].value == "1");
+top.rlIfType=2;
+top.rlIfIndex=1;
+}
+function getInteface()
+{
+if (formele["PortTrunkVlan"][1].checked==true)
+return (formele["trunk"].selectedIndex+parseInt(top.trunkFirstIndex));
+else
+return (getPortNumberFromName(formele["port"].options[formele["port"].selectedIndex].text));
+}
+function checkEntry(index)
+{
+i=1;
+while (formele["rlIfIndex$repeat?"+i])
+if (formele["rlIfIndex$repeat?"+i].value==index)
+return true
+else
+i++;
+return false;
+}
+function disableQuery()
+{
+formele["IfPolicyVT$query"].disabled=true;
+formele["rlIfIndex$query"].disabled=true;
+formele["rlIfType$query"].disabled=true;
+formele["rlQosIfPolicyMapStatus$query"].disabled=true;
+formele["IfPolicyVT$endQuery"].disabled=true;
+}
+function addEntry1(port)
+{
+disableQuery();
+disableHtml();
+formele["dot1dPortDefaultUserPriority$query"].disabled=true;
+formele["rlQosIfTrustActive$query"].disabled=true;
+formele["rlIfIndex$add"].disabled=false;
+formele["rlIfType$add"].disabled=false;
+formele["rlQosIfPolicyMapStatus$add"].disabled=false;
+formele["IfPolicyVT$endAdd"].disabled=false;
+formele["rlIfIndex$add"].value=port;
+formele["rlIfType$add"].value=2;
+formele["rlQosIfPolicyMapStatus$add"].value=4;
+document.cosqosInterfaceForm.submit();
+}
+function windowOpen()
+{
+var str1="interface_table.htm";
+window.open(str1,'', 'width=850, height=600, left=50, top=50, scrollbars=yes, resizable=yes');
+}
+// --End of Java code -->
+</script>
+</head>
+<body bgcolor="#FFFFFF" leftmargin="15" onload="setScreenMonitorState();">
+<script language="JavaScript">top.queueMenuIndex=1;top.Draw_Header(document.title);</script>
+
+<FORM METHOD='POST'  ACTION="/config/cosqos_interface.htm" name="cosqosInterfaceForm"   >
+<INPUT  Type="HIDDEN" Name="restoreUrl" SIZE=256   value="[IfPolicyVT]Query:rlIfType=2@rlIfIndex=1">
+<INPUT  TYPE="HIDDEN" NAME="errorCollector"   value="" SIZE="20" MAXLENGTH="20">
+
+<div align="right"><table cellspacing="0" cellpadding="0" border="0"><tr>
+<td style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/lbutton.gif"></td>
+<td valign="middle" align="center" class="data-area-button"><a href="javascript:void(0)" onClick="windowOpen();" title='Show All Interface Settings'>Show All</a></td>
+<td style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/rbutton.gif"></td>
+<td style="width: 14px; height: 25px"></td>
+</tr></table></div><br>
+
+<INPUT  Type=HIDDEN Name=IfPolicyVT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rlQosIfPolicyTable$VT SIZE=128   value="OK">
+<INPUT  Type=HIDDEN Name=rlIfIndex$VT SIZE=128   value="Type=0;Access=1;NumOfEnumerations=0;Range0=[-2147483648,2147483647]">
+<INPUT  Type=HIDDEN Name=rlIfType$VT SIZE=128   value="Type=0;Access=1;NumOfEnumerations=2;Range0=[1,2]">
+<INPUT  Type=HIDDEN Name=rlQosIfTrustActive$VT SIZE=128   value="Type=0;Access=2;NumOfEnumerations=2;Range0=[1,2];Default value=2">
+<INPUT  Type=HIDDEN Name=dot1dPortDefaultUserPriority$VT SIZE=128   value="Type=0;Access=2;NumOfEnumerations=0;Range0=[0,7];Default value=0">
+<INPUT  Type=HIDDEN Name=rlQosIfPolicyMapStatus$VT SIZE=128   value="Type=0;Access=2;NumOfEnumerations=6;Range0=[1,6];Default value=4">
+<INPUT  Type=HIDDEN Name=IfPolicyVT$endVT   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlIfIndex$add disabled   value="0" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlIfType$add disabled   value="0" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosIfPolicyMapStatus$add disabled   value="0" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=IfPolicyVT$endAdd disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=IfPolicyVT$query   value=" " SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlIfIndex$query   value=" " SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlIfType$query   value=" " SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosIfPolicyMapStatus$query   value=" " SIZE="20" MAXLENGTH="20">
+
+<table id="cosqos_interface_tbl" border="0" cellspacing="0" cellpadding="0" width="100%">
+<script language="JavaScript">
+formele=document.cosqosInterfaceForm.elements;
+top.Draw_TableTop(2);top.Draw_TableHeader()
+</script>
+<tr>
+<td nowrap style="width: 10px;height:24px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd" width="45%">Interface</td>
+<td nowrap class="data-area-canvas-odd">
+<input type="radio" class="monitorEnabled" id=radioPort name="PortTrunkVlan" value="1" Checked onClick="clickRadio(); selectInterface()">
+Port
+<select name="port" size="1" onChange="selectInterface()" class="monitorEnabled">
+<option value="0">&nbsp;</option>
+</select>
+<script language="javaScript">
+addPresentPortsSelectionList(document.forms[0],"port",1,"n","","",true);
+</script>
+<input type="radio" id=radioTrunk class="monitorEnabled" name="PortTrunkVlan" value="2" onClick="clickRadio(); selectInterface()">
+LAG
+<select name="trunk" size="1" onChange=selectInterface() class="monitorEnabled">
+<option value="0">&nbsp;</option>
+</select>
+<script language="javaScript" >
+addRangeSelectionList(document.portBandForm,"trunk",1,top.NumberOfTrunks,"",1);
+</script>
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="width: 10px;height:24px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas">Disable "Trust" Mode on Interface</td>
+<td nowrap class="data-area-canvas">
+
+<INPUT  Type=hidden Name= rlQosIfTrustActive$query   value=" " SIZE="20" MAXLENGTH="20">
+
+<input type="checkbox" name="QosIfTrustActive">
+
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="width: 10px;height:24px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd">Set Default CoS For Incoming Traffic To&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;
+</td>
+<td nowrap class="data-area-canvas-odd">
+
+<INPUT  TYPE=HIDDEN NAME=dot1dPortDefaultUserPriority$query   value=" " SIZE="20" MAXLENGTH="20">
+
+<select name="dot1dPortDefaultUserPriority$select" size="1">
+<option value="0">&nbsp;</option>
+</select>
+</td>
+<script language="javaScript">
+addRangeSelectionList(document.cosqosInterfaceForm,"dot1dPortDefaultUserPriority$select",0,7,"",document.cosqosInterfaceForm.dot1dPortDefaultUserPriority$query.value);
+</script>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<script language="JavaScript">top.Draw_TableBottom(2)</script>
+</table><br>
+
+<INPUT  type=hidden Name=IfPolicyVT$endQuery   value="OK" SIZE="20" MAXLENGTH="20">
+
+<br>
+<script language="JavaScript">
+if (formele["rlIfIndex$query"].value==top.queryNA)
+addEntry1(1);
+if (formele["rlIfType$query"].value=="1")
+selectInterface();
+cBoxQosIfTrustActive();
+ifIndexSign();
+</script>
+<div class="management-only">
+<script language="JavaScript">top.Draw_ButtonApply("formSubmit")</script>
+</div></td>
+
+</form>
+</body>
+</html>

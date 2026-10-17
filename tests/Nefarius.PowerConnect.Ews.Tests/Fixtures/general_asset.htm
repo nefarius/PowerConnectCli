@@ -1,0 +1,1105 @@
+
+
+
+<html>
+<head>
+<title>Asset</title>
+
+
+<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
+<!--
+if(top.location==self.location )
+{
+var refStr=self.location + " ";
+var ind=0;
+refStr.toLowerCase();
+ind=refStr.indexOf("config");
+var locationStr=refStr.substring(0,ind);
+if (opener)
+{
+if (opener.opener)
+{
+if(opener.opener.top.location==opener.opener.location)
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+else
+{
+if(opener.top.location==opener.location)
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+}
+else
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+//-->
+</SCRIPT>
+
+
+<link rel="stylesheet" href="../device/style.css" type="text/css">
+<style>
+#general_asset_hidden_tbl, #general_Entity_hidden_tbl { display:none; }
+</style>
+<script src="../js/globalFunctions.js"></script>
+<script language="JavaScript">
+var lastInvalidField = null;
+if(top.MonitorMode)
+{
+document.write("<link rel='stylesheet' href='../device/monitorMode.css' type='text/css'>")
+}
+<!-- Beginng of JavaScript Applet
+top.FirstTd=0;
+var vtime="",vdate="";
+var TICKS_PER_SECOND = 100;
+var dflag=0,sflag=0;
+FieldsToCheck = new Array(5);
+FieldsToCheck[0] = "sysName";
+FieldsToCheck[1] = "sysContact";
+FieldsToCheck[2] = "sysLocation";
+FieldsToCheck[3] = "rndManagedDate";
+FieldsToCheck[4] = "rndManagedTime";
+function formSubmit(){
+var formele = document.GeneralAssetForm.elements;
+for(var z=0; z<formele.length; z++)
+if (formele[z].type == "text")
+if (isFinite(parseInt(formele[z].getAttribute("maxlength"))))
+if (formele[z].value.length > parseInt(formele[z].getAttribute("maxlength")))
+formele[z].value = formele[z].value.substr(0, parseInt(formele[z].getAttribute("maxlength")));
+dflag=0;
+sflag=0;
+updateAsset();
+disableHtml();
+if(sflag==0)
+{
+document.GeneralAssetForm.submit();
+}
+}
+function checkValue(fieldName,minValue,maxValue){
+var formele=document.GeneralAssetForm.elements;
+var userValue = formele[fieldName].value;
+var result = checkIntegerLegalValue(userValue, minValue, maxValue);
+if(result==false){
+alert("The Value Must Be A Number Between "+minValue+" and "+maxValue+" !")
+formele[fieldName].value = formele[fieldName].defaultValue;
+}
+}
+var dellloopIndex=0;
+function dellIndexUpdate(index){
+dellloopIndex=index;
+}
+var physicalIndex=0;
+function physindexUpdate(index){
+physicalIndex=index;
+}
+var oobIndex=0;
+function oobindexUpdate(index){
+oobIndex=index;
+}
+var val;
+function sysTimeConvFunc(str,flag){
+var time = Math.round(str/TICKS_PER_SECOND);
+var timeStr;
+var days = Math.floor(time/(24*3600));
+time = time%(24*3600);
+var hours = Math.floor(time/3600);
+time = time%3600;
+var minutes = Math.floor(time/60);
+var sec = time%60;
+if(flag=="time")
+{
+var toRtrn="";
+for(i=0;i<6;i=i+2)
+{
+toRtrn=toRtrn+str.substr(i,2);
+if(i<4)
+toRtrn=toRtrn+":";
+}
+return toRtrn;
+}
+else if(flag=="up time")
+{
+timeStr= days + " d "+hours+" h "+minutes+" m "+sec+" s";
+return timeStr;
+}
+}
+function revertTime(str)
+{
+var result="";
+var arr=new Array();
+arr=str.split(":");
+for(i=0;i<arr.length;i++)
+{
+if(i==0)
+{
+if(arr[i]<0 || arr[i]>24 -1)
+{
+return false;
+alert("Wrong Input in the Time Field");
+document.forms[0].manipulateMngTime.value=vtime;
+document.forms[0].manipulateMngTime.focus();
+}
+}
+else
+{
+if(arr[i]<0 || arr[i]>60 -1)
+{
+return false;
+alert("Wrong Input in the Day Field");
+document.forms[0].manipulateMngDate.value=vdate;
+document.forms[0].manipulateMngDate.focus();
+}
+}
+result=result+arr[i];
+}
+document.GeneralAssetForm.elements["rndManagedTime"].value=result;
+return true;
+}
+function strFormatFunc(str,sep)
+{
+var i,format="";
+for(i=0;i<str.length;i++)
+{
+format=format+(str.charAt(i));
+if((i%2!=0)&&(i<str.length-1))
+{
+format=format+sep.charAt(0);
+if(sep=="/")
+{
+format=format+makeDate(str.substr(i+1,2));
+i=i+2;
+}
+}
+}
+return(format);
+}
+function makeDate(month)
+{
+switch(month)
+{
+case "01":month="Jan/";break;
+case "02":month="Feb/";break;
+case "03":month="Mar/";break;
+case "04":month="Apr/";break;
+case "05":month="May/";break;
+case "06":month="Jun/";break;
+case "07":month="Jul/";break;
+case "08":month="Aug/";break;
+case "09":month="Sep/";break;
+case "10":month="Oct/";break;
+case "11":month="Nov/";break;
+case "12":month="Dec/";break;
+}
+return month;
+}
+function disableHtml()
+{
+var formele=document.GeneralAssetForm.elements;
+if(checkDate(formele["manipulateMngDate"].value)==false)
+{
+sflag=1;
+return;
+}
+if(dflag==1)
+{
+sflag=1;
+return;
+}
+if(checkTime(formele["manipulateMngTime"].value)==false)
+{
+return;
+}
+formele["rndBasePhysicalAddress"].disabled=true;
+formele["sysObjectID"].disabled=true;
+formele["sysUpTime"].disabled=true;
+formele["manipulateMngTime"].disabled=true;
+formele["manipulateMngDate"].disabled=true;
+revertTime(formele["manipulateMngTime"].value)
+rerenderDate(formele["manipulateMngDate"].value)
+formele["manipulateMngTime"].disabled=true;
+formele["manipulateMngDate"].disabled=true;
+formele["displayAsset"].disabled=true;
+for(var i=1;i<=physicalIndex;i++)
+{
+var str=formele["entPhysicalIndex$repeat?"+i].value;
+if(i!=2)
+{
+formele["entPhysicalIndex$repeat?"+i].disabled=true;
+formele["entPhysicalAssetID$repeat?"+i].disabled=true;
+}
+}
+for(var i=1;i<=dellloopIndex;i++)
+{
+formele["productIdentificationServiceTag$repeat?"+i].disabled=true;
+formele["productIdentificationSerialNumber$repeat?"+i].disabled=true;
+if(i!=1)
+{
+formele["productIdentificationPerBoxIndex$repeat?"+i].disabled=true;
+formele["productIdentificationAssetTag$repeat?"+i].disabled=true;
+}
+}
+}
+function checkDate(expression)
+{
+anum=/(^\d{2}\/\S{3}\/\d{2}$)/
+if (!(anum.test(expression)))
+{
+alert("Wrong Input in Date Field");
+document.forms[0].manipulateMngDate.value=vdate;
+document.forms[0].manipulateMngDate.focus();
+return;
+}
+var str="";
+sflag=0;
+var arr=new Array();
+arr=expression.split("/");
+if(arr.length!=3)
+{
+alert("Wrong Input in Date Field");
+document.forms[0].manipulateMngDate.value=vdate;
+document.forms[0].manipulateMngDate.focus();
+sflag=1;
+return;
+}
+var m = 0
+switch(arr[1].toUpperCase())
+{
+case "JAN": m=0; break; case "FEB": m=1; break; case "MAR": m=2; break;
+case "APR": m=3; break; case "MAY": m=4; break; case "JUN": m=5; break;
+case "JUL": m=6; break; case "AUG": m=7; break; case "SEP": m=8; break;
+case "OCT": m=9; break; case "NOV": m=10; break; case "DEC": m=11; break;
+}
+var chk = new Date();
+day=arr[0];
+chk.setFullYear(2000 + parseInt(arr[2]), m, day);
+if ( chk.getDate()!=day || chk.getMonth()!=m || (chk.getFullYear() != 2000 + parseInt(arr[2])) )
+{
+alert("Wrong Input in Date Field");
+document.forms[0].manipulateMngDate.value=vdate;
+document.forms[0].manipulateMngDate.focus();
+sflag=1;
+return;
+}
+if(arr[2]<0 || arr[2]>97)
+{
+alert("Wrong Input in Date Field");
+document.forms[0].manipulateMngDate.value=vdate;
+document.forms[0].manipulateMngDate.focus();
+return;
+}
+rerenderDate(expression)
+lastInvalidField = null;
+}
+function checkTime(expression)
+{
+anum=/(^\d{2}:\d{2}:\d{2}$)/
+if (anum.test(expression))
+{
+if(!(revertTime(expression)))
+{
+alert("Wrong Input in the Time Field");
+document.forms[0].manipulateMngTime.value=vtime;
+document.forms[0].manipulateMngTime.focus();
+}
+}
+else
+{
+alert("Wrong Input in the Time Field");
+document.forms[0].manipulateMngTime.value=vtime;
+document.forms[0].manipulateMngTime.focus();
+}
+lastInvalidField = null;
+}
+function rerenderDate(manipulateMngDate)
+{
+var formele=document.GeneralAssetForm.elements;
+var str="";
+var arr=new Array();
+arr=manipulateMngDate.split("/");
+str=str+arr[0];
+arr[1]=arr[1].toUpperCase();
+switch(arr[1])
+{
+case "JAN":
+str=str+"01";
+dflag=0;
+break;
+case "FEB":
+str=str+"02";
+dflag=0;
+break;
+case "MAR":
+str=str+"03";
+dflag=0;
+break;
+case "APR":
+str=str+"04";
+dflag=0;
+break;
+case "MAY":
+str=str+"05";
+dflag=0;
+break;
+case "JUN":
+str=str+"06";
+dflag=0;
+break;
+case "JUL":
+str=str+"07";
+dflag=0;
+break;
+case "AUG":
+str=str+"08";
+dflag=0;
+break;
+case "SEP":
+str=str+"09";
+dflag=0;
+break;
+case "OCT":
+str=str+"10";
+dflag=0;
+break;
+case "NOV":
+str=str+"11";
+dflag=0;
+break;
+case "DEC":
+str=str+"12";
+dflag=0;
+break;
+default:
+alert("Wrong Input in the Date Field");
+document.forms[0].manipulateMngDate.value=vdate;
+document.forms[0].manipulateMngDate.focus();
+dflag=1;
+return;
+}
+str=str+arr[2];
+formele["rndManagedDate"].value=str;
+}
+function updateAssetValue()
+{
+var formele=document.GeneralAssetForm.elements;
+document.getElementById("cellServiceTag").innerHTML = formele["rlPhdUnitGenParamServiceTag$repeat?1"].value;
+formele["displayAsset"].value=formele["rlPhdUnitGenParamAssetTag$repeat?1"].value;
+vdate=document.forms[0].manipulateMngDate.value;
+vtime=document.forms[0].manipulateMngTime.value
+}
+function updateAsset()
+{
+var formele=document.GeneralAssetForm.elements;
+formele["rlPhdUnitGenParamAssetTag$repeat?1"].value=formele["displayAsset"].value;
+}
+function findOobPort()
+{
+var formele=document.GeneralAssetForm.elements;
+var oobRow=0;
+for(i=1;i<=oobIndex;i++)
+{
+if (formele["ifIndex$repeat?"+i].value==top.oobFirstIndex)
+{
+return(formele["ifPhysAddress$repeat?"+i].value);
+}
+}
+}
+function checkBrowserTelnetSupport()
+{
+var appVer = new RegExp("MSIE\\s(\\d{1,}).(\\d{1,})", "i");
+var appVerArr = navigator.appVersion.match(appVer);
+if (appVerArr != null)
+{
+var majorVer = parseInt(appVerArr[1], 10);
+var minorVer = parseInt(appVerArr[2], 10);
+if (majorVer > 6)
+{
+alert("The Telnet protocol handler is not supported in Windows Internet Explorer starting from version 7.");
+}
+}
+}
+// --End of Java code -->
+</script>
+</head>
+<body bgcolor="#FFFFFF" leftmargin="15" onload="updateAssetValue();setScreenMonitorState();">
+<script language="JavaScript">top.Draw_Header(document.title);</script>
+
+<FORM METHOD='POST' name="GeneralAssetForm"  ACTION="/config/general_asset.htm"   >
+<INPUT  Type="HIDDEN" Name="restoreUrl" SIZE=256   value="">
+<INPUT  TYPE="HIDDEN" NAME="errorCollector"   value="" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=AssetVT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=productIdentificationPerUnitTable$VT size=128   value="OK">
+<INPUT  Type=HIDDEN Name=productIdentificationPerBoxIndex$VT size=128   value="Type=0;Access=1;NumOfEnumerations=0;Range0=[1,2147483647]">
+<INPUT  Type=HIDDEN Name=productIdentificationSerialNumber$VT size=128   value="Type=100;Access=1;NumOfEnumerations=0;Range0=[0,160]">
+<INPUT  Type=HIDDEN Name=productIdentificationAssetTag$VT size=128   value="Type=100;Access=1;NumOfEnumerations=0;Range0=[0,160]">
+<INPUT  Type=HIDDEN Name=productIdentificationServiceTag$VT size=128   value="Type=100;Access=1;NumOfEnumerations=0;Range0=[0,160]">
+<INPUT  Type=HIDDEN Name=AssetVT$endVT   value="OK" SIZE="20" MAXLENGTH="20">
+
+<table id="general_asset_hidden_tbl" cellspacing="0" cellpadding="0" border="0" width="100%">
+
+
+<tr>
+<td nowrap>
+
+<INPUT  TYPE=hidden NAME=productIdentificationPerBoxIndex$repeat?1    value="1" SIZE="20" MAXLENGTH="20">
+<script>dellIndexUpdate(1);</script>
+
+</td>
+<td nowrap>
+
+<INPUT  TYPE=hidden NAME=productIdentificationServiceTag$repeat?1    value="SVCTAG0" SIZE="20" MAXLENGTH="20">
+
+</td>
+<td nowrap>
+
+<INPUT  TYPE=hidden NAME=productIdentificationAssetTag$repeat?1    value="&nbsp;" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=productIdentificationSerialNumber$repeat?1    value="SERIALNUMBER000000000" SIZE="20" MAXLENGTH="20">
+
+</td>
+
+<INPUT  type=hidden Name=AssetVT$endRepeat?1    value="OK" SIZE="20" MAXLENGTH="20">
+</tr>
+
+<INPUT  Type=HIDDEN Name=EntityAssetVT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=entPhysicalTable$VT size=128   value="OK">
+<INPUT  Type=HIDDEN Name=entPhysicalIndex$VT size=128   value="Type=0;Access=1;NumOfEnumerations=0;Range0=[1,2147483647]">
+<INPUT  Type=HIDDEN Name=entPhysicalAssetID$VT size=128   value="Type=2;Access=2;NumOfEnumerations=0;Range0=[0,32];Default value=">
+<INPUT  Type=HIDDEN Name=EntityAssetVT$endVT   value="OK" SIZE="20" MAXLENGTH="20">
+
+</table><table id="general_Entity_hidden_tbl" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+
+
+<tr>
+<td nowrap>
+
+<INPUT  TYPE=hidden NAME=entPhysicalIndex$repeat?1  disabled   value="64" SIZE="20" MAXLENGTH="20">
+<script>physindexUpdate(1);</script>
+
+</td>
+<td nowrap>
+
+<INPUT  TYPE=hidden NAME=String$repeat?1    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=entPhysicalAssetID$repeat?1  disabled   value="" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=Default$repeat?1    value="OK" SIZE="20" MAXLENGTH="20">
+
+</td>
+
+<INPUT  type=hidden Name=EntityAssetVT$endRepeat?1    value="OK" SIZE="20" MAXLENGTH="20">
+</tr>
+
+<tr>
+<td nowrap>
+
+<INPUT  TYPE=hidden NAME=entPhysicalIndex$repeat?2  disabled   value="67108992" SIZE="20" MAXLENGTH="20">
+<script>physindexUpdate(2);</script>
+
+</td>
+<td nowrap>
+
+<INPUT  TYPE=hidden NAME=String$repeat?2    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=entPhysicalAssetID$repeat?2  disabled   value="" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=Default$repeat?2    value="OK" SIZE="20" MAXLENGTH="20">
+
+</td>
+
+<INPUT  type=hidden Name=EntityAssetVT$endRepeat?2    value="OK" SIZE="20" MAXLENGTH="20">
+</tr>
+
+<tr>
+<td nowrap>
+
+<INPUT  TYPE=hidden NAME=entPhysicalIndex$repeat?3  disabled   value="68157952" SIZE="20" MAXLENGTH="20">
+<script>physindexUpdate(3);</script>
+
+</td>
+<td nowrap>
+
+<INPUT  TYPE=hidden NAME=String$repeat?3    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=entPhysicalAssetID$repeat?3  disabled   value="" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=Default$repeat?3    value="OK" SIZE="20" MAXLENGTH="20">
+
+</td>
+
+<INPUT  type=hidden Name=EntityAssetVT$endRepeat?3    value="OK" SIZE="20" MAXLENGTH="20">
+</tr>
+
+<tr>
+<td nowrap>
+
+<INPUT  TYPE=hidden NAME=entPhysicalIndex$repeat?4  disabled   value="68420352" SIZE="20" MAXLENGTH="20">
+<script>physindexUpdate(4);</script>
+
+</td>
+<td nowrap>
+
+<INPUT  TYPE=hidden NAME=String$repeat?4    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=entPhysicalAssetID$repeat?4  disabled   value="" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=Default$repeat?4    value="OK" SIZE="20" MAXLENGTH="20">
+
+</td>
+
+<INPUT  type=hidden Name=EntityAssetVT$endRepeat?4    value="OK" SIZE="20" MAXLENGTH="20">
+</tr>
+
+<tr>
+<td nowrap>
+
+<INPUT  TYPE=hidden NAME=entPhysicalIndex$repeat?5  disabled   value="68424704" SIZE="20" MAXLENGTH="20">
+<script>physindexUpdate(5);</script>
+
+</td>
+<td nowrap>
+
+<INPUT  TYPE=hidden NAME=String$repeat?5    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=entPhysicalAssetID$repeat?5  disabled   value="" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=Default$repeat?5    value="OK" SIZE="20" MAXLENGTH="20">
+
+</td>
+
+<INPUT  type=hidden Name=EntityAssetVT$endRepeat?5    value="OK" SIZE="20" MAXLENGTH="20">
+</tr>
+
+<tr>
+<td nowrap>
+
+<INPUT  TYPE=hidden NAME=entPhysicalIndex$repeat?6  disabled   value="68424769" SIZE="20" MAXLENGTH="20">
+<script>physindexUpdate(6);</script>
+
+</td>
+<td nowrap>
+
+<INPUT  TYPE=hidden NAME=String$repeat?6    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=entPhysicalAssetID$repeat?6  disabled   value="" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=Default$repeat?6    value="OK" SIZE="20" MAXLENGTH="20">
+
+</td>
+
+<INPUT  type=hidden Name=EntityAssetVT$endRepeat?6    value="OK" SIZE="20" MAXLENGTH="20">
+</tr>
+
+<tr>
+<td nowrap>
+
+<INPUT  TYPE=hidden NAME=entPhysicalIndex$repeat?7  disabled   value="68424770" SIZE="20" MAXLENGTH="20">
+<script>physindexUpdate(7);</script>
+
+</td>
+<td nowrap>
+
+<INPUT  TYPE=hidden NAME=String$repeat?7    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=entPhysicalAssetID$repeat?7  disabled   value="" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=Default$repeat?7    value="OK" SIZE="20" MAXLENGTH="20">
+
+</td>
+
+<INPUT  type=hidden Name=EntityAssetVT$endRepeat?7    value="OK" SIZE="20" MAXLENGTH="20">
+</tr>
+
+<tr>
+<td nowrap>
+
+<INPUT  TYPE=hidden NAME=entPhysicalIndex$repeat?8  disabled   value="68424771" SIZE="20" MAXLENGTH="20">
+<script>physindexUpdate(8);</script>
+
+</td>
+<td nowrap>
+
+<INPUT  TYPE=hidden NAME=String$repeat?8    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=entPhysicalAssetID$repeat?8  disabled   value="" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=Default$repeat?8    value="OK" SIZE="20" MAXLENGTH="20">
+
+</td>
+
+<INPUT  type=hidden Name=EntityAssetVT$endRepeat?8    value="OK" SIZE="20" MAXLENGTH="20">
+</tr>
+
+<tr>
+<td nowrap>
+
+<INPUT  TYPE=hidden NAME=entPhysicalIndex$repeat?9  disabled   value="68424772" SIZE="20" MAXLENGTH="20">
+<script>physindexUpdate(9);</script>
+
+</td>
+<td nowrap>
+
+<INPUT  TYPE=hidden NAME=String$repeat?9    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=entPhysicalAssetID$repeat?9  disabled   value="" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=Default$repeat?9    value="OK" SIZE="20" MAXLENGTH="20">
+
+</td>
+
+<INPUT  type=hidden Name=EntityAssetVT$endRepeat?9    value="OK" SIZE="20" MAXLENGTH="20">
+</tr>
+
+<tr>
+<td nowrap>
+
+<INPUT  TYPE=hidden NAME=entPhysicalIndex$repeat?10  disabled   value="68424773" SIZE="20" MAXLENGTH="20">
+<script>physindexUpdate(10);</script>
+
+</td>
+<td nowrap>
+
+<INPUT  TYPE=hidden NAME=String$repeat?10    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=entPhysicalAssetID$repeat?10  disabled   value="" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=Default$repeat?10    value="OK" SIZE="20" MAXLENGTH="20">
+
+</td>
+
+<INPUT  type=hidden Name=EntityAssetVT$endRepeat?10    value="OK" SIZE="20" MAXLENGTH="20">
+</tr>
+
+<tr>
+<td nowrap>
+
+<INPUT  TYPE=hidden NAME=entPhysicalIndex$repeat?11  disabled   value="68424774" SIZE="20" MAXLENGTH="20">
+<script>physindexUpdate(11);</script>
+
+</td>
+<td nowrap>
+
+<INPUT  TYPE=hidden NAME=String$repeat?11    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=entPhysicalAssetID$repeat?11  disabled   value="" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=Default$repeat?11    value="OK" SIZE="20" MAXLENGTH="20">
+
+</td>
+
+<INPUT  type=hidden Name=EntityAssetVT$endRepeat?11    value="OK" SIZE="20" MAXLENGTH="20">
+</tr>
+
+<tr>
+<td nowrap>
+
+<INPUT  TYPE=hidden NAME=entPhysicalIndex$repeat?12  disabled   value="68424775" SIZE="20" MAXLENGTH="20">
+<script>physindexUpdate(12);</script>
+
+</td>
+<td nowrap>
+
+<INPUT  TYPE=hidden NAME=String$repeat?12    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=entPhysicalAssetID$repeat?12  disabled   value="" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=Default$repeat?12    value="OK" SIZE="20" MAXLENGTH="20">
+
+</td>
+
+<INPUT  type=hidden Name=EntityAssetVT$endRepeat?12    value="OK" SIZE="20" MAXLENGTH="20">
+</tr>
+
+<tr>
+<td nowrap>
+
+<INPUT  TYPE=hidden NAME=entPhysicalIndex$repeat?13  disabled   value="68424776" SIZE="20" MAXLENGTH="20">
+<script>physindexUpdate(13);</script>
+
+</td>
+<td nowrap>
+
+<INPUT  TYPE=hidden NAME=String$repeat?13    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=entPhysicalAssetID$repeat?13  disabled   value="" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=Default$repeat?13    value="OK" SIZE="20" MAXLENGTH="20">
+
+</td>
+
+<INPUT  type=hidden Name=EntityAssetVT$endRepeat?13    value="OK" SIZE="20" MAXLENGTH="20">
+</tr>
+
+<tr>
+<td nowrap>
+
+<INPUT  TYPE=hidden NAME=entPhysicalIndex$repeat?14  disabled   value="68424777" SIZE="20" MAXLENGTH="20">
+<script>physindexUpdate(14);</script>
+
+</td>
+<td nowrap>
+
+<INPUT  TYPE=hidden NAME=String$repeat?14    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=entPhysicalAssetID$repeat?14  disabled   value="" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=Default$repeat?14    value="OK" SIZE="20" MAXLENGTH="20">
+
+</td>
+
+<INPUT  type=hidden Name=EntityAssetVT$endRepeat?14    value="OK" SIZE="20" MAXLENGTH="20">
+</tr>
+
+<tr>
+<td nowrap>
+
+<INPUT  TYPE=hidden NAME=entPhysicalIndex$repeat?15  disabled   value="68424778" SIZE="20" MAXLENGTH="20">
+<script>physindexUpdate(15);</script>
+
+</td>
+<td nowrap>
+
+<INPUT  TYPE=hidden NAME=String$repeat?15    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=entPhysicalAssetID$repeat?15  disabled   value="" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=Default$repeat?15    value="OK" SIZE="20" MAXLENGTH="20">
+
+</td>
+
+<INPUT  type=hidden Name=EntityAssetVT$endRepeat?15    value="OK" SIZE="20" MAXLENGTH="20">
+</tr>
+
+<tr>
+<td nowrap>
+
+<INPUT  TYPE=hidden NAME=entPhysicalIndex$repeat?16  disabled   value="68424779" SIZE="20" MAXLENGTH="20">
+<script>physindexUpdate(16);</script>
+
+</td>
+<td nowrap>
+
+<INPUT  TYPE=hidden NAME=String$repeat?16    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=entPhysicalAssetID$repeat?16  disabled   value="" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=Default$repeat?16    value="OK" SIZE="20" MAXLENGTH="20">
+
+</td>
+
+<INPUT  type=hidden Name=EntityAssetVT$endRepeat?16    value="OK" SIZE="20" MAXLENGTH="20">
+</tr>
+
+<tr>
+<td nowrap>
+
+<INPUT  TYPE=hidden NAME=entPhysicalIndex$repeat?17  disabled   value="68424780" SIZE="20" MAXLENGTH="20">
+<script>physindexUpdate(17);</script>
+
+</td>
+<td nowrap>
+
+<INPUT  TYPE=hidden NAME=String$repeat?17    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=entPhysicalAssetID$repeat?17  disabled   value="" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=Default$repeat?17    value="OK" SIZE="20" MAXLENGTH="20">
+
+</td>
+
+<INPUT  type=hidden Name=EntityAssetVT$endRepeat?17    value="OK" SIZE="20" MAXLENGTH="20">
+</tr>
+
+<tr>
+<td nowrap>
+
+<INPUT  TYPE=hidden NAME=entPhysicalIndex$repeat?18  disabled   value="68424781" SIZE="20" MAXLENGTH="20">
+<script>physindexUpdate(18);</script>
+
+</td>
+<td nowrap>
+
+<INPUT  TYPE=hidden NAME=String$repeat?18    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=entPhysicalAssetID$repeat?18  disabled   value="" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=Default$repeat?18    value="OK" SIZE="20" MAXLENGTH="20">
+
+</td>
+
+<INPUT  type=hidden Name=EntityAssetVT$endRepeat?18    value="OK" SIZE="20" MAXLENGTH="20">
+</tr>
+
+<tr>
+<td nowrap>
+
+<INPUT  TYPE=hidden NAME=entPhysicalIndex$repeat?19  disabled   value="68424782" SIZE="20" MAXLENGTH="20">
+<script>physindexUpdate(19);</script>
+
+</td>
+<td nowrap>
+
+<INPUT  TYPE=hidden NAME=String$repeat?19    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=entPhysicalAssetID$repeat?19  disabled   value="" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=Default$repeat?19    value="OK" SIZE="20" MAXLENGTH="20">
+
+</td>
+
+<INPUT  type=hidden Name=EntityAssetVT$endRepeat?19    value="OK" SIZE="20" MAXLENGTH="20">
+</tr>
+
+<tr>
+<td nowrap>
+
+<INPUT  TYPE=hidden NAME=entPhysicalIndex$repeat?20  disabled   value="68424783" SIZE="20" MAXLENGTH="20">
+<script>physindexUpdate(20);</script>
+
+</td>
+<td nowrap>
+
+<INPUT  TYPE=hidden NAME=String$repeat?20    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=entPhysicalAssetID$repeat?20  disabled   value="" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=Default$repeat?20    value="OK" SIZE="20" MAXLENGTH="20">
+
+</td>
+
+<INPUT  type=hidden Name=EntityAssetVT$endRepeat?20    value="OK" SIZE="20" MAXLENGTH="20">
+</tr>
+
+<tr>
+<td nowrap>
+
+<INPUT  TYPE=hidden NAME=entPhysicalIndex$repeat?21  disabled   value="68424784" SIZE="20" MAXLENGTH="20">
+<script>physindexUpdate(21);</script>
+
+</td>
+<td nowrap>
+
+<INPUT  TYPE=hidden NAME=String$repeat?21    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=entPhysicalAssetID$repeat?21  disabled   value="" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=Default$repeat?21    value="OK" SIZE="20" MAXLENGTH="20">
+
+</td>
+
+<INPUT  type=hidden Name=EntityAssetVT$endRepeat?21    value="OK" SIZE="20" MAXLENGTH="20">
+</tr>
+
+
+</table><table id="general_asset_tbl" border="0" cellspacing="0" cellpadding="0" width="100%">
+<script language="JavaScript">
+top.Draw_TableTop(2);top.Draw_TableHeader();
+</script>
+<tr>
+<td nowrap style="width: 10px" class="data-area-canvas">
+&nbsp;</td>
+<td nowrap class="data-area-canvas-odd">
+System Name&nbsp;(0-160 Characters)</td>
+<td nowrap class="data-area-canvas-odd">
+
+<INPUT  TYPE=text NAME="sysName" size="35" maxlength="160"   value="">
+
+</td>
+<td nowrap class="data-area-canvas">
+&nbsp;</td>
+<td nowrap style="width: 15px">
+&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="width: 10px" class="data-area-canvas">
+&nbsp;</td>
+<td nowrap class="data-area-canvas">
+System Contact&nbsp;(0-160 Characters)</td>
+<td nowrap class="data-area-canvas">
+
+<INPUT  TYPE=text NAME="sysContact" size="35" maxlength="160"   value="">
+
+</td>
+<td nowrap class="data-area-canvas">
+&nbsp;</td>
+<td nowrap style="width: 15px">
+&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="width: 10px" class="data-area-canvas">
+&nbsp;</td>
+<td nowrap class="data-area-canvas-odd">
+System Location&nbsp;(0-160 Characters)</td>
+<td nowrap class="data-area-canvas-odd">
+
+<INPUT  TYPE=text NAME="sysLocation" size="35" maxlength="160"   value="">
+
+</td>
+<td nowrap class="data-area-canvas">
+&nbsp;</td>
+<td nowrap style="width: 15px">
+&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="width: 10px; height: 24px" class="data-area-canvas">
+&nbsp;</td>
+<td nowrap class="data-area-canvas">
+MAC Address</td>
+<td nowrap class="data-area-canvas">
+
+<INPUT  TYPE=hidden NAME="rndBasePhysicalAddress"   value="000000000000" SIZE="20" MAXLENGTH="20">
+
+<script>val=strFormatFunc(document.GeneralAssetForm.rndBasePhysicalAddress.value,":");
+document.write(val)</script>
+</td>
+<td nowrap class="data-area-canvas">
+&nbsp;</td>
+<td nowrap style="width: 15px">
+&nbsp;</td>
+</tr>
+
+<INPUT  TYPE=HIDDEN name="(rlIfNumOfUserDefinedPorts EXISTS)&&(rlIfNumOfUserDefinedPorts>0)" disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+
+<INPUT  type=Hidden name= AssetVT$current   value="OK" SIZE="20" MAXLENGTH="20">
+
+<tr>
+<td nowrap style="width: 10px; height: 24px" class="data-area-canvas">
+&nbsp;</td>
+<script>document.write("<td nowrap nowrap align='left' class="+colorClass()+">");</script>
+Sys Object ID</td>
+<script>document.write("<td nowrap nowrap align='left' class="+colorClass()+">");</script>
+
+<INPUT  TYPE=hidden NAME="sysObjectID" size="35" maxlength="255"   value="1.3.6.1.4.1.674.10895.3027">
+
+<script>document.write(document.GeneralAssetForm.sysObjectID.value)</script>
+
+
+</td>
+<td nowrap class="data-area-canvas">
+&nbsp;</td>
+<td nowrap style="width: 15px">
+&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="width: 10px; height: 24px" class="data-area-canvas">
+&nbsp;</td>
+<script>ChangeRowColor();document.write("<td nowrap nowrap align='left' class="+colorClass()+">");</script>
+Service Tag</td>
+<script>document.write("<td id='cellServiceTag' nowrap nowrap align='left' class="+colorClass()+"></td>");</script>
+<td nowrap class="data-area-canvas">
+&nbsp;</td>
+<td nowrap style="width: 15px">
+&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="width: 10px; height: 24px" class="data-area-canvas">
+&nbsp;</td>
+<script>ChangeRowColor();document.write("<td nowrap nowrap align='left' class="+colorClass()+">");</script>
+Asset Tag&nbsp;(0-16 Characters)</td>
+<script>document.write("<td nowrap nowrap align='left' class="+colorClass()+">");</script>
+
+
+<input type="text" size="35" name="displayAsset" maxlength="16" onblur="checkValidation('','','','TRUE','STRING','1','16');">
+
+
+</td>
+<td nowrap class="data-area-canvas">
+&nbsp;</td>
+<td nowrap style="width: 15px">
+&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="width: 10px; height: 24px" class="data-area-canvas">
+&nbsp;</td>
+<script>ChangeRowColor();document.write("<td nowrap nowrap align='left' class="+colorClass()+">");</script>
+Serial No.</td>
+<script>document.write("<td nowrap nowrap align='left' class="+colorClass()+">");</script>
+<script>
+document.write(document.GeneralAssetForm.elements["productIdentificationSerialNumber$repeat?1"].value);
+</script>
+</td>
+<td nowrap class="data-area-canvas">
+&nbsp;</td>
+<td nowrap style="width: 15px">
+&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="width: 10px" class="data-area-canvas">
+&nbsp;</td>
+<script>ChangeRowColor();document.write("<td nowrap nowrap align='left' class="+colorClass()+">");</script>
+Date</td>
+<script>document.write("<td nowrap nowrap align='left' class="+colorClass()+">");</script>
+
+<INPUT  TYPE=hidden NAME="rndManagedDate" size="35" maxlength="255"   value="010100">
+
+<input type="text" name="manipulateMngDate" onfocus="if (lastInvalidField == null) { this.onblur = function () { lastInvalidField = this; checkDate(this.value); } } else { lastInvalidField.focus() }">&nbsp;(DD/MMM/YY)
+<script>val=strFormatFunc(document.GeneralAssetForm.rndManagedDate.value,"/");
+document.GeneralAssetForm.manipulateMngDate.value=val;</script>
+</td>
+<td nowrap class="data-area-canvas">
+&nbsp;</td>
+<td nowrap style="width: 15px">
+</td>
+</tr>
+<tr>
+<td nowrap style="width: 10px" class="data-area-canvas">
+&nbsp;</td>
+<script>ChangeRowColor();document.write("<td nowrap nowrap align='left' class="+colorClass()+">");</script>
+Time</td>
+<script>document.write("<td nowrap nowrap align='left' class="+colorClass()+">");</script>
+
+<INPUT  TYPE=hidden NAME="rndManagedTime" size="35" maxlength="255"   value="023059">
+
+<input type="text" name="manipulateMngTime" onfocus="if (lastInvalidField == null) { this.onblur=function () { lastInvalidField = this; checkTime(this.value); } } else { lastInvalidField.focus() }">&nbsp;(HH:MM:SS)
+<script>
+val=sysTimeConvFunc(document.GeneralAssetForm.rndManagedTime.value,"time");
+document.GeneralAssetForm.manipulateMngTime.value=val;
+</script>
+</td>
+<td nowrap class="data-area-canvas">
+&nbsp;</td>
+<td nowrap style="width: 15px">
+</td>
+</tr>
+<tr>
+<td nowrap style="width: 10px; height: 24px;" class="data-area-canvas">
+&nbsp;</td>
+<script>ChangeRowColor();document.write("<td nowrap nowrap align='left' class="+colorClass()+">");</script>
+System Up Time</td>
+<script>document.write("<td nowrap nowrap align='left' class="+colorClass()+">");</script>
+
+<INPUT  TYPE=hidden NAME="sysUpTime"   value="905900" SIZE="20" MAXLENGTH="20">
+
+<script>
+val=sysTimeConvFunc(document.GeneralAssetForm.sysUpTime.value,"up time");
+document.write(val);
+</script>
+</td>
+<td nowrap class="data-area-canvas">
+&nbsp;</td>
+<td nowrap style="width: 15px">
+</td>
+</tr>
+<script language="JavaScript">top.Draw_TableBottom(2)</script>
+</table>
+<br>
+<div align='left' class="management-only">
+<table id="general_asset_telnet_tbl" cellspacing="0" cellpadding="0" border="0">
+<tr>
+<td nowrap style="width: 14px; height: 25px">
+<img style="width: 14px; height: 25px" src="../Images/lbutton.gif"></td>
+<td nowrap valign="middle" align="center" class="data-area-button">
+<script>document.write('<a href=telnet:'+location.hostname+' onclick="checkBrowserTelnetSupport()">Telnet</a>');</script>
+</td>
+<td nowrap style="width: 14px; height: 25px">
+<img style="width: 14px; height: 25px" src="../Images/rbutton.gif"></td>
+<td nowrap>
+- Connect to textual user interface</td>
+</tr>
+</table>
+<br>
+</div>
+<div class="management-only">
+
+
+<div align="center"><table id="apply_tbl" cellspacing="0" cellpadding="0" border="0"><tr>
+<td nowrap nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/lbutton.gif"></td>
+<td nowrap nowrap valign="middle" align="center" class="data-area-button"><a href="javascript:preSubmit();">Apply Changes</a></td>
+<td nowrap nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/rbutton.gif"></td>
+</tr></table></div><br>
+<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
+<!--
+if(document.forms[0] && document.forms[0].elements.length<=1000)
+{
+for(i=0;(document.forms[0] && i<document.forms[0].elements.length);i++)
+{
+if(document.forms[0] && document.forms[0].elements[i].type=="select-one")
+if(document.forms[0] && document.forms[0].elements[i].length==0)
+document.forms[0].elements[i].style.width="70px";
+}
+}
+//-->
+</SCRIPT>
+
+</div>
+<INPUT  type="hidden" name="GenParamTable"   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  type="hidden" name="rlPhdUnitGenParamTable$VT"   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  type="hidden" name="rlPhdUnitGenParamStackUnit$VT"   value="Type=0;Access=1;NumOfEnumerations=0;Range0=[-2147483648,2147483647]" SIZE="20" MAXLENGTH="20">
+<INPUT  type="hidden" name="rlPhdUnitGenParamAssetTag$VT" size="128"   value="Type=100;Access=2;NumOfEnumerations=0;Range0=[0,160];Default value= ">
+<INPUT  type="hidden" name="rlPhdUnitGenParamServiceTag$VT" size="128"   value="Type=100;Access=1;NumOfEnumerations=0;Range0=[0,160]">
+<INPUT  type="hidden" name="GenParamTable$endVT"   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  type="hidden" name="rlPhdUnitGenParamStackUnit$repeat?1"    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  size="128" type="hidden" name="rlPhdUnitGenParamAssetTag$repeat?1"    value="&nbsp;">
+<INPUT  size="128" type="hidden" name="rlPhdUnitGenParamServiceTag$repeat?1"  disabled   value="SVCTAG0">
+<INPUT  type="hidden" name="GenParamTable$endRepeat?1"    value="OK" SIZE="20" MAXLENGTH="20">
+
+
+</form>
+</body>
+</html>

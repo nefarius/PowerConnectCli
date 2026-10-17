@@ -1,0 +1,930 @@
+
+<html>
+<head>
+<title>File Download from Server</title>
+<link rel="stylesheet" href="/device/style.css" type="text/css">
+<style type="text/css">
+iframe.dataFrame {
+position: absolute;
+left: -100px;
+top: -100px;
+width: 10px;
+height: 10px;
+visibility: hidden;
+}
+</style>
+<script type="text/javascript" src="/js2/utils.js"></script>
+<script type="text/javascript" src="/js2/dialog.js"></script>
+<script type="text/javascript" src="/js2/ui.js"></script>
+<script type="text/javascript" src="/js/globalfunctions.js"></script>
+<script type="text/javascript">
+if(top.MonitorMode) {
+document.write("<link rel='stylesheet' href='../device/monitorMode.css' type='text/css'>")
+}
+var pageLoaded = false;
+var imageOnly = false;
+var completedSuccessfully = false;
+var configurationWasLoaded = false;
+function refresh() {
+location.reload(false);
+}
+function initForm() {
+}
+function disableTextControl(control) {
+control.disabled = true;
+control.style.backgroundColor = "#CCC";
+}
+function enableTextControl(control) {
+control.disabled = false;
+control.style.backgroundColor = "#FFF";
+}
+function disableTabControls(tab) {
+var c = tab.getElementsByTagName("input");
+var i = c.length;
+while (i-- > 0) {
+switch (c[i].type) {
+case "text":
+disableTextControl(c[i]);
+break;
+case "file":
+disableTextControl(c[i]);
+break;
+default:
+c[i].disabled = true;
+}
+}
+c = tab.getElementsByTagName("select");
+i = c.length;
+while (i-- > 0) {
+disableTextControl(c[i]);
+}
+c = tab.getElementsByTagName("textarea");
+i = c.length;
+while (i-- > 0) {
+disableTextControl(c[i]);
+}
+}
+function enableTabControls(tab) {
+var c = tab.getElementsByTagName("input");
+var i = c.length;
+while (i-- > 0) {
+switch (c[i].type) {
+case "text":
+enableTextControl(c[i]);
+break;
+case "file":
+enableTextControl(c[i]);
+break;
+default:
+c[i].disabled = false;
+}
+}
+c = tab.getElementsByTagName("select");
+i = c.length;
+while (i-- > 0) {
+enableTextControl(c[i]);
+}
+c = tab.getElementsByTagName("textarea");
+i = c.length;
+while (i-- > 0) {
+enableTextControl(c[i]);
+}
+}
+function showTab(tab) {
+tab.style.cssText = "";
+}
+function hideTab(tab) {
+tab.style.cssText = "position: absolute; left: -100px; top: -100px; width: 10px; height: 10px; overflow: hidden";
+}
+function setDownloadMethod() {
+var configurationTftpControls = document.getElementById("configurationTftpControls");
+var configurationHttpControls = document.getElementById("configurationHttpControls");
+var firmwareTftpControls = document.getElementById("firmwareTftpControls");
+var firmwareHttpControls = document.getElementById("firmwareHttpControls");
+var firmwareRadio = document.getElementById("firmwareRadio");
+var configurationRadio = document.getElementById("configurationRadio");
+var httpRadio = document.getElementById("httpRadio");
+if (firmwareRadio.checked) {
+enableTabControls(firmwareTftpControls);
+enableTabControls(firmwareHttpControls);
+enableTextControl(firmwareHttpMibData._data.contentWindow.document.getElementById("firmwareFile"));
+disableTabControls(configurationTftpControls);
+disableTabControls(configurationHttpControls);
+disableTextControl(configurationHttpMibData._data.contentWindow.document.getElementById("firmwareFile"));
+if (httpRadio.checked) {
+disableTextControl(document.getElementById("fakeFirmwareTftpAddress"));
+}
+}
+if (configurationRadio.checked) {
+enableTabControls(configurationTftpControls);
+enableTabControls(configurationHttpControls);
+enableTextControl(configurationHttpMibData._data.contentWindow.document.getElementById("firmwareFile"));
+disableTabControls(firmwareTftpControls);
+disableTabControls(firmwareHttpControls);
+disableTextControl(firmwareHttpMibData._data.contentWindow.document.getElementById("firmwareFile"));
+if (httpRadio.checked) {
+disableTextControl(document.getElementById("fakeConfigurationTftpAddress"));
+}
+}
+}
+function setProtocol() {
+var configurationTftpControls = document.getElementById("configurationTftpControls");
+var configurationHttpControls = document.getElementById("configurationHttpControls");
+var firmwareTftpControls = document.getElementById("firmwareTftpControls");
+var firmwareHttpControls = document.getElementById("firmwareHttpControls");
+var tftpRadio = document.getElementById("tftpRadio");
+var httpRadio = document.getElementById("httpRadio");
+hideTab(document.getElementById("firmwareTftpControls"));
+hideTab(document.getElementById("firmwareHttpControls"));
+hideTab(document.getElementById("configurationTftpControls"));
+hideTab(document.getElementById("configurationHttpControls"));
+if (tftpRadio.checked) {
+showTab(document.getElementById("firmwareTftpControls"));
+showTab(document.getElementById("configurationTftpControls"));
+}
+if (httpRadio.checked) {
+showTab(document.getElementById("firmwareHttpControls"));
+showTab(document.getElementById("configurationHttpControls"));
+disableTextControl(document.getElementById("fakeFirmwareTftpAddress"));
+disableTextControl(document.getElementById("fakeConfigurationTftpAddress"));
+}
+}
+function showUI() {
+if (dataLoaded && pageLoaded && httpFirmwareFileControlLoaded && httpConfigFileControlLoaded) {
+document.body.style.visibility = "visible";
+setProtocol();
+setDownloadMethod();
+}
+}
+var userInput = {
+framesToDisable: ["up_menu", "logo", "serv_name", "vline", "submenu", "hline", "tree", "main"],
+enable: function () {
+var i = this.framesToDisable.length;
+while (i-- > 0) {
+if (window.top[this.framesToDisable[i]].page)
+window.top[this.framesToDisable[i]].page.enableUserInput();
+}
+},
+disable: function () {
+var i = this.framesToDisable.length;
+while (i-- > 0) {
+if (window.top[this.framesToDisable[i]].page)
+window.top[this.framesToDisable[i]].page.disableUserInput();
+}
+}
+}
+function pageUnloadListener() {
+userInput.enable();
+}
+if ("addEventListener" in document) {
+window.addEventListener("unload", pageUnloadListener, false);
+} else {
+window.attachEvent("onunload", pageUnloadListener);
+}
+var dataLoaded = false;
+var httpFirmwareFileControlLoaded = false;
+var httpConfigFileControlLoaded = false;
+function notifyHttpFirmwareFileControlLoaded() {
+httpFirmwareFileControlLoaded = true;
+showUI();
+}
+function notifyHttpConfigFileControlLoaded() {
+httpConfigFileControlLoaded = true;
+showUI();
+}
+function notifyTransferInProgress() {
+alert("Another file transfer in progress. Download page can not be used until file transfer ends.");
+top.location.reload();
+}
+function trimWhitespaces(str) {
+if (str != "") {
+str = str.split(/^[^\S]*/i);
+str = str[str.length - 1];
+str = str.split(/[^\S]*$/i)[0];
+}
+return str;
+}
+function checkIPAddress(ipAddressString) {
+if (/^(\d{1,3}\.){3}\d{1,3}\s*$/.test(ipAddressString)) {
+var octets = ipAddressString.split(".");
+var i = octets.length;
+while ((i > 0) && (parseInt(octets[--i]) < 256));
+return i == 0;
+} else {
+return false;
+}
+}
+function notifyDataLoaded() {
+if(imageOnly) {
+location.reload();
+}
+dataLoaded = true;
+showUI();
+}
+function showActiveImage() {
+var activeText = (mibData.getValue("rndActiveSoftwareFile$query")) == "1" ? "Image 1" : "Image 2";
+var activeAfterReset = mibData.getValue("rndActiveSoftwareFileAfterReset$query");
+document.getElementById("activeImageText").innerHTML = activeText;
+document.getElementById("activeImageAfterResetSelect").value = activeAfterReset;
+}
+function isActiveImageChanged() {
+var activeAfterReset = mibData.getValue("rndActiveSoftwareFileAfterReset$query");
+return (selectValue != activeAfterReset);
+}
+function areFirmwareControlsEmpty() {
+var address;
+var filename;
+if (document.getElementById("tftpRadio").checked) {
+address = document.getElementById("firmwareTftpAddress").value;
+filename = document.getElementById("firmwareTftpFileName").value;
+} else {
+address = "";
+filename = firmwareHttpMibData.getValue("srcFileName");
+}
+return (address == "" && filename == "");
+}
+function changeActiveImageOnly() {
+imageOnly = true;
+userInput.disable();
+mibData.sendData();
+}
+function setActiveImage(data){
+data.setValue("rndActiveSoftwareFileAfterReset$query", document.getElementById("activeImageAfterResetSelect").value);
+data.enableField("swImagesActiveTableVT");
+data.enableField("rndActiveSoftwareFileTable$VT");
+data.enableField("rndUnitNumber$VT");
+data.enableField("rndActiveSoftwareFile$VT");
+data.enableField("rndActiveSoftwareFileAfterReset$VT");
+data.enableField("swImagesActiveTableVT$endVT");
+data.enableField("swImagesActiveTableVT$query");
+data.enableField("rndUnitNumber$query");
+data.enableField("swImagesActiveTableVT$endQuery");
+}
+function checkFirmwareTftpInput() {
+var inputCorrect = true;
+var addrField = document.getElementById("firmwareTftpAddress");
+addrField.value = trimWhitespaces(addrField.value);
+if (!checkTftpAddress(addrField)) {
+inputCorrect = false;
+}
+var fileField = document.getElementById("firmwareTftpFileName");
+var fileFieldValue = fileField.value;
+if (inputCorrect && (/^\s*$/.test(fileFieldValue))) {
+alert("You must enter a file name.");
+fileField.focus();
+inputCorrect = false;
+}
+return inputCorrect;
+}
+function checkConfigurationTftpInput() {
+var inputCorrect = true;
+var addrField = document.getElementById("configurationTftpAddress");
+addrField.value = trimWhitespaces(addrField.value);
+if (!checkTftpAddress(addrField)) {
+inputCorrect = false;
+}
+var fileField = document.getElementById("configurationTftpFileName");
+var fileFieldValue = fileField.value;
+if (inputCorrect && (/^\s*$/.test(fileFieldValue))) {
+alert("You must enter a file name.");
+fileField.focus();
+inputCorrect = false;
+}
+return inputCorrect;
+}
+function checkConfigurationHttpInput() {
+return true;
+}
+function checkTftpAddress(addrField) {
+var address = addrField.value;
+if (/^\s*$/.test(address)) {
+alert("You must enter TFTP server IP address.");
+addrField.focus();
+return false;
+}
+if (!checkIPAddress(address)) {
+alert("You must enter correct IP address.");
+addrField.focus();
+return false;
+}
+var ipAddr = ipToBits(mibData.getValue("ipAdEntAddr$query"));
+var ipMask = ipToBits(mibData.getValue("ipAdEntNetMask$query"));
+var addr = ipToBits(address);
+var sum = countOneBits(bitOr(addr, ipMask));
+if (sum == addr.length) {
+alert("The entered TFTP server address cannot be a broadcast IP address!");
+addrField.focus();
+return false;
+}
+sum = countOneBits(bitAnd(addr, bitNot(ipMask)));
+if (sum == 0) {
+alert("The entered TFTP server address cannot be a subnet IP address!");
+addrField.focus();
+return false;
+}
+return true;
+}
+function bitAnd(a, b) {
+if (a.length != b.length) {
+return false;
+}
+var result = "";
+var bit;
+for (var i = 0; i<a.length; i++) {
+bit = (a.charAt(i) == "1" && b.charAt(i) == "1") ? "1" : "0";
+result += bit;
+}
+return result;
+}
+function bitOr(a, b) {
+if (a.length != b.length) {
+return false;
+}
+var result = "";
+var bit;
+for (var i = 0; i<a.length; i++) {
+bit = (a.charAt(i) == "1" || b.charAt(i) == "1") ? "1" : "0";
+result += bit;
+}
+return result;
+}
+function bitNot(a) {
+var result = "";
+for (var i = 0; i<a.length; i++) {
+bit = (a.charAt(i) == "0") ? "1" : "0";
+result += bit;
+}
+return result;
+}
+function ipToBits(ipAddress) {
+return octetToBitsAsChars(ipToOctet(ipAddress));
+}
+function countOneBits(a) {
+var result = 0;
+for (var i = 0; i<a.length; i++) {
+if(a.charAt(i) == "1") {
+result ++;
+}
+}
+return result;
+}
+function startOperation() {
+if (document.getElementById("firmwareRadio").checked) {
+if (document.getElementById("tftpRadio").checked) {
+if (checkFirmwareTftpInput()) {
+var fileTypeSelect = document.getElementById("firmwareTftpFileType");
+var fileType = fileTypeSelect[fileTypeSelect.selectedIndex].value;
+mibData.setValue("rlCopyIndex$Add", 1);
+mibData.setValue("rlCopySourceLocation$Add", 3);
+mibData.setValue("rlCopySourceIpAddress$Add", document.getElementById("firmwareTftpAddress").value);
+mibData.setValue("rlCopySourceFileName$Add", document.getElementById("firmwareTftpFileName").value);
+mibData.setValue("rlCopyDestinationLocation$Add", 1);
+mibData.setValue("rlCopyDestinationFileType$Add", fileType);
+mibData.enableField("rlcopyTableVT");
+mibData.enableField("rlCopyTable$VT");
+mibData.enableField("rlCopyIndex$VT");
+mibData.enableField("rlCopySourceLocation$VT");
+mibData.enableField("rlCopySourceIpAddress$VT");
+mibData.enableField("rlCopySourceFileName$VT");
+mibData.enableField("rlCopyDestinationLocation$VT");
+mibData.enableField("rlCopyDestinationFileType$VT");
+mibData.enableField("rlCopyRowStatus$VT");
+mibData.enableField("rlCopyHistoryIndex$VT");
+mibData.enableField("rlcopyTableVT$endVT");
+mibData.setValue("rlCopyRowStatus$Add", "4");
+mibData.setValue("rlCopyHistoryIndex$Add", mibData.getValue("rlCopyFreeHistoryIndex$scalar"));
+mibData.enableField("rlcopyTableVT$endAdd");
+mibData.sendData();
+infoPopup.show("/config/copy_history_status.htm?[rlCopyHistoryTableVT]Query:rlCopyHistoryHistoryIndex=1");
+}
+}
+if (document.getElementById("httpRadio").checked) {
+try{
+var fileTypeSelect = document.getElementById("firmwareHttpFileType");
+var fileType = fileTypeSelect[fileTypeSelect.selectedIndex].value;
+firmwareHttpMibData.setValue("rlCopyDestinationFileType", fileType);
+firmwareHttpMibData.setValue("rlCopyFreeHistoryIndex", firmwareHttpMibData.getValue("rlCopyFreeHistoryIndex$scalar"));
+firmwareHttpMibData.enableField("srcFileName");
+firmwareHttpMibData.sendData();
+infoPopup.show("/config/copy_history_status.htm?[rlCopyHistoryTableVT]Query:rlCopyHistoryHistoryIndex=1");
+}catch(err){alert("Invalid file name or file does not exist.");}
+}
+}
+if (document.getElementById("configurationRadio").checked) {
+if (document.getElementById("tftpRadio").checked && checkConfigurationTftpInput()) {
+var confType = 6;
+mibData.setValue("rlCopyIndex$Add", 1);
+mibData.setValue("rlCopySourceLocation$Add", 3);
+mibData.setValue("rlCopySourceIpAddress$Add", document.getElementById("configurationTftpAddress").value);
+mibData.setValue("rlCopySourceFileName$Add", document.getElementById("configurationTftpFileName").value);
+mibData.setValue("rlCopyDestinationLocation$Add", 1);
+mibData.setValue("rlCopyDestinationFileType$Add", confType);
+mibData.enableField("rlcopyTableVT");
+mibData.enableField("rlCopyTable$VT");
+mibData.enableField("rlCopyIndex$VT");
+mibData.enableField("rlCopySourceLocation$VT");
+mibData.enableField("rlCopySourceIpAddress$VT");
+mibData.enableField("rlCopySourceFileName$VT");
+mibData.enableField("rlCopyDestinationLocation$VT");
+mibData.enableField("rlCopyDestinationFileType$VT");
+mibData.enableField("rlCopyRowStatus$VT");
+mibData.enableField("rlCopyHistoryIndex$VT");
+mibData.enableField("rlcopyTableVT$endVT");
+mibData.setValue("rlCopyRowStatus$Add", "4");
+mibData.setValue("rlCopyHistoryIndex$Add", mibData.getValue("rlCopyFreeHistoryIndex$scalar"));
+mibData.enableField("rlcopyTableVT$endAdd");
+mibData.sendData();
+configurationWasLoaded = true;
+infoPopup.show("/config/copy_history_status.htm?[rlCopyHistoryTableVT]Query:rlCopyHistoryHistoryIndex=1");
+}
+if (document.getElementById("httpRadio").checked && checkConfigurationHttpInput()) {
+try{
+var confType = 6;
+configurationHttpMibData.setValue("rlCopyDestinationFileType", confType);
+configurationHttpMibData.setValue("rlCopyFreeHistoryIndex", configurationHttpMibData.getValue("rlCopyFreeHistoryIndex$scalar"));
+configurationHttpMibData.enableField("srcFileName");
+configurationHttpMibData.sendData();
+configurationWasLoaded = true;
+infoPopup.show("/config/copy_history_status.htm?[rlCopyHistoryTableVT]Query:rlCopyHistoryHistoryIndex=1");
+}catch(err){alert("Invalid file name or file does not exist.");}
+}
+}
+}
+function onClosePopup() {
+if (completedSuccessfully && configurationWasLoaded) {
+alert("The downloaded configuration will be activated after reseting the device");
+}
+infoPopup.hide();
+location.reload()
+}
+</script>
+</head>
+<body leftmargin="15" style="background-color: #FFF; visibility: hidden" onload="initForm();setScreenMonitorState();">
+<script type="text/javascript">
+var dialog = new Dialog();
+var page = new dialog.DialogPage("/config/software_dl.htm");
+</script>
+<iframe id="dataFrame" src="/config/copy_history_delete.htm" class="dataFrame"></iframe>
+<div id="infoPopup" style="z-index: 1005; padding: 15px; background-color: #FFF; border: 1px solid #666; position: absolute; width: 380px; display: none">
+<table cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 15px">
+<script type="text/javascript">
+top.Draw_TableTop(2);
+</script>
+<tr>
+<td nowrap style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas" valign="top" width="45%">&nbsp;</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd" width="40%" style="padding-right: 5px">Status:</td>
+<td nowrap class="data-area-canvas-odd" id="operationStatusValue">starting operation&hellip;</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas" width="40%" style="padding-right: 5px">Bytes transferred:</td>
+<td nowrap class="data-area-canvas" id="bytesTransferredValue">0</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+</tr>
+<tr id="errorMessage" style="display: none">
+<td nowrap style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd" width="40%" style="padding-right: 5px">Error message:</td>
+<td class="data-area-canvas-odd" id="errorMessageValue">None</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+</tr>
+<script type="text/javascript">
+top.Draw_TableBottom(2)
+</script>
+</table>
+<div align="center" id="closeButton" style="display: none">
+<table id="apply_tbl" cellspacing="0" cellpadding="0" border="0">
+<tr>
+<td nowrap style="width: 14px"><img style="width: 14px; height: 25px" src="../Images/lbutton.gif"></td>
+<td nowrap valign="middle" align="center" class="data-area-button"><a href="#" onclick="onClosePopup();">Close</a></td>
+<td nowrap style="width: 14px"><img style="width: 14px; height: 25px" src="../Images/rbutton.gif"></td>
+</tr>
+</table>
+</div>
+</div>
+<script type="text/javascript">
+top.Draw_Header(document.title);
+</script>
+<form name="pageForm" method="post" action="/config/software_dl.htm">
+<table border="0" cellspacing="0" cellpadding="0" style="margin-bottom: 1.2em; width: 100%">
+<tr>
+<td style="padding-right: 15px; width: 50%; vertical-align: top">
+<table border="0" cellspacing="0" cellpadding="0" width="100%">
+<col width="10">
+<col width="40%">
+<col>
+<col width="10">
+<script type="text/javascript">
+top.Draw_TableTop(2);
+</script>
+<tr>
+<td colspan="4" class="data-area-canvas">&nbsp;</td>
+</tr>
+<tr>
+<td class="data-area-canvas"><img src="" width="1" height="1" alt="" style="visibility: hidden"></td>
+<td colspan="2" class="data-area-separator"><img src="" width="1" height="1" alt="" style="visibility: hidden"></td>
+<td class="data-area-canvas"><img src="" width="1" height="1" alt="" style="visibility: hidden"></td>
+</tr>
+<tr>
+<td class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd">
+<label for="firmwareRadio">Firmware Download</label>
+</td>
+<td class="data-area-canvas-odd">
+<input type="radio" name="operationTypeRadio" id="firmwareRadio" checked onclick="setDownloadMethod()">
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+</tr>
+<tr>
+<td class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas">
+<label for="configurationRadio">Configuration Download</label>
+</td>
+<td class="data-area-canvas">
+<input type="radio" name="operationTypeRadio" id="configurationRadio" onClick="setDownloadMethod()">
+</td>
+<td class="data-area-canvas">&nbsp;</td>
+</tr>
+<script language="JavaScript">
+top.Draw_TableBottom(2)
+</script>
+</table>
+</td>
+<td style="width: 50%; vertical-align: top">
+<table border="0" cellspacing="0" cellpadding="0" width="100%">
+<col width="10">
+<col width="40%">
+<col>
+<col width="10">
+<script language="JavaScript">
+top.Draw_TableTop(2);
+</script>
+<tr>
+<td colspan="4" class="data-area-canvas">&nbsp;</td>
+</tr>
+<tr>
+<td class="data-area-canvas"><img src="" width="1" height="1" alt="" style="visibility: hidden"></td>
+<td colspan="2" class="data-area-separator"><img src="" width="1" height="1" alt="" style="visibility: hidden"></td>
+<td class="data-area-canvas"><img src="" width="1" height="1" alt="" style="visibility: hidden"></td>
+</tr>
+<tr>
+<td class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd">
+<label for="tftpRadio">Download via TFTP</label>
+</td>
+<td class="data-area-canvas-odd">
+<input type="radio" name="protocolRadio" id="tftpRadio" checked onclick="setProtocol()">
+</td>
+<td class="data-area-canvas">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas">
+<label for="httpRadio">Download via HTTP</label>
+</td>
+<td nowrap class="data-area-canvas">
+<input type="radio" name="protocolRadio" id="httpRadio" onclick="setProtocol()">
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+</tr>
+<script language="JavaScript">
+top.Draw_TableBottom(2)
+</script>
+</table>
+</td>
+</tr>
+</table>
+<div id="firmwareTftpControls">
+<table border="0" cellspacing="0" cellpadding="0" style="margin-bottom: 1.2em; width: 100%">
+<col width="10">
+<col width="40%">
+<col>
+<col width="10">
+<script type="text/javascript">
+top.Draw_TableTop(2);
+</script>
+<tr>
+<td class="data-area-canvas">&nbsp;</td>
+<td colspan="2" class="data-area-canvas"><strong>Firmware Download</strong></td>
+<td class="data-area-canvas">&nbsp;</td>
+</tr>
+<tr>
+<td class="data-area-canvas"><img src="" width="1" height="1" alt="" style="visibility: hidden"></td>
+<td colspan="2" class="data-area-separator"><img src="" width="1" height="1" alt="" style="visibility: hidden"></td>
+<td class="data-area-canvas"><img src="" width="1" height="1" alt="" style="visibility: hidden"></td>
+</tr>
+<tr>
+<td class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd">
+<label for="firmwareTftpAddress">Server IP Address</label>
+</td>
+<td nowrap class="data-area-canvas-odd">
+<input type="text" id="firmwareTftpAddress" maxlength="15">
+(X.X.X.X)
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+</tr>
+<tr>
+<td class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas">
+<label for="firmwareTftpFileName">Source File Name (1-159 Characters)</label>
+</td>
+<td class="data-area-canvas">
+<input type="text" id="firmwareTftpFileName" maxlength="159">
+</td>
+<td class="data-area-canvas">&nbsp;</td>
+</tr>
+<tr>
+<td class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd">
+<label for="firmwareTftpFileType">Destination File Name</label>
+</td>
+<td class="data-area-canvas-odd">
+<select id="firmwareTftpFileType">
+<option value="8">Software Image</option>
+<option value="9">Boot Code</option>
+</select>
+</td>
+<td class="data-area-canvas">&nbsp;</td>
+</tr>
+<script type="text/javascript">
+top.Draw_TableBottom(2);
+</script>
+</table>
+</div>
+<div id="firmwareHttpControls">
+<table border="0" cellspacing="0" cellpadding="0" style="margin-bottom: 1.2em; width: 100%">
+<col width="10">
+<col width="40%">
+<col>
+<col width="10">
+<script type="text/javascript">
+top.Draw_TableTop(2);
+</script>
+<tr>
+<td class="data-area-canvas">&nbsp;</td>
+<td nowrap colspan="2" class="data-area-canvas"><strong>Firmware Download</strong></td>
+<td class="data-area-canvas">&nbsp;</td>
+</tr>
+<tr>
+<td class="data-area-canvas"><img src="" width="1" height="1" alt="" style="visibility: hidden"></td>
+<td colspan="2" class="data-area-separator"><img src="" width="1" height="1" alt="" style="visibility: hidden"></td>
+<td class="data-area-canvas"><img src="" width="1" height="1" alt="" style="visibility: hidden"></td>
+</tr>
+<tr>
+<td class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd">
+<label for="firmwareTftpAddress">Server IP Address</label>
+</td>
+<td nowrap class="data-area-canvas-odd">
+<input type="text" id="fakeFirmwareTftpAddress" maxlength="15">
+(X.X.X.X)
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+</tr>
+<tr>
+<td class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas">Source File</td>
+<td class="data-area-canvas">
+<iframe id="firmwareHttpData" src="/config/software_dl_fhttp.htm" border="0" frameborder="0" scrolling="no" style="height: 1px; width: 1px"></iframe>
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+</tr>
+<tr>
+<td class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd">Destination File</td>
+<td class="data-area-canvas-odd">
+<select id="firmwareHttpFileType">
+<option value="8">Software Image</option>
+<option value="9">Boot Code</option>
+</select>
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+</tr>
+<script type="text/javascript">
+top.Draw_TableBottom(2);
+</script>
+</table>
+</div>
+<div id="configurationTftpControls">
+<table id="configurationTftpControls" cellspacing="0" cellpadding="0" border="0" style="margin-bottom: 1.2em; width: 100%">
+<col width="10">
+<col width="40%">
+<col>
+<col width="10">
+<script type="text/javascript">
+top.Draw_TableTop(2);
+</script>
+<tr>
+<td class="data-area-canvas">&nbsp;</td>
+<td nowrap colspan="2" class="data-area-canvas"><strong>Configuration Download</strong></td>
+<td class="data-area-canvas">&nbsp;</td>
+</tr>
+<tr>
+<td class="data-area-canvas"><img src="" width="1" height="1" alt="" style="visibility: hidden"></td>
+<td colspan="2" class="data-area-separator"><img src="" width="1" height="1" alt="" style="visibility: hidden"></td>
+<td class="data-area-canvas"><img src="" width="1" height="1" alt="" style="visibility: hidden"></td>
+</tr>
+<tr>
+<td class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd">Server IP Address</td>
+<td class="data-area-canvas-odd">
+<input type="text" id="configurationTftpAddress" maxlength="15">
+(X.X.X.X)
+</td>
+<td nowrap style="width: 5px" class="data-area-canvas">&nbsp;</td>
+</tr>
+<tr>
+<td class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas">Source File Name </td>
+<td class="data-area-canvas">
+<input type="text" id="configurationTftpFileName" maxlength="159">
+</td>
+<td class="data-area-canvas">&nbsp;</td>
+</tr>
+<script type="text/javascript">
+top.Draw_TableBottom(2)
+</script>
+</table>
+</div>
+<div id="configurationHttpControls">
+<table id="configurationHttpControls" cellspacing="0" cellpadding="0" border="0" style="margin-bottom: 1.2em; width: 100%">
+<col width="10">
+<col width="40%">
+<col>
+<col width="10">
+<script type="text/javascript">
+top.Draw_TableTop(2);
+</script>
+<tr>
+<td class="data-area-canvas">&nbsp;</td>
+<td nowrap colspan="2" class="data-area-canvas"><strong>Configuration Download</strong></td>
+<td class="data-area-canvas">&nbsp;</td>
+</tr>
+<tr>
+<td class="data-area-canvas"><img src="" width="1" height="1" alt="" style="visibility: hidden"></td>
+<td colspan="2" class="data-area-separator"><img src="" width="1" height="1" alt="" style="visibility: hidden"></td>
+<td class="data-area-canvas"><img src="" width="1" height="1" alt="" style="visibility: hidden"></td>
+</tr>
+<tr>
+<td class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd">Server IP Address</td>
+<td class="data-area-canvas-odd">
+<input type="text" id="fakeConfigurationTftpAddress" maxlength="15">
+(X.X.X.X)
+</td>
+<td nowrap style="width: 5px" class="data-area-canvas">&nbsp;</td>
+</tr>
+<tr>
+<td class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas">Source File</td>
+<td class="data-area-canvas">
+<iframe src="/config/software_dl_chttp.htm" id="configurationHttpData" border="0" frameborder="0" scrolling="no" style="height: 1px; width: 1px"></iframe>
+</td>
+<td class="data-area-canvas">&nbsp;</td>
+</tr>
+<script type="text/javascript">
+top.Draw_TableBottom(2);
+</script>
+</table>
+</div>
+<div style="text-align: center; position: relative" class="management-only">
+<table cellspacing="0" cellpadding="0" border="0" style="margin: 0 auto">
+<tr>
+<td><img src="/Images/lbutton.gif" width="14" height="25" alt=""></td>
+<td class="data-area-button" style="text-align: center"><a href="#" onclick="startOperation(); return false">Apply Changes</a></td>
+<td><img src="/Images/rbutton.gif" width="14" height="25" alt=""></td>
+</tr>
+</table>
+</div>
+</form>
+<script type="text/javascript">
+var infoPopup = new (function () {
+this._popup = document.getElementById("infoPopup");
+var ui = new UI();
+this._popupContainer = new ui.Container(this._popup);
+this._bodyContainer = new ui.Container(document.body);
+this._popupErrorMessage = document.getElementById("errorMessage");
+this._popupErrorMessageText = document.getElementById("errorMessageValue");
+this._popupCloseButton = document.getElementById("closeButton");
+this._popupData = document.createElement("iframe");
+this._popupData.ownerPopup = this;
+with (this._popupData.style) {
+position = "absolute";
+visibility = "hidden";
+width = "1px";
+height = "1px";
+left = "-100px";
+top = "-100px";
+}
+document.body.insertBefore(this._popupData, document.body.firstChild);
+this._popupErrorMessage.style.display = "none";
+this._popupCloseButton.style.display = "none";
+this._viewportChangeListener = function () {
+var bodyR = this._bodyContainer.getBoundingBox();
+var popupR = this._popupContainer.getBoundingBox();
+this._popup.style.left = Math.round((bodyR.right - bodyR.left - popupR.right + popupR.left) / 2) + document.body.scrollLeft + "px";
+this._popup.style.top = Math.round((bodyR.bottom - bodyR.top - popupR.bottom + popupR.top) / 2) + document.body.scrollTop + "px";
+}
+var utils = new Utils();
+this._viewportChangeListenerTask = new utils.Task(this, this._viewportChangeListener);
+this._notifyDataAvailable = function () {
+document.getElementById("operationStatusValue").innerHTML = this._popupData.contentWindow.getOperationStateMessage();
+document.getElementById("bytesTransferredValue").innerHTML = this._popupData.contentWindow.getBytesTransferred();
+if (this._popupData.contentWindow.isOperationFinished()) {
+var errorMessage = this._popupData.contentWindow.getErrorMessage();
+if (/^\s*$/.test(errorMessage)) {
+errorMessage = "Unknown Error";
+}
+this.showErrorMessage(errorMessage);
+if (errorMessage == "None") {
+completedSuccessfully = true;
+}
+this.showCloseButton();
+}
+}
+this.show = function (dataURI) {
+userInput.disable();
+if ("addEventListener" in window) {
+window.addEventListener("scroll", this._viewportChangeListenerTask.execute, false);
+} else {
+window.attachEvent("onresize", this._viewportChangeListenerTask.execute);
+window.attachEvent("onscroll", this._viewportChangeListenerTask.execute);
+}
+this._popup.style.visibility = "hidden";
+this._popup.style.display = "block";
+this._viewportChangeListener();
+this._popup.style.visibility = "visible";
+this._popupData.contentWindow.location.replace(dataURI);
+}
+this.hide = function () {
+this.hideErrorMessage();
+this.hideCloseButton();
+if ("addEventListener" in window) {
+window.removeEventListener("scroll", this._viewportChangeListenerTask.execute, false);
+} else {
+window.detachEvent("onresize", this._viewportChangeListenerTask.execute);
+window.detachEvent("onscroll", this._viewportChangeListenerTask.execute);
+}
+this._popup.style.display = "none";
+}
+this.showErrorMessage = function (messageText) {
+messageText = messageText.split(String.fromCharCode(160)).join(" ");
+this._popupErrorMessageText.innerHTML = messageText;
+if ("addEventListener" in document) {
+this._popupErrorMessage.style.display = "table-row";
+} else {
+this._popupErrorMessage.style.display = "block";
+}
+this._viewportChangeListener();
+}
+this.hideErrorMessage = function () {
+this._popupErrorMessage.style.display = "none";
+}
+this.showCloseButton = function () {
+this._popupCloseButton.style.display = "block";
+}
+this.hideCloseButton = function () {
+this._popupCloseButton.style.display = "none";
+}
+})();
+function MIBData(dataFrame) {
+this._data = dataFrame;
+}
+MIBData.prototype.setValue = function (fieldName, fieldValue) {
+with (this._data.contentWindow.document.getElementsByName(fieldName)[0]) {
+value = fieldValue;
+disabled = false;
+}
+}
+MIBData.prototype.getValue = function (fieldName) {
+return this._data.contentWindow.document.getElementsByName(fieldName)[0].value;
+}
+MIBData.prototype.getColumnValues = function (columnName) {
+var columnFields = this._data.contentWindow.document.getElementsByName(columnName);
+var columnFieldsValues = new Array();
+for (var i = 0; i < columnFields.length; ++i) {
+columnFieldsValues[i] = columnFields[i].value;
+}
+return columnFieldsValues;
+}
+MIBData.prototype.enableField = function (fieldName) {
+this._data.contentWindow.document.getElementsByName(fieldName)[0].disabled = false;
+}
+MIBData.prototype.sendData = function () {
+this._data.contentWindow.document.forms[0].submit();
+}
+var mibData = new MIBData(document.getElementById("dataFrame"));
+var firmwareHttpMibData = new MIBData(document.getElementById("firmwareHttpData"));
+var configurationHttpMibData = new MIBData(document.getElementById("configurationHttpData"));
+var pageLoaded = true;
+showUI();
+</script>
+</body>
+</html>

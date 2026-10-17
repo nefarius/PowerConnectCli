@@ -1,0 +1,133 @@
+
+
+
+<html>
+<head>
+<title>Excluded Addresses</title>
+<link rel="stylesheet" href="../device/style.css" type="text/css">
+<script src="../js/globalFunctions.js"></script>
+<script language="JavaScript">
+if(top.MonitorMode) {
+document.write("<link rel='stylesheet' href='../device/monitorMode.css' type='text/css'>")
+}
+var currIndex=0;
+function cbClick()
+{}
+function formSubmit()
+{
+var i
+var flagDelete=false;
+for (i=1; i<=currIndex;i++)
+{
+if (formele["Checkbox_"+i].checked)
+{
+formele["rlDhcpSrvDynamicRowStatus$repeat11?"+i].value=6;
+formele["rlDhcpSrvDynamicRowStatus$repeat11?"+i].disabled=false;
+formele["rlDhcpSrvDynamicPoolName$repeat11?"+i].disabled=false;
+formele["rlDhcpSrvDynamicIpAddrFrom$repeat11?"+i].disabled=false;
+formele["rlDhcpSrvDynamicIpAddrTo$repeat11?"+i].disabled=false;
+flagDelete=true;
+}
+}
+if (flagDelete==false)
+{
+alert ("No entries were selected for deletion.");
+return false;
+}
+disableHTML();
+document.excludedAddresses.submit();
+}
+function disableHTML()
+{
+for (i=1;i<=currIndex;i++)
+{ formele["Checkbox_"+i].disabled=true;}
+}
+// --End of Java code -->
+</script>
+</head>
+<body bgcolor="#ffffff" leftmargin="15" onload="setScreenMonitorState();">
+<script language="JavaScript">
+top.Draw_Header(document.title);
+</script>
+<div align="right">
+<table cellspacing="0" cellpadding="0" border="0" ID="Table1">
+<tr>
+<div class="management-only" id="addButtonDiv">
+<td style="width: 14px; height: 25px" class="management-only"><img style="width: 14px; height: 25px" src="../Images/lbutton.gif"></td>
+<td valign="middle" align="center" class="data-area-button-management-only"><a href="javascript:void(0)" onClick="javascript:window.open('ExcludedAddresses_add.htm','', 'width=850, height=600, left=50, top=50, scrollbars=yes, resizable=yes');" title='Add Notification Recipient'>&nbsp;&nbsp;Add&nbsp;&nbsp;</a></td>
+<td style="width: 14px; height: 25px" class="management-only"><img style="width: 14px; height: 25px" src="../Images/rbutton.gif"></td>
+</div>
+<td style="width: 14px; height: 25px"></td>
+</tr>
+</table>
+</div>
+<br>
+
+<FORM METHOD='POST' name="excludedAddresses"  ACTION="/config/ExcludedAddresses.htm" onsubmit="return(formSubmit());"  >
+<script>
+var formele = document.excludedAddresses.elements;
+</script>
+<INPUT  Type="HIDDEN" Name="restoreUrl" SIZE=256   value="[DHCPexcludeVT]Filter:rlDhcpSrvDynamicLeaseTime=0">
+<INPUT  TYPE="HIDDEN" NAME="errorCollector"   value="" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=DHCPexcludeVT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rlDhcpSrvDynamicTable$VT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rlDhcpSrvDynamicPoolName$VT SIZE=128   value="Type=100;Access=2;NumOfEnumerations=0;Range0=[1,32]">
+<INPUT  Type=HIDDEN Name=rlDhcpSrvDynamicIpAddrFrom$VT SIZE=128   value="Type=5;Access=2;NumOfEnumerations=0">
+<INPUT  Type=HIDDEN Name=rlDhcpSrvDynamicIpAddrTo$VT SIZE=128   value="Type=5;Access=2;NumOfEnumerations=0">
+<INPUT  Type=HIDDEN Name=rlDhcpSrvDynamicLeaseTime$VT SIZE=128   value="Type=7;Access=2;NumOfEnumerations=0;Range0=[-2147483648,2147483647];Default value=86400">
+<INPUT  Type=HIDDEN Name=rlDhcpSrvDynamicRowStatus$VT SIZE=128   value="Type=0;Access=2;NumOfEnumerations=6;Range0=[1,6]">
+<INPUT  Type=HIDDEN Name=DHCPexcludeVT$endVT   value="OK" SIZE="20" MAXLENGTH="20">
+<table border="0" cellspacing="0" cellpadding="0" width="100%">
+<script language="JavaScript">
+top.Draw_TableTop(4);
+</script>
+<tr>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas"><b>Start IP Address</b></td>
+<td class="data-area-canvas"><b>End IP Address</b></td>
+<td class="data-area-canvas" align=center><b>Remove</b></td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td style="height: 1px; width: 10px" class="data-area-canvas"><img style="width: 1px; height: 1px" src=""></td>
+<td colspan="4" style="height: 1px" class="data-area-separator"><img style="width: 1px; height: 1px" src=""></td>
+<td style="height: 1px" class="data-area-canvas"><img style="width: 1px; height: 1px" src=""></td>
+<td style="height: 1px; width: 5px"><img style="width: 1px; height: 1px" src=""></td>
+</tr>
+<script>
+docObj.FirstTd=0;
+</script>
+
+<script language="JavaScript">top.Draw_TableBottom(4)</script>
+</table>
+<br>
+
+<div class="management-only">
+
+<div align="center"><table id="apply_tbl" cellspacing="0" cellpadding="0" border="0"><tr>
+<td nowrap nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/lbutton.gif"></td>
+<td nowrap nowrap valign="middle" align="center" class="data-area-button"><a href="javascript:preSubmit();">Apply Changes</a></td>
+<td nowrap nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/rbutton.gif"></td>
+</tr></table></div><br>
+<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
+<!--
+if(document.forms[0] && document.forms[0].elements.length<=1000)
+{
+for(i=0;(document.forms[0] && i<document.forms[0].elements.length);i++)
+{
+if(document.forms[0] && document.forms[0].elements[i].type=="select-one")
+if(document.forms[0] && document.forms[0].elements[i].length==0)
+document.forms[0].elements[i].style.width="70px";
+}
+}
+//-->
+</SCRIPT>
+
+</div>
+<script>
+</script>
+</form>
+</body>
+</html>

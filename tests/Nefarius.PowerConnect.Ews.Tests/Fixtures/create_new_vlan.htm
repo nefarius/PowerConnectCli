@@ -1,0 +1,239 @@
+<script>
+</script>
+
+
+
+<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
+<!--
+if(top.location==self.location )
+{
+var refStr=self.location + " ";
+var ind=0;
+refStr.toLowerCase();
+ind=refStr.indexOf("config");
+var locationStr=refStr.substring(0,ind);
+if (opener)
+{
+if (opener.opener)
+{
+if(opener.opener.top.location==opener.opener.location)
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+else
+{
+if(opener.top.location==opener.location)
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+}
+else
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+//-->
+</SCRIPT>
+
+<html>
+
+<head>
+<title>Create New VLAN</title>
+<link rel="stylesheet" href="../device/style.css" type="text/css">
+<script src="../js/globalFunctions.js"></script>
+<script language="JavaScript">
+<!-- Beginng of JavaScript Applet
+var maxVlanId=0;
+function disableHtml(){
+formele["AuthNotReq"].disabled = true;
+}
+function formSubmit()
+{
+formele=document.VlanMemberForm.elements;
+if (checkIntegerValueKenan(formele["dot1qVlanIndex$add"], true, 2, parseInt(formele["dot1qMaxVlanId"].value, 10)))
+{
+if (formele["AuthNotReq"].value == 1)
+{
+var idx = parseInt(formele["dot1qVlanIndex$add"].value);
+formele["dot1qFdbId$add"].disabled = false;
+formele["dot1qFdbId$add"].value = idx;
+formele["rldot1xUnAuthenticatedVlanStatus$add"].disabled = false;
+formele["rldot1xUnAuthenticatedVlanStatus$add"].value = 4;
+}
+disableHtml();
+document.VlanMemberForm.submit();
+}
+}
+function insertZeroValues()
+{
+formele=document.VlanMemberForm.elements;
+formele["dot1qVlanIndex$add"].value="";
+formele["dot1qVlanStaticName$add"].value="";
+formele["dot1qVlanStaticEgressPorts$add"].value="00"
+formele["dot1qVlanForbiddenEgressPorts$add"].value="00"
+formele["dot1qVlanStaticUntaggedPorts$add"].value="00"
+formele["dot1qVlanStaticRowStatus$add"].value=4;
+}
+function checkValue(fieldName){
+var formele=document.VlanMemberForm.elements;
+var max=0,min=0;
+if(fieldName=="dot1qVlanIndex$add"){
+min = 2;
+max = formele["dot1qMaxVlanId"].value;
+}
+var userValue = formele[fieldName].value;
+var result = checkIntegerLegalValue(userValue, min, max);
+if(result==false){
+alert("The Value Must Be A Number Between "+min+" - "+max+" !");
+formele[fieldName].value = formele[fieldName].defaultValue;
+formele[fieldName].focus();
+}
+}
+function displayVlanIdRange(){
+var formele=document.VlanMemberForm.elements;
+var max = formele["dot1qMaxVlanId"].value;
+document.write("(2-"+max+")");
+}
+function myCheckValidation(){
+var formele=document.VlanMemberForm.elements;
+var max = formele["dot1qMaxVlanId"].value;
+checkValidation('','','dot1qVlanIndex$add',true,'INT',2,max)
+}
+// --End of Java code -->
+</script>
+</head>
+<body bgcolor="#FFFFFF" leftmargin="15">
+<span id="pagetitle" class="data-area-page-title">Create New VLAN</span>
+
+<FORM METHOD='POST' name="VlanMemberForm"  ACTION="/config/create_new_vlan.htm"   >
+
+<div align="right"><table cellspacing="0" cellpadding="0" border="0"><tr>
+<td style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/lbutton.gif"></td>
+<td valign="middle" align="center" class="data-area-button"><a href="javascript:refresh();">Refresh</a></td>
+<td style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/rbutton.gif"></td>
+<td style="width: 14px; height: 25px"></td>
+</tr></table></div><br>
+
+<INPUT  TYPE="HIDDEN" NAME="errorCollector"   value="" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE="HIDDEN" NAME="dot1qMaxVlanId" disabled   value="4094" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=VlanMemberStaticVT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=dot1qVlanStaticTable$VT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=dot1qVlanIndex$VT size=128   value="Type=7;Access=1;NumOfEnumerations=0;Range0=[-2147483648,2147483647]">
+<INPUT  Type=HIDDEN Name=dot1qVlanStaticName$VT size=128   value="Type=2;Access=2;NumOfEnumerations=0;Range0=[0,32]">
+<INPUT  Type=HIDDEN Name=dot1qVlanStaticEgressPorts$VT size=128   value="Type=101;Access=2;NumOfEnumerations=0;Range0=[0,160]">
+<INPUT  Type=HIDDEN Name=dot1qVlanForbiddenEgressPorts$VT size=128   value="Type=101;Access=2;NumOfEnumerations=0;Range0=[0,160]">
+<INPUT  Type=HIDDEN Name=dot1qVlanStaticUntaggedPorts$VT size=128   value="Type=101;Access=2;NumOfEnumerations=0;Range0=[0,160]">
+<INPUT  Type=HIDDEN Name=dot1qVlanStaticRowStatus$VT size=128   value="Type=0;Access=2;NumOfEnumerations=6;Range0=[1,6]">
+<INPUT  Type=HIDDEN Name=VlanMemberStaticVT$endVT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=AuthenticatedVlanTable   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rldot1xUnAuthenticatedVlanTable$VT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=dot1qFdbId$VT SIZE=128   value="Type=7;Access=1;NumOfEnumerations=0;Range0=[-2147483648,2147483647]">
+<INPUT  Type=HIDDEN Name=rldot1xUnAuthenticatedVlanStatus$VT SIZE=128   value="Type=0;Access=2;NumOfEnumerations=6;Range0=[1,6]">
+<INPUT  Type=HIDDEN Name=AuthenticatedVlanTable$endVT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  type=Hidden name=VlanMemberStaticVT$current   value="OK" SIZE="20" MAXLENGTH="20">
+
+<table id="create_new_vlan_tbl" border="0" cellspacing="0" cellpadding="0" width="100%" align="center">
+<tr>
+<td nowrap class="data-area-canvas" width="10px" height="10px"><img width="10px" height="10px" src="../Images/tl.gif"></td>
+<td nowrap colspan="2" width=100% class="data-area-canvas"><font style="font-size: 8px">&nbsp;</font></td>
+<td nowrap class="data-area-canvas" width="10px" height="10px"><img width="10px" height="10px" src="../Images/tr.gif"></td>
+<td nowrap style="width: 5px"></td>
+</tr>
+<tr>
+<td nowrap style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="height: 1px; width: 10px" class="data-area-canvas"><img style="width: 1px; height: 1px" src=""></td>
+<td nowrap colspan="2" style="height: 1px" class="data-area-separator"><img style="width: 1px; height: 1px" src=""></td>
+<td nowrap style="height: 1px" class="data-area-canvas"><img style="width: 1px; height: 1px" src=""></td>
+<td nowrap style="height: 1px; width: 5px"><img style="width: 1px; height: 1px" src=""></td>
+</tr>
+<tr>
+<td nowrap style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd">VLAN ID
+<script language=javascript>
+var formele=document.VlanMemberForm.elements;
+maxVlanId = formele["dot1qMaxVlanId"].value;
+displayVlanIdRange();
+</script>
+</td>
+<td nowrap class="data-area-canvas-odd">
+
+<INPUT  TYPE=text NAME=dot1qVlanIndex$add size=5   value="0">
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas">VLAN Name (0-32 characters)</td>
+<td nowrap class="data-area-canvas">
+<INPUT  TYPE=hidden NAME=String$add   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=text NAME=dot1qVlanStaticName$add size=32 MAXLENGTH=32  onBlur=checkValidation('','','',true,'STRING',0,32)   value="">
+<INPUT  TYPE=hidden NAME=Default$add   value="OK" SIZE="20" MAXLENGTH="20">
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<INPUT  TYPE=hidden NAME=dot1qVlanStaticEgressPorts$add size=160   value="">
+<INPUT  TYPE=hidden NAME=dot1qVlanForbiddenEgressPorts$add size=160   value="">
+<INPUT  TYPE=hidden NAME=dot1qVlanStaticUntaggedPorts$add size=160   value="">
+<INPUT  TYPE=hidden NAME=dot1qVlanStaticRowStatus$add   value="0" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=VlanMemberStaticVT$endAdd   value="OK" SIZE="20" MAXLENGTH="20">
+
+<tr>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas-odd">Authentication Not Required</td>
+<td class="data-area-canvas-odd"><select name="AuthNotReq"><option value=1>Enable</option><option value=0 selected>Disable</option></select></td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+
+<INPUT  type=Hidden name=AuthenticatedVlanTable$current   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden disabled NAME=dot1qFdbId$add size=160   value="0">
+<INPUT  TYPE=hidden disabled NAME=rldot1xUnAuthenticatedVlanStatus$add size=160   value="0">
+<INPUT  type=hidden Name=AuthenticatedVlanTable$endAdd disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<script language=javascript>
+insertZeroValues();
+</script>
+<tr>
+<td nowrap class="data-area-canvas" width="10px" height="10px"><img width="10px" height="10px" src="../Images/bl.gif"></td>
+<td nowrap colspan="2" width=100% class="data-area-canvas"><font style="font-size: 8px">&nbsp;</font></td>
+<td nowrap class="data-area-canvas" width="10px" height="10px"><img width="10px" height="10px" src="../Images/br.gif"></td>
+<td nowrap style="width: 5px"></td>
+</tr>
+</table><br>
+
+
+<div align="center"><table id="apply_tbl" cellspacing="0" cellpadding="0" border="0"><tr>
+<td nowrap nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/lbutton.gif"></td>
+<td nowrap nowrap valign="middle" align="center" class="data-area-button"><a href="javascript:preSubmit();">Apply Changes</a></td>
+<td nowrap nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/rbutton.gif"></td>
+</tr></table></div><br>
+<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
+<!--
+if(document.forms[0] && document.forms[0].elements.length<=1000)
+{
+for(i=0;(document.forms[0] && i<document.forms[0].elements.length);i++)
+{
+if(document.forms[0] && document.forms[0].elements[i].type=="select-one")
+if(document.forms[0] && document.forms[0].elements[i].length==0)
+document.forms[0].elements[i].style.width="70px";
+}
+}
+//-->
+</SCRIPT>
+
+</form>
+</body>
+</html>

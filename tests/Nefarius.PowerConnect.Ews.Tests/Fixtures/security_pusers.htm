@@ -1,0 +1,376 @@
+
+
+<html>
+
+<head>
+
+
+<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
+<!--
+if(top.location==self.location )
+{
+var refStr=self.location + " ";
+var ind=0;
+refStr.toLowerCase();
+ind=refStr.indexOf("config");
+var locationStr=refStr.substring(0,ind);
+if (opener)
+{
+if (opener.opener)
+{
+if(opener.opener.top.location==opener.opener.location)
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+else
+{
+if(opener.top.location==opener.location)
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+}
+else
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+//-->
+</SCRIPT>
+
+
+<script>
+if (top.DeviceType && top.DeviceType == 1)
+{
+document.write("<title>Authenticated Users</title>");
+}
+else
+{
+document.write("<title>Authenticated Users</title>");
+}
+</script>
+<link rel="stylesheet" href="../device/style.css" type="text/css">
+<script src="../js/globalFunctions.js"></script>
+<script language="JavaScript">
+<!-- Beginng of JavaScript Applet
+var authMethodArr = new Array();
+var currIndex = 0;
+var rowClass;
+function selectFilter(selIndex)
+{
+formele=document.secPUsersForm.elements;
+selName=formele["rldot1xAuthMultiSessionUserName$select"];
+if (selName.options.length>0)
+{
+var hrefStr="security_pusers.htm?[authMultiSessionTable]Filter:(rldot1xAuthMultiSessionUserName=0x'";
+var selVal="";
+if (isNaN(selIndex))
+selVal=(Str2OctetReturn(selName.options[selName.selectedIndex].text)).toLowerCase();
+else selVal=(Str2OctetReturn(selName.options[0].text)).toLowerCase();
+if (selVal!="")
+{
+hrefStr+=selVal+"')";
+document.location.href=hrefStr;
+}
+}
+else{
+var hrefStr="security_pusers.htm?Filter:";
+document.location.href=hrefStr;
+}
+}
+function checkHref()
+{
+var formele=document.secPUsersForm.elements;
+if (formele["restoreUrl"].value!="")
+return true;
+return false;
+}
+function checkListAndFirstFilter()
+{
+formele=document.secPUsersForm.elements;
+selName=formele["rldot1xAuthMultiSessionUserName$select"];
+for (var i=0; i<selName.options.length; i++)
+{
+if (selName.options[i].text=="" || selName.options[i].text==" " || selName.options[i].text=='\n' || selName.options[i].text=='\t' )
+{
+if (notIE)
+selName.remove(i);
+else selName.options[i]=null;
+break;
+}
+}
+if(!checkHref())
+{
+selectFilter(0);
+return true;
+}
+return false;
+}
+function indexSign()
+{
+var formele=document.secPUsersForm.elements;
+var userNameList=formele["rldot1xAuthMultiSessionUserName$select"];
+if (formele["rldot1xAuthMultiSessionUserName$repeat?1"])
+{
+var userName = formele["rldot1xAuthMultiSessionUserName$repeat?1"].value;
+userName = Octet2StrReturn(userName);
+i = 0;
+while (userNameList.options[i] != null)
+{
+if (userNameList.options[i].text == userName)
+{
+userNameList.selectedIndex = i;
+break;
+}
+i = i + 1;
+}
+}
+else userNameList.selectedIndex=-1;
+if (userNameList.length==0) userNameList.disabled=true;
+}
+function displayAuthMethod(portNum)
+{
+portNum = parseInt(portNum,10);
+var auth = authMethodArr[portNum];
+switch(auth)
+{
+case "1":
+document.write("Remote");
+break;
+case "2":
+document.write("Local");
+break;
+case "3":
+document.write("None");
+break;
+}
+}
+function openShowAll()
+{
+window.open('users_table.htm','', 'width=850, height=600, left=50, top=50, scrollbars=yes, resizable=yes');
+}
+// --End of Java code -->
+</script>
+</head>
+<body bgcolor="#FFFFFF" leftmargin="15" style="display:none;">
+<script language="JavaScript">top.Draw_Header(document.title);</script>
+
+<FORM METHOD='POST' name="secPUsersForm"  ACTION="/config/security_pusers.htm"   >
+<script>
+var formele = document.secPUsersForm.elements;
+var authIndx = 0;
+</script>
+<INPUT  Type="HIDDEN" Name="restoreUrl" SIZE=256   value="">
+<INPUT  TYPE="HIDDEN" NAME="errorCollector"   value="" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=authSessionTable   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=dot1xAuthSessionStatsTable   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=dot1xPaePortNumber$VT SIZE=128   value="Type=0;Access=1;NumOfEnumerations=0;Range0=[1,2147483647]">
+<INPUT  Type=HIDDEN Name=rlDot1xAuthSessionAuthenticMethod$VT SIZE=128   value="Type=0;Access=1;NumOfEnumerations=3;Range0=[1,3]">
+<INPUT  Type=HIDDEN Name=authSessionTable$endVT   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=dot1xPaePortNumber$repeat0?1  disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlDot1xAuthSessionAuthenticMethod$repeat0?1  disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=authSessionTable$endRepeat0?1  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+authIndx++;
+authMethodArr[parseInt(formele["dot1xPaePortNumber$repeat0?"+authIndx].value,10)] = formele["rlDot1xAuthSessionAuthenticMethod$repeat0?"+authIndx].value;
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=dot1xPaePortNumber$repeat0?2  disabled   value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlDot1xAuthSessionAuthenticMethod$repeat0?2  disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=authSessionTable$endRepeat0?2  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+authIndx++;
+authMethodArr[parseInt(formele["dot1xPaePortNumber$repeat0?"+authIndx].value,10)] = formele["rlDot1xAuthSessionAuthenticMethod$repeat0?"+authIndx].value;
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=dot1xPaePortNumber$repeat0?3  disabled   value="3" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlDot1xAuthSessionAuthenticMethod$repeat0?3  disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=authSessionTable$endRepeat0?3  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+authIndx++;
+authMethodArr[parseInt(formele["dot1xPaePortNumber$repeat0?"+authIndx].value,10)] = formele["rlDot1xAuthSessionAuthenticMethod$repeat0?"+authIndx].value;
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=dot1xPaePortNumber$repeat0?4  disabled   value="4" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlDot1xAuthSessionAuthenticMethod$repeat0?4  disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=authSessionTable$endRepeat0?4  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+authIndx++;
+authMethodArr[parseInt(formele["dot1xPaePortNumber$repeat0?"+authIndx].value,10)] = formele["rlDot1xAuthSessionAuthenticMethod$repeat0?"+authIndx].value;
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=dot1xPaePortNumber$repeat0?5  disabled   value="5" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlDot1xAuthSessionAuthenticMethod$repeat0?5  disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=authSessionTable$endRepeat0?5  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+authIndx++;
+authMethodArr[parseInt(formele["dot1xPaePortNumber$repeat0?"+authIndx].value,10)] = formele["rlDot1xAuthSessionAuthenticMethod$repeat0?"+authIndx].value;
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=dot1xPaePortNumber$repeat0?6  disabled   value="6" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlDot1xAuthSessionAuthenticMethod$repeat0?6  disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=authSessionTable$endRepeat0?6  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+authIndx++;
+authMethodArr[parseInt(formele["dot1xPaePortNumber$repeat0?"+authIndx].value,10)] = formele["rlDot1xAuthSessionAuthenticMethod$repeat0?"+authIndx].value;
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=dot1xPaePortNumber$repeat0?7  disabled   value="7" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlDot1xAuthSessionAuthenticMethod$repeat0?7  disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=authSessionTable$endRepeat0?7  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+authIndx++;
+authMethodArr[parseInt(formele["dot1xPaePortNumber$repeat0?"+authIndx].value,10)] = formele["rlDot1xAuthSessionAuthenticMethod$repeat0?"+authIndx].value;
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=dot1xPaePortNumber$repeat0?8  disabled   value="8" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlDot1xAuthSessionAuthenticMethod$repeat0?8  disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=authSessionTable$endRepeat0?8  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+authIndx++;
+authMethodArr[parseInt(formele["dot1xPaePortNumber$repeat0?"+authIndx].value,10)] = formele["rlDot1xAuthSessionAuthenticMethod$repeat0?"+authIndx].value;
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=dot1xPaePortNumber$repeat0?9  disabled   value="9" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlDot1xAuthSessionAuthenticMethod$repeat0?9  disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=authSessionTable$endRepeat0?9  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+authIndx++;
+authMethodArr[parseInt(formele["dot1xPaePortNumber$repeat0?"+authIndx].value,10)] = formele["rlDot1xAuthSessionAuthenticMethod$repeat0?"+authIndx].value;
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=dot1xPaePortNumber$repeat0?10  disabled   value="10" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlDot1xAuthSessionAuthenticMethod$repeat0?10  disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=authSessionTable$endRepeat0?10  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+authIndx++;
+authMethodArr[parseInt(formele["dot1xPaePortNumber$repeat0?"+authIndx].value,10)] = formele["rlDot1xAuthSessionAuthenticMethod$repeat0?"+authIndx].value;
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=dot1xPaePortNumber$repeat0?11  disabled   value="11" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlDot1xAuthSessionAuthenticMethod$repeat0?11  disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=authSessionTable$endRepeat0?11  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+authIndx++;
+authMethodArr[parseInt(formele["dot1xPaePortNumber$repeat0?"+authIndx].value,10)] = formele["rlDot1xAuthSessionAuthenticMethod$repeat0?"+authIndx].value;
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=dot1xPaePortNumber$repeat0?12  disabled   value="12" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlDot1xAuthSessionAuthenticMethod$repeat0?12  disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=authSessionTable$endRepeat0?12  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+authIndx++;
+authMethodArr[parseInt(formele["dot1xPaePortNumber$repeat0?"+authIndx].value,10)] = formele["rlDot1xAuthSessionAuthenticMethod$repeat0?"+authIndx].value;
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=dot1xPaePortNumber$repeat0?13  disabled   value="13" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlDot1xAuthSessionAuthenticMethod$repeat0?13  disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=authSessionTable$endRepeat0?13  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+authIndx++;
+authMethodArr[parseInt(formele["dot1xPaePortNumber$repeat0?"+authIndx].value,10)] = formele["rlDot1xAuthSessionAuthenticMethod$repeat0?"+authIndx].value;
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=dot1xPaePortNumber$repeat0?14  disabled   value="14" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlDot1xAuthSessionAuthenticMethod$repeat0?14  disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=authSessionTable$endRepeat0?14  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+authIndx++;
+authMethodArr[parseInt(formele["dot1xPaePortNumber$repeat0?"+authIndx].value,10)] = formele["rlDot1xAuthSessionAuthenticMethod$repeat0?"+authIndx].value;
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=dot1xPaePortNumber$repeat0?15  disabled   value="15" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlDot1xAuthSessionAuthenticMethod$repeat0?15  disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=authSessionTable$endRepeat0?15  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+authIndx++;
+authMethodArr[parseInt(formele["dot1xPaePortNumber$repeat0?"+authIndx].value,10)] = formele["rlDot1xAuthSessionAuthenticMethod$repeat0?"+authIndx].value;
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=dot1xPaePortNumber$repeat0?16  disabled   value="16" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlDot1xAuthSessionAuthenticMethod$repeat0?16  disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=authSessionTable$endRepeat0?16  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+authIndx++;
+authMethodArr[parseInt(formele["dot1xPaePortNumber$repeat0?"+authIndx].value,10)] = formele["rlDot1xAuthSessionAuthenticMethod$repeat0?"+authIndx].value;
+</script>
+
+
+<INPUT  Type=HIDDEN Name=authMultiSessionTable   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rldot1xAuthMultiSessionStatsTable   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rldot1xAuthMultiSessionStatsPortNumber$VT SIZE=128   value="Type=0;Access=1;NumOfEnumerations=0;Range0=[-2147483648,2147483647]">
+<INPUT  Type=HIDDEN Name=rlPhdPortsIfIndexName$VT SIZE=128   value="Type=100;Access=1;NumOfEnumerations=0;Range0=[1,20]">
+<INPUT  Type=HIDDEN Name=rldot1xAuthMultiSessionStatsSourceMac$VT SIZE=128   value="Type=2;Access=1;NumOfEnumerations=0;Range0=[6,6]">
+<INPUT  Type=HIDDEN Name=rldot1xAuthMultiSessionTime$VT SIZE=128   value="Type=8;Access=1;NumOfEnumerations=0">
+<INPUT  Type=HIDDEN Name=rldot1xAuthMultiSessionUserName$VT SIZE=128   value="Type=2;Access=1;NumOfEnumerations=0;Range0=[0,160]">
+<INPUT  Type=HIDDEN Name=authMultiSessionTable$endVT   value="OK" SIZE="20" MAXLENGTH="20">
+<div align="right"><table cellspacing="0" cellpadding="0" border="0"><tr>
+<td style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/lbutton.gif"></td>
+<td valign="middle" align="center" class="data-area-button"><a href="javascript:void(0)" onclick="javascript:openShowAll()" title='Show Authenticated Users Table'>Show All</a></td>
+<td style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/rbutton.gif"></td>
+<td style="width: 14px; height: 25px"></td>
+</tr></table></div><br>
+<table border="0" cellspacing="0" cellpadding="0" width="100%" align="center">
+<script language="JavaScript">
+top.Draw_TableTop(2);top.Draw_TableHeader();
+</script>
+<tr>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas-odd" width="40%">User Name</td>
+<td class="data-area-canvas-odd">
+
+<INPUT  Type=hidden NAME=String$select   value="OK" SIZE="20" MAXLENGTH="20">
+<SELECT  Name=rldot1xAuthMultiSessionUserName$select size="1" onChange="selectFilter()"
+ RpGetType=complex >
+</select>
+
+<INPUT  Type=hidden NAME=Default$select   value="OK" SIZE="20" MAXLENGTH="20">
+
+</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<script language="JavaScript">
+top.Draw_TableBottom(2);
+checkListAndFirstFilter();
+</script>
+</table><br>
+<table border="0" cellspacing="0" cellpadding="0" width="100%">
+<script language="JavaScript">
+top.Draw_TableTop(5);
+</script>
+<tr>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td align=center class="data-area-canvas"><b>Port</b></td>
+<td align=center class="data-area-canvas"><b>Session Time</b></td>
+<td align=center class="data-area-canvas"><b>Authentication Method</b></td>
+<td align=center class="data-area-canvas"><b>MAC Address</b></td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td style="height: 1px; width: 10px" class="data-area-canvas"></td>
+<td colspan="5" style="height: 1px" class="data-area-separator"></td>
+<td style="height: 1px" class="data-area-canvas"></td>
+<td style="height: 1px; width: 5px"></td>
+</tr>
+
+
+
+
+<script language="JavaScript">
+indexSign();
+top.Draw_TableBottom(5);
+document.body.style.display = "block";
+</script>
+</table>
+
+</form>
+</body>
+</html>

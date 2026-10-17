@@ -1,0 +1,620 @@
+
+
+<html>
+<head>
+<title>Spanning Tree Global Settings</title>
+
+<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
+<!--
+if(top.location==self.location )
+{
+var refStr=self.location + " ";
+var ind=0;
+refStr.toLowerCase();
+ind=refStr.indexOf("config");
+var locationStr=refStr.substring(0,ind);
+if (opener)
+{
+if (opener.opener)
+{
+if(opener.opener.top.location==opener.opener.location)
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+else
+{
+if(opener.top.location==opener.location)
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+}
+else
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+//-->
+</SCRIPT>
+
+<link rel="stylesheet" href="../device/style.css" type="text/css">
+<script src="../js/globalFunctions.js"></script>
+<script language="JavaScript">
+<!-- Beginng of JavaScript Applet
+if(top.MonitorMode)
+{
+document.write("<link rel='stylesheet' href='../device/monitorMode.css' type='text/css'>")
+}
+var isIE = (navigator.appName.indexOf("Microsoft") != -1);
+var maxHelloTime=0;
+var maxMaxAge=0;
+var maxForwardDelay=0 ;
+var minHelloTime=0 ;
+var minMaxAge=0;
+var minForwardDelay=0 ;
+function formSubmit() {
+if (!checkPriority()) {
+return;
+}
+if(document.getElementById("helloTimeRadio").checked) {
+if (!ckHelloTime()) {
+return;
+}
+} else if (document.getElementById("maxAgeSecsRadio").checked) {
+if (!ckMaxAge()) {
+return;
+}
+} else {
+if (!ckForwardDelay()) {
+return;
+}
+}
+document.staBridgeForm.submit();
+}
+function displayLastTop( lastTopChangeTicks ) {
+var time = Math.round(lastTopChangeTicks/TICKS_PER_SECOND);
+var days = Math.floor(time/(24*3600));
+time = time%(24*3600);
+var hours = Math.floor(time/3600);
+time = time%3600;
+var min = Math.floor(time/60);
+var sec = time%60;
+var timeStr= days + "D/ "+hours+"H/ "+min+"M/ "+sec+"S";
+document.write(timeStr);
+}
+function displayBridgeId ( prior , mac ){
+document.write( prior + '-' + fromStringToMacAddress(mac)) ;
+}
+function displayRootBridgeId( designatedRoot) {
+var strLength = designatedRoot.length ;
+var periorLen = strLength - 12 ;
+var leftStr = designatedRoot.substring(0,periorLen) ;
+var rightStr = designatedRoot.substring(periorLen,designatedRoot.length ) ;
+leftStr=hexToDec(leftStr);
+document.write( leftStr + '-' + fromStringToMacAddress(rightStr) );
+}
+function displayRootPort( fldName) {
+formele=document.staBridgeForm.elements;
+var rootPort=formele[fldName].value;
+if (checkInteger(rootPort)==0) {
+return;
+}
+var rootPortText = "0" ;
+rootPortText = (rootPort>=top.trunkFirstIndex) ? "LAG "+ (parseInt(rootPort)-top.trunkFirstIndex+1): getPortNameFromNumber(rootPort);
+document.write(rootPortText);
+}
+function checkInt(text) {
+if (text == "" || text == " ") {
+alert("Blank is not a legal value");
+return false;
+}
+if (!checkInteger(text)) {
+alert(text + " is not a valid integer");
+return false;
+}
+return true;
+}
+function checkPriority() {
+var priorityCtrl = document.getElementById("dot1dStpPriorityText");
+if (!checkInt(priorityCtrl.value)) {
+priorityCtrl.select();
+return false;
+}
+var priority = parseInt(priorityCtrl.value);
+if (priority < 0 || priority > 61440 || (priority%4096)!=0) {
+alert ("Priority should be between 0 and 61440 in steps of 4096.");
+priorityCtrl.select();
+return false;
+}
+document.getElementsByName("dot1dStpPriority")[0].value = priorityCtrl.value;
+return true;
+}
+function selectRadio(ctrl) {
+var radioId;
+switch (ctrl.id) {
+case "helloTimeSecsText":
+radioId = "helloTimeRadio";
+break;
+case "maxAgeSecsText":
+radioId = "maxAgeSecsRadio";
+break;
+default:
+radioId = "forwardDelaySecsRadio";
+}
+document.getElementById(radioId).checked = true;
+selectTimer();
+ctrl.select();
+}
+function ckHelloTime(fldName) {
+var helloTimeCtrl = document.getElementById("helloTimeSecsText");
+var maxAgeCtrl = document.getElementById("maxAgeSecsText");
+if (!checkInt(helloTimeCtrl.value)) {
+selectRadio(helloTimeCtrl);
+return false;
+}
+var helloTime = parseInt(helloTimeCtrl.value);
+var maxAge = parseInt(maxAgeCtrl.value);
+if ( helloTime < minHelloTime || helloTime > maxHelloTime || maxAge < (helloTime+1)*2 ) {
+alert("The Hello Time range is 1 - 10.\nHowever, ensure the following when defining the field: Max-Age >= 2*(Hello-Time + 1)");
+selectRadio(helloTimeCtrl);
+return false;
+}
+document.getElementsByName("dot1dStpBridgeHelloTime")[0].value = secondsToTicks(helloTime);
+document.getElementsByName("dot1dStpBridgeHelloTime")[0].disabled = false;
+return true;
+}
+function ckMaxAge(fldName) {
+var helloTimeCtrl = document.getElementById("helloTimeSecsText");
+var maxAgeCtrl = document.getElementById("maxAgeSecsText");
+var forwardDelayCtrl = document.getElementById("forwardDelaySecsText");
+if (!checkInt(maxAgeCtrl.value)) {
+selectRadio(maxAgeCtrl);
+return false;
+}
+var helloTime = parseInt(helloTimeCtrl.value);
+var maxAge = parseInt(maxAgeCtrl.value);
+var forwardDelay = parseInt(forwardDelayCtrl.value);
+if ( maxAge < minMaxAge || maxAge > maxMaxAge || maxAge < (helloTime +1)*2 || (forwardDelay-1)*2 < maxAge ) {
+alert ("The Max Age field value range is 6 - 40.\nHowever, ensure the following when defining the field:\n2*(Forward-Delay - 1) >= Max-Age and Max-Age >= 2*(Hello-Time + 1)");
+selectRadio(maxAgeCtrl);
+return false;
+}
+document.getElementsByName("dot1dStpBridgeMaxAge")[0].value = secondsToTicks(maxAge);
+document.getElementsByName("dot1dStpBridgeMaxAge")[0].disabled = false;
+return true;
+}
+function ckForwardDelay(fldName) {
+var maxAgeCtrl = document.getElementById("maxAgeSecsText");
+var forwardDelayCtrl = document.getElementById("forwardDelaySecsText");
+if (!checkInt(forwardDelayCtrl.value)) {
+selectRadio(forwardDelayCtrl);
+return false;
+}
+var forwardDelay = parseInt(forwardDelayCtrl.value);
+var maxAge = parseInt(maxAgeCtrl.value);
+if ( forwardDelay < minForwardDelay || forwardDelay > maxForwardDelay || (forwardDelay-1)*2 < maxAge ) {
+alert ("The Forward Delay field value range is 4 - 30.\nHowever, ensure the following when defining the field: 2*(Forward-Delay - 1) >= Max-Age ");
+selectRadio(forwardDelayCtrl);
+return false;
+}
+document.getElementsByName("dot1dStpBridgeForwardDelay")[0].value = secondsToTicks(forwardDelay);
+document.getElementsByName("dot1dStpBridgeForwardDelay")[0].disabled = false;
+return true;
+}
+function displayDividedRange(fieldName) {
+var returnedRange = returnIntRange(fieldName);
+var minVal=null;
+var maxVal=null;
+var rangeStr='';
+var tmpValArr = sliceString(returnedRange,"(");
+if (tmpValArr && tmpValArr[1]) {
+var tmp = tmpValArr[1];
+tmpValArr = sliceString(tmp,")");
+if (tmpValArr) {
+tmp=tmpValArr[0];
+tmpValArr=sliceString(tmp,"-");
+if (tmpValArr && 2==tmpValArr.length) {
+minVal=parseInt(tmpValArr[0]);
+maxVal=parseInt(tmpValArr[1]);
+if ( minVal !=null || maxVal !=null) {
+if ( (minVal !=null ) ) {
+minVal=minVal/TICKS_PER_SECOND;
+rangeStr+="("+minVal+"-";
+}
+if ( ( maxVal !=null) ) {
+maxVal=maxVal/TICKS_PER_SECOND;
+rangeStr+=maxVal+") ";
+}
+}
+}
+}
+}
+switch (fieldName) {
+case "dot1dStpBridgeHelloTime" :
+if ( minVal != null ) {
+minHelloTime = minVal;
+}
+if ( maxVal != null ) {
+maxHelloTime = maxVal;
+}
+break;
+case "dot1dStpBridgeMaxAge":
+if ( minVal != null ) {
+minMaxAge = minVal;
+}
+if ( maxVal != null ) {
+maxMaxAge = maxVal;
+}
+break;
+default:
+if ( minVal != null ) {
+minForwardDelay = minVal;
+}
+if ( maxVal != null ) {
+maxForwardDelay = maxVal;
+}
+}
+document.write(rangeStr);
+}
+var TICKS_PER_SECOND = 100;
+function ticksToSeconds(ticks) {
+return ticks / TICKS_PER_SECOND;
+}
+function secondsToTicks(secs) {
+return secs * TICKS_PER_SECOND;
+}
+function enableTextControl(control) {
+control.disabled = false;
+control.style.backgroundColor="#ffffff";
+}
+function disableTextControl(control) {
+control.disabled = true;
+control.style.backgroundColor="#cccccc";
+}
+function selectTimer() {
+var helloTimeSecsCtrl = document.getElementById("helloTimeSecsText");
+var maxAgeSecsCtrl = document.getElementById("maxAgeSecsText");
+var forwardDelaySecsCtrl = document.getElementById("forwardDelaySecsText");
+disableTextControl(helloTimeSecsCtrl);
+disableTextControl(maxAgeSecsCtrl);
+disableTextControl(forwardDelaySecsCtrl);
+helloTimeSecsCtrl.value = helloTimeSecsCtrl.defaultValue;
+maxAgeSecsCtrl.value = maxAgeSecsCtrl.defaultValue;
+forwardDelaySecsCtrl.value = forwardDelaySecsCtrl.defaultValue;
+if(document.getElementById("helloTimeRadio").checked) {
+enableTextControl(helloTimeSecsCtrl);
+} else if (document.getElementById("maxAgeSecsRadio").checked) {
+enableTextControl(maxAgeSecsCtrl);
+} else {
+enableTextControl(forwardDelaySecsCtrl);
+}
+}
+function changeStpEnable(val) {
+document.getElementsByName("rldot1dStpEnable")[0].value = val;
+}
+function changeVersion(val) {
+document.getElementsByName("dot1dStpVersion")[0].value = val;
+}
+function changeStpPathCostDefault(val) {
+document.getElementsByName("dot1dStpPathCostDefault")[0].value = val;
+}
+function changeStpFilterBpdu(val) {
+document.getElementsByName("rldot1dStpFilterBpdu")[0].value = val;
+}
+// --End of Java code -->
+</script>
+</head>
+<body bgcolor="#FFFFFF" leftmargin="15" onload="setScreenMonitorState();">
+<script language="JavaScript">top.Draw_Header(document.title);</script>
+<FORM METHOD='POST' name="staBridgeForm"  ACTION="/config/sta_bridge.htm"   >
+<INPUT  Type="HIDDEN" Name="restoreUrl" SIZE=256   value="">
+<INPUT  TYPE="HIDDEN" NAME="errorCollector"   value="" SIZE="20" MAXLENGTH="20">
+<INPUT  Type="HIDDEN" Name="rldot1dStpEnable"   value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  Type="HIDDEN" Name="dot1dStpVersion"   value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  Type="HIDDEN" Name="dot1dStpPathCostDefault"   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  Type="HIDDEN" Name="rldot1dStpFilterBpdu"   value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden NAME=dot1dStpPriority$bnd   value="Type=0;Access=2;NumOfEnumerations=0;Range0=[0,65535]" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=hidden Name=dot1dStpPriority   value="32768" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=hidden Name=dot1dStpBridgeHelloTime disabled   value="200" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden NAME=dot1dStpBridgeHelloTime$bnd disabled   value="Type=0;Access=2;NumOfEnumerations=0;Range0=[100,1000]" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=hidden Name=dot1dStpBridgeMaxAge disabled   value="2000" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden NAME=dot1dStpBridgeMaxAge$bnd disabled   value="Type=0;Access=2;NumOfEnumerations=0;Range0=[600,4000]" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=hidden Name=dot1dStpBridgeForwardDelay disabled   value="1500" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden NAME=dot1dStpBridgeForwardDelay$bnd disabled   value="Type=0;Access=2;NumOfEnumerations=0;Range0=[400,3000]" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=hidden Name=dot1dStpPriority$help   value="32768" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=Hidden Name=dot1dBaseBridgeAddress   value="000000000000" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=hidden Name=dot1dStpDesignatedRoot   value="8000000000000000" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=hidden NAME=dot1dStpRootPort   value="0" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=hidden NAME=dot1dStpRootCost   value="0" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=hidden NAME=dot1dStpTopChanges   value="0" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=hidden Name=dot1dStpTimeSinceTopologyChange   value="907510" SIZE="20" MAXLENGTH="20">
+</form>
+<table id="sta_bridge_state_tbl" border="0" cellspacing="0" cellpadding="0" width="100%">
+<script language="JavaScript">
+top.Draw_TableTop(2);top.Draw_TableHeader();
+</script>
+<tr>
+<td nowrap style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd" width="40%">Spanning Tree State</td>
+<td nowrap class="data-area-canvas-odd">
+<select id="rldot1dStpEnableSelect" onchange="changeStpEnable(this.value)">
+<option value="1">Enable</option>
+<option value="2">Disable</option>
+</select>
+<script type="text/javascript">
+var rldot1dStpEnable = document.getElementsByName("rldot1dStpEnable")[0].value;
+document.getElementById("rldot1dStpEnableSelect").value = rldot1dStpEnable;
+</script>
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas">STP Operation Mode</td>
+<td nowrap class="data-area-canvas">
+<select id="dot1dStpVersionSelect" onchange="changeVersion(this.value)">
+<option value="0">Classic STP</option>
+<option value="2">Rapid STP</option>
+</select>
+<script type="text/javascript">
+var dot1dStpVersion = document.getElementsByName("dot1dStpVersion")[0].value;
+document.getElementById("dot1dStpVersionSelect").value = dot1dStpVersion;
+</script>
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas-odd">BPDU Handling</td>
+<td class="data-area-canvas-odd">
+<select id="rldot1dStpFilterBpduSelect" onchange="changeStpFilterBpdu(this.value)">
+<option value="1">Filtering</option>
+<option value="2">Flooding</option>
+</select>
+<script type="text/javascript">
+var rldot1dStpFilterBpdu = document.getElementsByName("rldot1dStpFilterBpdu")[0].value;
+document.getElementById("rldot1dStpFilterBpduSelect").value = rldot1dStpFilterBpdu;
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas">Path Cost Default Values&nbsp;</td>
+<td nowrap class="data-area-canvas">
+<select id="dot1dStpPathCostDefaultSelect" onchange="changeStpPathCostDefault(this.value)">
+<option value="1">Short</option>
+<option value="2">Long</option>
+</select>
+<script type="text/javascript">
+var dot1dStpPathCostDefault = document.getElementsByName("dot1dStpPathCostDefault")[0].value;
+document.getElementById("dot1dStpPathCostDefaultSelect").value = dot1dStpPathCostDefault;
+</script>
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<script language="JavaScript">top.Draw_TableBottom(2)</script>
+</table>
+<br>
+<table id="sta_bridge_set_tbl" border="0" cellspacing="0" cellpadding="0" width="100%">
+<script language="JavaScript">
+top.Draw_TableTop(2);
+</script>
+<tr>
+<td nowrap style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas" width="40%"><b>Bridge Settings</b></td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="height: 1px; width: 10px" class="data-area-canvas"><img style="width: 1px; height: 1px" src=""></td>
+<td nowrap colspan="2" style="height: 1px" class="data-area-separator"><img style="width: 1px; height: 1px" src=""></td>
+<td nowrap style="height: 1px" class="data-area-canvas"><img style="width: 1px; height: 1px" src=""></td>
+<td nowrap style="height: 1px; width: 5px"><img style="width: 1px; height: 1px" src=""></td>
+</tr>
+<tr>
+<td nowrap style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Priority&nbsp;
+<script language="JavaScript">
+document.write("(0-61440 in steps of 4096)");
+</script>
+</td>
+<td nowrap class="data-area-canvas-odd">
+<input type="text" id="dot1dStpPriorityText" maxlength = "5">
+<script type="text/javascript">
+var dot1dStpPriority = document.getElementsByName("dot1dStpPriority")[0].value;
+document.getElementById("dot1dStpPriorityText").value = dot1dStpPriority;
+</script>
+&nbsp;&nbsp;
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas">
+<input type="radio" name="timers" id="helloTimeRadio" checked onClick="selectTimer()">Hello Time&nbsp;
+<script language="JavaScript">
+displayDividedRange("dot1dStpBridgeHelloTime");
+</script>
+</td>
+<td nowrap class="data-area-canvas">
+<input name="dot1dStpBridgeHelloTimeSecs" id="helloTimeSecsText" maxlength = "2">
+&nbsp;&nbsp;(Sec)
+</td>
+<script>
+var tics = document.getElementsByName("dot1dStpBridgeHelloTime")[0].value;
+var secsCtrl = document.getElementById("helloTimeSecsText");
+secsCtrl.value = ticksToSeconds(tics);
+secsCtrl.defaultValue = secsCtrl.value;
+</script>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd">
+<input type="radio" name="timers" id="maxAgeSecsRadio" onClick="selectTimer()">Max Age&nbsp;
+<script language="JavaScript">
+displayDividedRange("dot1dStpBridgeMaxAge");
+</script>
+</td>
+<td nowrap class="data-area-canvas-odd">
+<input name="dot1dStpBridgeMaxAgeSecs" id="maxAgeSecsText" disabled style="background-color: #cccccc;" maxlength = "2">
+<script lang="javascript">
+tics = document.getElementsByName("dot1dStpBridgeMaxAge")[0].value;
+secsCtrl = document.getElementById("maxAgeSecsText");
+secsCtrl.value = ticksToSeconds(tics);
+secsCtrl.defaultValue = secsCtrl.value;
+</script>
+&nbsp;&nbsp;(Sec)
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas">
+<input type="radio" name="timers" id="forwardDelaySecsRadio" onclick="selectTimer()">Forward Delay&nbsp;
+<script language="JavaScript">
+displayDividedRange("dot1dStpBridgeForwardDelay");
+</script>
+</td>
+<td nowrap class="data-area-canvas">
+<input name="dot1dStpBridgeForwardDelaySecs" id="forwardDelaySecsText" disabled style="background-color: #cccccc;" maxlength = "2">
+<script lang="javascript">
+tics = document.getElementsByName("dot1dStpBridgeForwardDelay")[0].value;
+secsCtrl = document.getElementById("forwardDelaySecsText");
+secsCtrl.value = ticksToSeconds(tics);
+secsCtrl.defaultValue = secsCtrl.value;
+</script>
+&nbsp;&nbsp;(Sec)
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<script language="JavaScript">
+top.Draw_TableBottom(2);
+</script>
+</table>
+<br>
+<table id="sta_bridge_root_tbl" border="0" cellspacing="0" cellpadding="0" width="100%">
+<script language="JavaScript">
+top.Draw_TableTop(2);
+</script>
+<tr>
+<td nowrap style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas" width="40%"><b>Designated Root</b></td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="height: 1px; width: 10px" class="data-area-canvas"><img style="width: 1px; height: 1px" src=""></td>
+<td nowrap colspan="2" style="height: 1px" class="data-area-separator"><img style="width: 1px; height: 1px" src=""></td>
+<td nowrap style="height: 1px" class="data-area-canvas"><img style="width: 1px; height: 1px" src=""></td>
+<td nowrap style="height: 1px; width: 5px"><img style="width: 1px; height: 1px" src=""></td>
+</tr>
+<tr>
+<td nowrap style="width: 10px; height: 24px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd" style="width: 140px">Bridge ID</td>
+<td nowrap class="data-area-canvas-odd" style="width: 170px">
+<script>
+displayBridgeId(document.staBridgeForm.dot1dStpPriority$help.value , document.staBridgeForm.dot1dBaseBridgeAddress.value );
+</script>
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="width: 10px; height: 24px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas">Root Bridge ID</td>
+<td nowrap class="data-area-canvas">
+<script>
+displayRootBridgeId(document.staBridgeForm.dot1dStpDesignatedRoot.value);
+</script>
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="width: 10px; height: 24px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd">Root Port</td>
+<td nowrap class="data-area-canvas-odd">
+<script>
+displayRootPort("dot1dStpRootPort");
+</script>
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="width: 10px; height: 24px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas">Root Path Cost</td>
+<td nowrap class="data-area-canvas">
+<script type="text/javascript">
+document.write(document.getElementsByName("dot1dStpRootCost")[0].value);
+</script>
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="width: 10px; height: 24px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd">Topology Changes Counts</td>
+<td nowrap class="data-area-canvas-odd">
+<script type="text/javascript">
+document.write(document.getElementsByName("dot1dStpTopChanges")[0].value);
+</script>
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="width: 10px; height: 24px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas">Last Topology Change</td>
+<td nowrap class="data-area-canvas">
+<script>
+displayLastTop(document.staBridgeForm.dot1dStpTimeSinceTopologyChange.value);
+</script>
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<script language="JavaScript">
+top.Draw_TableBottom(2);
+</script>
+</table>
+<br>
+<div class="management-only">
+
+<div align="center"><table id="apply_tbl" cellspacing="0" cellpadding="0" border="0"><tr>
+<td nowrap nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/lbutton.gif"></td>
+<td nowrap nowrap valign="middle" align="center" class="data-area-button"><a href="javascript:preSubmit();">Apply Changes</a></td>
+<td nowrap nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/rbutton.gif"></td>
+</tr></table></div><br>
+<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
+<!--
+if(document.forms[0] && document.forms[0].elements.length<=1000)
+{
+for(i=0;(document.forms[0] && i<document.forms[0].elements.length);i++)
+{
+if(document.forms[0] && document.forms[0].elements[i].type=="select-one")
+if(document.forms[0] && document.forms[0].elements[i].length==0)
+document.forms[0].elements[i].style.width="70px";
+}
+}
+//-->
+</SCRIPT>
+
+</div>
+</body>
+</html>

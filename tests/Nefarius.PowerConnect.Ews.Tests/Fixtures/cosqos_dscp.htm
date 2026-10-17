@@ -1,0 +1,2331 @@
+
+
+<html>
+
+<head>
+
+
+<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
+<!--
+if(top.location==self.location )
+{
+var refStr=self.location + " ";
+var ind=0;
+refStr.toLowerCase();
+ind=refStr.indexOf("config");
+var locationStr=refStr.substring(0,ind);
+if (opener)
+{
+if (opener.opener)
+{
+if(opener.opener.top.location==opener.opener.location)
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+else
+{
+if(opener.top.location==opener.location)
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+}
+else
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+//-->
+</SCRIPT>
+
+
+<title>DSCP to Queue Mapping</title>
+<link rel="stylesheet" href="../device/style.css" type="text/css">
+<script src="../js/globalFunctions.js"></script>
+<script language="JavaScript">
+<!-- Beginng of JavaScript Applet
+if(top.MonitorMode) {
+document.write("<link rel='stylesheet' href='../device/monitorMode.css' type='text/css'>")
+}
+FieldsToCheck = new Array(3);
+FieldsToCheck[0] = "rlQosOldDscp$repeat";
+FieldsToCheck[1] = "rlQosQueueNum$repeat";
+FieldsToCheck[2] = "DSCPMapTable$endRepeat";
+var dscp=0;
+var disableDscpIndex=3;
+var defValuesArr=new Array(64);
+function initDefValuesArr()
+{
+var formObj=document.cosqosDscpForm.elements;
+var dscpVal=0;
+for(var i=1;i<=defValuesArr.length;i++)
+{
+if(formObj["rlQosDscpQueueDefaultMapDscp$repeat?"+i].value)
+{
+dscpVal=formObj["rlQosDscpQueueDefaultMapDscp$repeat?"+i].value;
+defValuesArr[dscpVal]=formObj["rlQosDscpQueueDefaultMapQueueId$repeat?"+i].value;
+}
+else
+{
+defValuesArr[dscpVal]=((dscpVal * top.numOfQueues) / 64) + 1 ;
+dscpVal++;
+}
+}
+}
+function chkClick()
+{
+var formObj=document.cosqosDscpForm.elements;
+if(formObj["chkResore"].checked==true){
+for (i=1;i<=dscp;i++)
+{
+if(formObj["rlQosQueueNum$select?"+i].disabled==false)
+{
+formObj["rlQosQueueNum$repeat?"+i].value=defValuesArr[i-1];
+formObj["rlQosQueueNum$select?"+i].selectedIndex=defValuesArr[i-1]-1;
+}
+}
+disableHtml();
+}
+else{
+enableHtml();
+formObj["rlQosQueueNum$select?4"].disabled=true;
+formObj["rlQosQueueNum$select?12"].disabled=true;
+formObj["rlQosQueueNum$select?20"].disabled=true;
+formObj["rlQosQueueNum$select?28"].disabled=true;
+formObj["rlQosQueueNum$select?36"].disabled=true;
+formObj["rlQosQueueNum$select?44"].disabled=true;
+formObj["rlQosQueueNum$select?52"].disabled=true;
+formObj["rlQosQueueNum$select?60"].disabled=true;
+}
+}
+function formSubmit()
+{
+disableHtml();
+if (DisableUnchanged(document.cosqosDscpForm,FieldsToCheck[0],FieldsToCheck)==1)
+{
+document.cosqosDscpForm.submit();
+}
+}
+function fillSelect(cntrl)
+{
+var opt, val;
+for(var i = 1; i <= top.numOfQueues; i++)
+{
+val = i;
+opt = new Option(val,val);
+cntrl.options[cntrl.options.length] = opt;
+}
+}
+function re()
+{
+if (navigator.appName=="Netscape")
+{
+document.loading.visibility='hide';
+document.site.visibility='show';
+}
+else
+{
+loading.style.visibility='hidden';
+site.style.visibility='visible';
+}
+}
+function enableHtml()
+{
+formObj=document.cosqosDscpForm;
+for (i=1;i<=dscp;i++)
+{
+formObj["rlQosQueueNum$select?"+i].disabled=false;
+}
+}
+function disableHtml()
+{
+formObj=document.cosqosDscpForm;
+for (i=1;i<=dscp;i++)
+{
+formObj["rlQosQueueNum$select?"+i].disabled=true;
+}
+}
+function Change(dscpNum)
+{
+var formele=document.cosqosDscpForm.elements;
+var e,fldName;
+if (window.event && window.event.srcElement && window.event.srcElement.name)
+{
+e=window.event;
+fldName=e.srcElement.name;
+}
+else if (!window.event)
+{
+e=arguments.callee.caller.arguments[0];
+fldName=e.target.name ;
+}
+mibFldNameArr=sliceString(fldName,"$");
+mibFldName=mibFldNameArr[0]+"$repeat?"+dscpNum;
+formele[mibFldName].value=parseInt(formele[fldName].options[formele[fldName].selectedIndex].text);
+}
+function makeQueueSelect(dscpNum)
+{
+var formObj=document.cosqosDscpForm;
+var selectName="rlQosQueueNum$select?"+dscpNum;
+var selectedVal=parseInt(formObj.elements["rlQosQueueNum$repeat?"+dscpNum].value);
+document.write("<td align='center' class="+colorClass()+">");
+document.write('<select name='+selectName+' onChange=Change('+dscpNum+')>');
+document.write('<option value=""></option></select></td>');
+addRangeSelectionList(formObj,selectName,1,8,"",selectedVal) ;
+document.write('<td class="data-area-canvas">&nbsp;</td><td style="width: 15px">&nbsp;</td></tr>');
+ChangeRowColor();
+}
+function writeTableHeader()
+{
+top.FirstTd=0;
+var tableSide="";
+if (dscp==1 || dscp==22)
+tableSide="left";
+else tableSide="right";
+document.write("<table border='0' cellspacing='0' cellpadding='0' width='33%' align='"+tableSide+"'>");
+top.Draw_TableTop(2)
+document.write("<tr>");
+document.write("<td style='width: 10px' class='data-area-canvas'>&nbsp;</td>");
+document.write("<td class='data-area-tab-header' align='left'><b>DSCP In</b></td>");
+document.write("<td class='data-area-tab-header' align='left'><b>Queue</b></td>");
+document.write("<td class='data-area-canvas'>&nbsp;</td>");
+document.write("<td style='width: 15px'>&nbsp;</td>");
+document.write("</tr>");
+document.write("<tr>");
+document.write("<td style='height: 1px; width: 10px' class='data-area-canvas'><img style='width: 1px; height: 1px' src=''></td>");
+document.write("<td colspan='2' style='height: 1px' class='data-area-separator'><img style='width: 1px; height: 1px' src=''></td>");
+document.write("<td style='height: 1px' class='data-area-canvas'><img style='width: 1px; height: 1px' src=''></td>");
+document.write("<td style='height: 1px; width: 15px'><img style='width: 1px; height: 1px' src=''></td>");
+document.write("</tr>");
+}
+function writeTableEnd()
+{
+top.Draw_TableBottom(2)
+document.write("</table>");
+}
+function dscpUpdateAndDisplay(dscpNum)
+{
+var formObj=document.cosqosDscpForm;
+dscp=parseInt(formObj.elements["rlQosOldDscp$repeat?"+dscpNum].value)+1;
+if (dscpNum==22 || dscpNum==43)
+{
+writeTableEnd()
+}
+if (dscpNum==1 || dscpNum==22 || dscpNum==43)
+{
+writeTableHeader()
+}
+document.write('<tr><td style="width: 10px" class="data-area-canvas">&nbsp;</td>');
+document.write("<td align='left' class="+colorClass()+">");
+document.write('<b>'+(dscp-1)+'</b></td>');
+}
+// --End of Java code -->
+</script>
+</head>
+<body bgcolor="#FFFFFF" leftmargin="15" onload="setScreenMonitorState();">
+<script language="JavaScript">top.Draw_Header(document.title);</script>
+
+<FORM METHOD='POST' name="cosqosDscpForm"  ACTION="/config/cosqos_dscp.htm"   >
+<INPUT  TYPE="HIDDEN" Name="restoreUrl" size=256   value="">
+<INPUT  TYPE="HIDDEN" NAME="errorCollector"   value="" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=DSCPMapDefTable   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rlQosDscpQueueDefaultMapTable   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rlQosDscpQueueDefaultMapDscp$VT SIZE=128   value="Type=0;Access=1;NumOfEnumerations=0;Range0=[0,63]">
+<INPUT  Type=HIDDEN Name=rlQosDscpQueueDefaultMapQueueId$VT SIZE=128   value="Type=0;Access=1;NumOfEnumerations=0;Range0=[1,8]">
+<INPUT  Type=HIDDEN Name=DSCPMapDefTable$endVT   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?1  disabled   value="0" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?1  disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?1  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?2  disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?2  disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?2  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?3  disabled   value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?3  disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?3  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?4  disabled   value="3" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?4  disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?4  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?5  disabled   value="4" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?5  disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?5  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?6  disabled   value="5" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?6  disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?6  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?7  disabled   value="6" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?7  disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?7  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?8  disabled   value="7" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?8  disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?8  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?9  disabled   value="8" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?9  disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?9  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?10  disabled   value="9" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?10  disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?10  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?11  disabled   value="10" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?11  disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?11  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?12  disabled   value="11" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?12  disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?12  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?13  disabled   value="12" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?13  disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?13  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?14  disabled   value="13" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?14  disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?14  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?15  disabled   value="14" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?15  disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?15  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?16  disabled   value="15" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?16  disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?16  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?17  disabled   value="16" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?17  disabled   value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?17  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?18  disabled   value="17" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?18  disabled   value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?18  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?19  disabled   value="18" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?19  disabled   value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?19  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?20  disabled   value="19" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?20  disabled   value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?20  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?21  disabled   value="20" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?21  disabled   value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?21  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?22  disabled   value="21" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?22  disabled   value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?22  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?23  disabled   value="22" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?23  disabled   value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?23  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?24  disabled   value="23" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?24  disabled   value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?24  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?25  disabled   value="24" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?25  disabled   value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?25  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?26  disabled   value="25" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?26  disabled   value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?26  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?27  disabled   value="26" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?27  disabled   value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?27  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?28  disabled   value="27" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?28  disabled   value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?28  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?29  disabled   value="28" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?29  disabled   value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?29  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?30  disabled   value="29" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?30  disabled   value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?30  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?31  disabled   value="30" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?31  disabled   value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?31  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?32  disabled   value="31" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?32  disabled   value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?32  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?33  disabled   value="32" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?33  disabled   value="3" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?33  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?34  disabled   value="33" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?34  disabled   value="3" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?34  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?35  disabled   value="34" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?35  disabled   value="3" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?35  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?36  disabled   value="35" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?36  disabled   value="3" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?36  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?37  disabled   value="36" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?37  disabled   value="3" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?37  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?38  disabled   value="37" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?38  disabled   value="3" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?38  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?39  disabled   value="38" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?39  disabled   value="3" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?39  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?40  disabled   value="39" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?40  disabled   value="3" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?40  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?41  disabled   value="40" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?41  disabled   value="3" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?41  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?42  disabled   value="41" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?42  disabled   value="3" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?42  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?43  disabled   value="42" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?43  disabled   value="3" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?43  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?44  disabled   value="43" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?44  disabled   value="3" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?44  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?45  disabled   value="44" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?45  disabled   value="3" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?45  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?46  disabled   value="45" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?46  disabled   value="3" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?46  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?47  disabled   value="46" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?47  disabled   value="3" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?47  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?48  disabled   value="47" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?48  disabled   value="3" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?48  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?49  disabled   value="48" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?49  disabled   value="4" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?49  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?50  disabled   value="49" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?50  disabled   value="4" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?50  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?51  disabled   value="50" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?51  disabled   value="4" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?51  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?52  disabled   value="51" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?52  disabled   value="4" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?52  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?53  disabled   value="52" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?53  disabled   value="4" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?53  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?54  disabled   value="53" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?54  disabled   value="4" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?54  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?55  disabled   value="54" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?55  disabled   value="4" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?55  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?56  disabled   value="55" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?56  disabled   value="4" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?56  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?57  disabled   value="56" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?57  disabled   value="4" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?57  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?58  disabled   value="57" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?58  disabled   value="4" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?58  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?59  disabled   value="58" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?59  disabled   value="4" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?59  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?60  disabled   value="59" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?60  disabled   value="4" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?60  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?61  disabled   value="60" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?61  disabled   value="4" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?61  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?62  disabled   value="61" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?62  disabled   value="4" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?62  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?63  disabled   value="62" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?63  disabled   value="4" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?63  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapDscp$repeat?64  disabled   value="63" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosDscpQueueDefaultMapQueueId$repeat?64  disabled   value="4" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DSCPMapDefTable$endRepeat?64  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  Type=HIDDEN Name=DSCPMapTable   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rlQosDscpMutationTable   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rlQosOldDscp$VT SIZE=128   value="Type=0;Access=1;NumOfEnumerations=0;Range0=[0,63]">
+<INPUT  Type=HIDDEN Name=rlQosQueueNum$VT SIZE=128   value="Type=0;Access=2;NumOfEnumerations=0;Range0=[1,8]">
+<INPUT  Type=HIDDEN Name=DSCPMapTable$endVT   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?1    value="0" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?1    value="0" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(1);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?1    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?1    value="1" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?1 onChange=Change(1)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?1    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?1    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?2    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?2    value="1" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(2);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?2    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?2    value="1" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?2 onChange=Change(2)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?2    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?2    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?3    value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?3    value="2" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(3);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?3    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?3    value="1" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?3 onChange=Change(3)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?3    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?3    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?4    value="3" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?4    value="3" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(4);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?4    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?4    value="1" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?4 onChange=Change(4)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?4    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?4    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?5    value="4" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?5    value="4" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(5);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?5    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?5    value="1" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?5 onChange=Change(5)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?5    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?5    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?6    value="5" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?6    value="5" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(6);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?6    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?6    value="1" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?6 onChange=Change(6)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?6    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?6    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?7    value="6" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?7    value="6" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(7);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?7    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?7    value="1" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?7 onChange=Change(7)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?7    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?7    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?8    value="7" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?8    value="7" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(8);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?8    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?8    value="1" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?8 onChange=Change(8)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?8    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?8    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?9    value="8" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?9    value="8" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(9);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?9    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?9    value="1" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?9 onChange=Change(9)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?9    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?9    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?10    value="9" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?10    value="9" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(10);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?10    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?10    value="1" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?10 onChange=Change(10)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?10    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?10    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?11    value="10" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?11    value="10" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(11);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?11    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?11    value="1" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?11 onChange=Change(11)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?11    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?11    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?12    value="11" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?12    value="11" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(12);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?12    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?12    value="1" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?12 onChange=Change(12)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?12    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?12    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?13    value="12" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?13    value="12" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(13);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?13    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?13    value="1" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?13 onChange=Change(13)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?13    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?13    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?14    value="13" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?14    value="13" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(14);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?14    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?14    value="1" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?14 onChange=Change(14)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?14    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?14    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?15    value="14" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?15    value="14" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(15);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?15    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?15    value="1" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?15 onChange=Change(15)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?15    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?15    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?16    value="15" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?16    value="15" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(16);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?16    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?16    value="1" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?16 onChange=Change(16)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?16    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?16    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?17    value="16" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?17    value="16" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(17);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?17    value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?17    value="2" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?17 onChange=Change(17)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?17    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?17    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?18    value="17" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?18    value="17" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(18);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?18    value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?18    value="2" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?18 onChange=Change(18)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?18    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?18    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?19    value="18" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?19    value="18" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(19);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?19    value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?19    value="2" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?19 onChange=Change(19)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?19    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?19    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?20    value="19" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?20    value="19" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(20);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?20    value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?20    value="2" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?20 onChange=Change(20)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?20    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?20    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?21    value="20" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?21    value="20" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(21);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?21    value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?21    value="2" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?21 onChange=Change(21)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?21    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?21    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?22    value="21" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?22    value="21" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(22);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?22    value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?22    value="2" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?22 onChange=Change(22)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?22    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?22    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?23    value="22" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?23    value="22" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(23);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?23    value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?23    value="2" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?23 onChange=Change(23)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?23    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?23    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?24    value="23" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?24    value="23" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(24);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?24    value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?24    value="2" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?24 onChange=Change(24)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?24    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?24    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?25    value="24" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?25    value="24" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(25);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?25    value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?25    value="2" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?25 onChange=Change(25)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?25    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?25    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?26    value="25" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?26    value="25" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(26);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?26    value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?26    value="2" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?26 onChange=Change(26)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?26    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?26    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?27    value="26" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?27    value="26" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(27);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?27    value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?27    value="2" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?27 onChange=Change(27)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?27    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?27    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?28    value="27" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?28    value="27" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(28);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?28    value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?28    value="2" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?28 onChange=Change(28)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?28    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?28    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?29    value="28" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?29    value="28" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(29);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?29    value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?29    value="2" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?29 onChange=Change(29)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?29    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?29    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?30    value="29" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?30    value="29" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(30);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?30    value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?30    value="2" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?30 onChange=Change(30)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?30    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?30    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?31    value="30" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?31    value="30" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(31);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?31    value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?31    value="2" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?31 onChange=Change(31)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?31    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?31    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?32    value="31" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?32    value="31" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(32);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?32    value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?32    value="2" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?32 onChange=Change(32)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?32    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?32    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?33    value="32" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?33    value="32" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(33);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?33    value="3" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?33    value="3" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?33 onChange=Change(33)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?33    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?33    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?34    value="33" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?34    value="33" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(34);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?34    value="3" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?34    value="3" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?34 onChange=Change(34)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?34    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?34    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?35    value="34" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?35    value="34" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(35);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?35    value="3" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?35    value="3" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?35 onChange=Change(35)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?35    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?35    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?36    value="35" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?36    value="35" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(36);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?36    value="3" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?36    value="3" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?36 onChange=Change(36)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?36    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?36    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?37    value="36" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?37    value="36" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(37);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?37    value="3" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?37    value="3" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?37 onChange=Change(37)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?37    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?37    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?38    value="37" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?38    value="37" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(38);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?38    value="3" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?38    value="3" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?38 onChange=Change(38)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?38    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?38    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?39    value="38" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?39    value="38" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(39);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?39    value="3" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?39    value="3" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?39 onChange=Change(39)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?39    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?39    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?40    value="39" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?40    value="39" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(40);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?40    value="3" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?40    value="3" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?40 onChange=Change(40)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?40    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?40    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?41    value="40" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?41    value="40" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(41);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?41    value="3" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?41    value="3" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?41 onChange=Change(41)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?41    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?41    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?42    value="41" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?42    value="41" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(42);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?42    value="3" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?42    value="3" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?42 onChange=Change(42)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?42    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?42    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?43    value="42" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?43    value="42" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(43);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?43    value="3" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?43    value="3" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?43 onChange=Change(43)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?43    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?43    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?44    value="43" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?44    value="43" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(44);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?44    value="3" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?44    value="3" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?44 onChange=Change(44)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?44    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?44    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?45    value="44" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?45    value="44" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(45);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?45    value="3" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?45    value="3" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?45 onChange=Change(45)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?45    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?45    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?46    value="45" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?46    value="45" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(46);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?46    value="3" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?46    value="3" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?46 onChange=Change(46)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?46    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?46    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?47    value="46" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?47    value="46" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(47);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?47    value="3" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?47    value="3" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?47 onChange=Change(47)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?47    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?47    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?48    value="47" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?48    value="47" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(48);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?48    value="3" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?48    value="3" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?48 onChange=Change(48)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?48    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?48    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?49    value="48" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?49    value="48" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(49);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?49    value="4" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?49    value="4" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?49 onChange=Change(49)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?49    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?49    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?50    value="49" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?50    value="49" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(50);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?50    value="4" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?50    value="4" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?50 onChange=Change(50)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?50    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?50    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?51    value="50" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?51    value="50" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(51);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?51    value="4" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?51    value="4" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?51 onChange=Change(51)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?51    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?51    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?52    value="51" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?52    value="51" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(52);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?52    value="4" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?52    value="4" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?52 onChange=Change(52)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?52    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?52    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?53    value="52" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?53    value="52" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(53);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?53    value="4" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?53    value="4" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?53 onChange=Change(53)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?53    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?53    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?54    value="53" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?54    value="53" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(54);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?54    value="4" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?54    value="4" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?54 onChange=Change(54)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?54    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?54    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?55    value="54" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?55    value="54" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(55);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?55    value="4" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?55    value="4" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?55 onChange=Change(55)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?55    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?55    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?56    value="55" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?56    value="55" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(56);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?56    value="4" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?56    value="4" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?56 onChange=Change(56)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?56    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?56    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?57    value="56" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?57    value="56" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(57);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?57    value="4" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?57    value="4" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?57 onChange=Change(57)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?57    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?57    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?58    value="57" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?58    value="57" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(58);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?58    value="4" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?58    value="4" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?58 onChange=Change(58)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?58    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?58    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?59    value="58" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?59    value="58" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(59);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?59    value="4" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?59    value="4" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?59 onChange=Change(59)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?59    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?59    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?60    value="59" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?60    value="59" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(60);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?60    value="4" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?60    value="4" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?60 onChange=Change(60)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?60    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?60    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?61    value="60" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?61    value="60" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(61);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?61    value="4" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?61    value="4" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?61 onChange=Change(61)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?61    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?61    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?62    value="61" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?62    value="61" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(62);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?62    value="4" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?62    value="4" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?62 onChange=Change(62)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?62    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?62    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?63    value="62" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?63    value="62" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(63);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?63    value="4" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?63    value="4" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?63 onChange=Change(63)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?63    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?63    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$repeat?64    value="63" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosOldDscp$default?64    value="63" SIZE="20" MAXLENGTH="20">
+<script>dscpUpdateAndDisplay(64);</script>
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$repeat?64    value="4" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosQueueNum$default?64    value="4" SIZE="20" MAXLENGTH="20">
+<script>document.write("<td align='left' class='"+colorClass()+"'>");</script>
+<select name=rlQosQueueNum$select?64 onChange=Change(64)>
+
+</select>
+</td>
+<script language=javascript>
+fillSelect(document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp]);
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].selectedIndex=(parseInt(document.cosqosDscpForm.elements["rlQosQueueNum$repeat?"+dscp].value)-1);
+if (disableDscpIndex==(dscp-1))
+{
+document.cosqosDscpForm.elements["rlQosQueueNum$select?"+dscp].disabled=true;
+disableDscpIndex+=8;
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td></tr>
+
+<INPUT  type=hidden Name=DSCPMapTable$endRepeat?64    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=DSCPMapTable$default?64    value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+ChangeRowColor();
+</script>
+
+
+
+<script language=javascript>
+writeTableEnd();
+var isIE = (navigator.appName.indexOf("Microsoft") != -1);
+if (isIE)
+document.write("<br><br><br><br><br><br><br><br>");
+</script>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<table border="0" cellspacing="0" cellpadding="0" width="100%">
+<script language="JavaScript">
+top.Draw_TableTop(2);top.Draw_TableHeader();
+</script>
+<tr>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas-odd" width="45%">Restore Defaults</td>
+<td class="data-area-canvas-odd"><input id="chkResore" onclick="chkClick();" type="checkbox"></td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px"></td>
+</tr>
+<script language="JavaScript">top.Draw_TableBottom(2);initDefValuesArr();</script>
+</table>
+<br>
+<div align="center" class="management-only"><script language="JavaScript">top.Draw_ButtonApply("formSubmit")</script></div>
+<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
+for(i=0;i<document.forms[0].elements.length;i++)
+{
+if(document.forms[0].elements[i].type=="select-one")
+if(document.forms[0].elements[i].length==0)
+document.forms[0].elements[i].style.width="60px";
+}
+</SCRIPT>
+
+</form>
+</div>
+</body>
+</html>

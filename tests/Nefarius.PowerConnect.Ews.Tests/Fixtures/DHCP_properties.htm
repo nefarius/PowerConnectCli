@@ -1,0 +1,222 @@
+
+
+
+<html>
+<head>
+<title>DHCP Server Properties</title>
+<link rel="stylesheet" href="../device/style.css" type="text/css">
+<script src="../js/globalFunctions.js"></script>
+<script language="JavaScript">
+if(top.MonitorMode) {
+document.write("<link rel='stylesheet' href='../device/monitorMode.css' type='text/css'>")
+}
+function formSubmit()
+{
+if (formele["rlDhcpSrvProbeEnable"].value!=2)
+{
+top.fldToCheck = "";
+if(formele["txtRetries"].disabled == false)
+if (!checkValidation('Ping Retries','','txtRetries',false,'int',1,10))
+return false;
+top.fldToCheck = "";
+if(formele["txtTimeout"].disabled == false)
+if (!checkValidation('Ping Timeout','','txtTimeout',false,'int',300,10000))
+return false;
+}
+formele["rlDhcpSrvEnable"].value=formele["Select2"].value;
+if((formele["rlGlobalIpAdOwner$repeat?1"].value == 2) && (formele["rlDhcpSrvEnable"].value == 1)){
+alert("DHCP server can't be configured. In order to enable DHCP server remove DHCP client on all interfaces.");
+return false;
+}
+formele["rlDhcpSrvProbeEnable"].value=formele["selPing"].value;
+if (formele["rlDhcpSrvProbeEnable"].value==2)
+{
+formele["rlDhcpSrvProbeRetries"].disabled=true;
+formele["rlDhcpSrvProbeTimeout"].disabled=true;
+}
+else
+{
+formele["rlDhcpSrvProbeRetries"].disabled=false;
+formele["rlDhcpSrvProbeRetries"].value=formele["txtRetries"].value;
+formele["rlDhcpSrvProbeTimeout"].disabled=false;
+formele["rlDhcpSrvProbeTimeout"].value=formele["txtTimeout"].value;
+if (formele["chkRetries"].checked==true)
+formele["rlDhcpSrvProbeRetries"].value=2;
+if (formele["cbUseDefault"].checked==true)
+formele["rlDhcpSrvProbeTimeout"].value=500;
+}
+disableHTML();
+document.DHCPPropertiesForm.submit();
+}
+function setPingState()
+{
+if (formele["selPing"].value==2)
+{
+setDisabled(formele["txtRetries"],true);
+setDisabled(formele["txtTimeout"],true);
+formele["chkRetries"].disabled=true;
+formele["cbUseDefault"].disabled=true;
+formele["rlDhcpSrvProbeEnable"].value=2;
+}
+else
+{
+setDisabled(formele["txtRetries"],false);
+setDisabled(formele["txtTimeout"],false);
+formele["chkRetries"].disabled=false;
+formele["cbUseDefault"].disabled=false;
+formele["rlDhcpSrvProbeEnable"].value=1;
+}
+}
+function disableHTML()
+{ formele["txtRetries"].disabled=true;
+formele["txtTimeout"].disabled=true;
+formele["Select2"].disabled=true;
+formele["selPing"].disabled=true;
+formele["cbUseDefault"].disabled=true;
+formele["chkRetries"].disabled=true;
+}
+function setRetriesDef(cntrl)
+{
+setDisabled(formele["txtRetries"],cntrl.checked);
+}
+function setTimeOutDef(cntrl)
+{
+setDisabled(formele["txtTimeout"],cntrl.checked);
+}
+function signControls()
+{
+formele["Select2"].value=formele["rlDhcpSrvEnable"].value;
+formele["selPing"].value=formele["rlDhcpSrvProbeEnable"].value;
+formele["txtRetries"].value=formele["rlDhcpSrvProbeRetries"].value;
+formele["txtTimeout"].value=formele["rlDhcpSrvProbeTimeout"].value;
+setPingState();
+}
+function callSubmit()
+{
+if (opener)
+{
+docObj.popHndl=window.self;
+}
+else
+{
+docObj.popHndl=top.main;
+}
+docObj.locationHndl=(document.location.pathname+"?")
+if (document.forms[0].restoreUrl)
+docObj.locationHndl+=(document.forms[0].restoreUrl.value);
+formSubmit();
+}
+// --End of Java code -->
+</script>
+</head>
+<body bgcolor="#ffffff" leftmargin="15" onload="setScreenMonitorState();">
+<script language="JavaScript">top.Draw_Header(document.title);</script>
+
+<FORM METHOD='POST' name="DHCPPropertiesForm"  ACTION="/config/DHCP_properties.htm" onsubmit="return(formSubmit());"  >
+<script>
+var formele = document.DHCPPropertiesForm.elements;
+</script>
+<span id="pagetitle" class="data-area-page-title">
+<script>
+</script>
+</span>
+<INPUT  Type="HIDDEN" Name="restoreUrl" SIZE=256   value="">
+<INPUT  TYPE="HIDDEN" NAME="errorCollector"   value="" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME="rlDhcpSrvEnable"   value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME="rlDhcpSrvProbeEnable"   value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME="rlDhcpSrvProbeRetries"   value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME="rlDhcpSrvProbeTimeout"   value="500" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=IpTable   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rlGlobalIpAddrTable$VT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rlGlobalIpAdIndex$VT   value="Type=0;Access=1;NumOfEnumerations=0;Range0=[1,1]" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rlGlobalIpAdOwner$VT   value="Type=0;Access=2;NumOfEnumerations=3;Range0=[1,3];Default value=3" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=IpTable$endVT   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=hidden NAME=rlGlobalIpAdOwner$repeat?1  disabled   value="1" SIZE="20" MAXLENGTH="20">
+
+<table border="0" cellspacing="0" cellpadding="0" width="100%" ID="Table1">
+<script language="JavaScript">
+top.Draw_TableTop(3);
+</script>
+<tr>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas" valign="top">&nbsp;</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px" class="data-area-canvas">&nbsp;</td>
+</tr>
+<tr>
+<td style="height: 1px; width: 10px" class="data-area-canvas"><img style="width: 1px; height: 1px" src=""></td>
+<td colspan="3" style="height: 1px" class="data-area-separator"><img style="width: 1px; height: 1px" src=""></td>
+<td style="height: 1px" class="data-area-canvas"><img style="width: 1px; height: 1px" src=""></td>
+<td style="height: 1px; width: 5px"><img style="width: 1px; height: 1px" src=""></td>
+</tr>
+<tr>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas-odd" width="45%">DHCP Server Status</td>
+<td class="data-area-canvas-odd"><select ID="Select2" NAME="Select2">
+<option value="1">Enable</option>
+<option value="2">Disable</option>
+</select></td>
+<td class="data-area-canvas-odd">&nbsp;</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas">DHCP Ping</td>
+<td class="data-area-canvas" nowrap>
+<select onchange="setPingState()" id=selPing NAME="selPing">
+<option value="1">Enable</option>
+<option value="2">Disable</option>
+</select></td>
+<td class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas-odd">DHCP Ping Retries </td>
+<td class="data-area-canvas-odd"><input type="text" id="txtRetries" NAME="txtRetries" onKeyPress="return numbersOnlyNoSigns(this, event , true);"></td>
+<td class="data-area-canvas-odd"><input type="checkbox" id="chkRetries" onclick="setRetriesDef(this);" NAME="chkRetries">&nbsp;Use Default</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas">DHCP Ping Timeout</td>
+<td class="data-area-canvas"><input type="text" id=txtTimeout NAME="txtTimeout" onKeyPress="return numbersOnlyNoSigns(this, event , true);" >&nbsp;(mSec)</td>
+<td class="data-area-canvas"><input type="checkbox"id="cbUseDefault" onclick="setTimeOutDef(this)" NAME="cbUseDefault">&nbsp;Use Default</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<script language="JavaScript">top.Draw_TableBottom(3)</script>
+</table>
+<br>
+<div class="management-only">
+
+<div align="center"><table id="apply_tbl" cellspacing="0" cellpadding="0" border="0"><tr>
+<td nowrap nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/lbutton.gif"></td>
+<td nowrap nowrap valign="middle" align="center" class="data-area-button"><a href="javascript:preSubmit();">Apply Changes</a></td>
+<td nowrap nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/rbutton.gif"></td>
+</tr></table></div><br>
+<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
+<!--
+if(document.forms[0] && document.forms[0].elements.length<=1000)
+{
+for(i=0;(document.forms[0] && i<document.forms[0].elements.length);i++)
+{
+if(document.forms[0] && document.forms[0].elements[i].type=="select-one")
+if(document.forms[0] && document.forms[0].elements[i].length==0)
+document.forms[0].elements[i].style.width="70px";
+}
+}
+//-->
+</SCRIPT>
+
+</div>
+<script>signControls();
+</script>
+</form>
+</body>
+</html>

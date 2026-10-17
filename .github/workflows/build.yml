@@ -1,0 +1,42 @@
+name: .NET
+
+on:
+  push:
+    branches: [ "master" ]
+    tags: [ "v*" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Build
+        run: dotnet build -c Release
+
+      - name: Test
+        run: dotnet test -c Release --no-build
+
+      - name: Publish linux-x64
+        if: success() && startsWith(github.ref, 'refs/tags/v')
+        run: dotnet publish cli/pc28xx/pc28xx.csproj -c Release -r linux-x64 --self-contained -p:PublishSingleFile=true -o publish/linux-x64
+
+      - name: Publish win-x64
+        if: success() && startsWith(github.ref, 'refs/tags/v')
+        run: dotnet publish cli/pc28xx/pc28xx.csproj -c Release -r win-x64 --self-contained -p:PublishSingleFile=true -o publish/win-x64
+
+      - name: Upload publish artifacts
+        if: success() && startsWith(github.ref, 'refs/tags/v')
+        uses: actions/upload-artifact@v4
+        with:
+          name: pc28xx-${{ github.ref_name }}
+          path: publish/

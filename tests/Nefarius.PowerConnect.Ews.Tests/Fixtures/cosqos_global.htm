@@ -1,0 +1,187 @@
+
+
+<html>
+
+<head>
+<title>CoS Settings</title>
+<link rel="stylesheet" href="../device/style.css" type="text/css">
+<script src="../js/globalFunctions.js"></script>
+<script language="JavaScript">
+<!-- Beginng of JavaScript Applet
+if(top.MonitorMode) {
+document.write("<link rel='stylesheet' href='../device/monitorMode.css' type='text/css'>")
+}
+var DSCP_MUTATION="4";
+var DSCP_optionIndex=1;
+var initQosMode=0;
+function formSubmit()
+{
+formele=document.cosqosGlobalForm.elements;
+if (!isChanged(formele["rlQosCliQosMode$scalar"]))
+formele["rlQosCliQosMode$scalar"].disabled=true;
+if (formele["rlQosCliBasicModeCfg$select"].disabled==true)
+formele["rlQosCliBasicModeCfg$scalar"].disabled=true;
+disableHTML()
+document.cosqosGlobalForm.submit();
+}
+function disableHTML()
+{
+formele=document.cosqosGlobalForm.elements;
+formele["rlQosCliQosMode$select"].disabled=true;
+formele["rlQosCliBasicModeCfg$select"].disabled=true;
+}
+function updateSettings()
+{
+formele=document.cosqosGlobalForm.elements;
+top.cosqosMode=parseInt(formele["rlQosCliQosMode$scalar"].value)-1;
+formele["rlQosCliQosMode$select"].selectedIndex=parseInt(formele["rlQosCliQosMode$scalar"].value)-1;
+switch (formele["rlQosCliQosMode$scalar"].value)
+{
+case "1":
+formele["rlQosCliBasicModeCfg$select"].selectedIndex=-1;
+formele["rlQosCliBasicModeCfg$select"].disabled=true;
+break;
+case "2":
+top.cosqosMode=0;
+formele["rlQosCliBasicModeCfg$select"].disabled=false;
+for (i=0; i<formele["rlQosCliBasicModeCfg$select"].options.length; i++)
+{
+if (formele["rlQosCliBasicModeCfg$scalar"].value==formele["rlQosCliBasicModeCfg$select"].options[i].value)
+{
+formele["rlQosCliBasicModeCfg$select"].options[i].selected=true;
+break;
+}
+if (formele["rlQosCliBasicModeCfg$scalar"].value==DSCP_MUTATION)
+{
+formele["rlQosCliBasicModeCfg$select"].options[DSCP_optionIndex].selected=true;
+break;
+}
+}
+break;
+default: break;
+}
+}
+function selectCosQosMode()
+{
+formele=document.cosqosGlobalForm.elements;
+if(formele["rlQosCliQosMode$select"].selectedIndex==0)
+{
+var cont=true;
+if (initQosMode!=1)
+{
+if (!confirm("This action will cause loss of configuration. Do you wish to continue(y/n)?"))
+{
+cont=false;
+}
+}
+if (cont)
+{
+top.cosqosMode=-1;
+formele["rlQosCliBasicModeCfg$select"].selectedIndex=-1;
+formele["rlQosCliBasicModeCfg$select"].disabled=true;
+}
+else
+{
+formele["rlQosCliQosMode$select"].selectedIndex=1;
+updateSettings();
+}
+}
+else if(formele["rlQosCliQosMode$select"].selectedIndex==1)
+{
+top.cosqosMode=0;
+if (formele["rlQosCliBasicModeCfg$select"].disabled)
+{
+formele["rlQosCliBasicModeCfg$select"].disabled=false;
+if(formele["rlQosCliBasicModeCfg$scalar"].value == 3)
+formele["rlQosCliBasicModeCfg$select"].selectedIndex=1;
+else
+formele["rlQosCliBasicModeCfg$select"].selectedIndex=0;
+selectTrust();
+}
+}
+formele["rlQosCliQosMode$scalar"].value=formele["rlQosCliQosMode$select"].selectedIndex+1;
+if (cont)
+{
+}
+}
+function selectTrust()
+{
+formele=document.cosqosGlobalForm.elements;
+if (formele["rlQosCliBasicModeCfg$select"].selectedIndex!=-1) {
+var new_basic_mode_value = formele["rlQosCliBasicModeCfg$select"].options[formele["rlQosCliBasicModeCfg$select"].selectedIndex].value;
+if (new_basic_mode_value != 1)
+{
+formele["rlQosCliBasicModeCfg$scalar"].disabled = false;
+formele["rlQosCliBasicModeCfg$scalar"].value = formele["rlQosCliBasicModeCfg$select"].value;
+}
+else
+{
+formele["rlQosCliQosMode$select"].selectedIndex = 0;
+selectCosQosMode ();
+}
+}
+}
+// --End of Java code -->
+</script>
+</head>
+<body bgcolor="#FFFFFF" leftmargin="15" onload="setScreenMonitorState();">
+<script language="JavaScript">top.genMenuIndex=1;top.Draw_Header(document.title);</script>
+<br>
+<FORM METHOD='POST' name="cosqosGlobalForm"  ACTION="/config/cosqos_global.htm"   >
+<INPUT  TYPE="HIDDEN" Name="restoreUrl" size=256   value="">
+
+
+<table border="0" cellspacing="0" cellpadding="0" width="100%">
+<script language="JavaScript">
+top.Draw_TableTop(2);
+</script>
+<tr>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas-odd" width="40%">CoS Mode</td>
+<td class="data-area-canvas-odd">
+
+<INPUT  Type=hidden Name=rlQosCliQosMode$scalar   value="1" SIZE="20" MAXLENGTH="20">
+
+<script>
+formele=document.cosqosGlobalForm.elements;
+initQosMode=formele["rlQosCliQosMode$scalar"].value;
+</script>
+<select name="rlQosCliQosMode$select" size="1" onChange="selectCosQosMode()">
+<option value="1">Disable</option>
+<option value="2">Enable</option>
+</select>
+</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td style="width: 10px;height:25px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas">Trust Mode</td>
+<td class="data-area-canvas">
+
+<INPUT  Type=hidden Name=rlQosCliBasicModeCfg$scalar disabled   value="1" SIZE="20" MAXLENGTH="20">
+
+<select name="rlQosCliBasicModeCfg$select" size="1" onChange="selectTrust()">
+<option value="2">CoS (802.1P)</option>
+<option value="3">DSCP</option>
+</select>
+</SCRIPT>
+</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<script>
+updateSettings();
+</script>
+<script language="JavaScript">top.Draw_TableBottom(2)</script>
+</table>
+<br>
+<div align="center" class="management-only"><table cellspacing="0" cellpadding="0" border="0"><tr>
+<td style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/lbutton.gif"></td>
+<td valign="middle" align="center" class="data-area-button"><a href="javascript:formSubmit();">Apply Changes</a></td>
+<td style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/rbutton.gif"></td>
+</tr></table></div><br>
+
+</form>
+</body>
+</html>

@@ -1,0 +1,1165 @@
+<script>
+</script>
+
+
+
+<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
+<!--
+if(top.location==self.location )
+{
+var refStr=self.location + " ";
+var ind=0;
+refStr.toLowerCase();
+ind=refStr.indexOf("config");
+var locationStr=refStr.substring(0,ind);
+if (opener)
+{
+if (opener.opener)
+{
+if(opener.opener.top.location==opener.opener.location)
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+else
+{
+if(opener.top.location==opener.location)
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+}
+else
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+//-->
+</SCRIPT>
+
+
+<style type="text/css">
+font.small{color:black;font-size:9;}
+font.big{color:black;font-size:18;font-weight:bold;}
+</style>
+<html>
+<script>
+if (top.DeviceType && top.DeviceType == 1)
+{
+document.write("<title>VLAN Membership</title>");
+}
+else
+{
+document.write("<title>VLAN Membership</title> ");
+}
+</script>
+<link rel="stylesheet" href="../device/style.css" type="text/css">
+<script src="../js/globalFunctions.js"></script>
+<head>
+<script language="javascript">
+<!--
+if(top.MonitorMode) {
+document.write("<link rel='stylesheet' href='../device/monitorMode.css' type='text/css'>")
+}
+if (document.images) {
+cellImages = new Array(3)
+cellImages[0] = new Array(4)
+cellImages[0][0] = new Image(20,20)
+cellImages[0][0].src = '../Images/blankup.gif'
+cellImages[0][1] = new Image(20,20)
+cellImages[0][1].src = '../Images/tup.gif'
+cellImages[0][2] = new Image(20,20)
+cellImages[0][2].src = '../Images/uup.gif'
+cellImages[0][3] = new Image(20,20)
+cellImages[0][3].src = '../Images/fup.gif'
+cellImages[1] = new Array(4)
+cellImages[1][0] = new Image(20,20)
+cellImages[1][0].src = '../Images/blankup.gif'
+cellImages[1][1] = new Image(20,20)
+cellImages[1][1].src = '../Images/tup.gif'
+cellImages[1][2] = new Image(20,20)
+cellImages[1][2].src = '../Images/uup.gif'
+cellImages[1][3] = new Image(20,20)
+cellImages[1][3].src = '../Images/fup.gif'
+cellImages[2] = new Array(4)
+cellImages[2][0] = new Image(20,20)
+cellImages[2][0].src = '../Images/blankdown.gif'
+cellImages[2][1] = new Image(20,20)
+cellImages[2][1].src = '../Images/tdown.gif'
+cellImages[2][2] = new Image(20,20)
+cellImages[2][2].src = '../Images/udown.gif'
+cellImages[2][3] = new Image(20,20)
+cellImages[2][3].src = '../Images/fdown.gif'
+}
+var formele;
+var portsStateArray = new Array(top.NumberOfPorts+top.NumberOfTrunks);
+var addMode=false;
+var amMaxVlanCount = 1094;
+var amMaxTrunkCount = top.NumberOfTrunks;
+var currentVlan;
+var amMaxPortCount = top.NumberOfPorts;
+var vlanCurrentEgress;
+var vlanCurrentUntagged;
+var vlanStaticUntagged;
+var vlanStaticEgress;
+var vlanForbidden;
+var arrayOfPortsInDevice = new Array();
+var arrayOfTrunksInDevice = new Array();
+var staticVLAN=false;
+var wasDynamic=false;
+function putDataToVriables()
+{
+amMaxPortCount =top.NumberOfPorts;
+vlanCurrentEgress =octetToBitsAsChars(formele["dot1qVlanCurrentEgressPorts$query"].value);
+if ((!vlanCurrentEgress)||(vlanCurrentEgress==top.queryNA))
+{
+vlanCurrentEgress="";
+for (i=0;i<parseInt(top.trunkFirstIndex)+amMaxTrunkCount;i++)
+vlanCurrentEgress+="0";
+}
+else
+if (vlanCurrentEgress.length<parseInt(top.trunkFirstIndex)+amMaxTrunkCount)
+for (i=vlanCurrentEgress.length;i<=parseInt(top.trunkFirstIndex)+amMaxTrunkCount;i++)
+vlanCurrentEgress+="0";
+vlanStaticUntagged =octetToBitsAsChars(formele["dot1qVlanStaticUntaggedPorts$query"].value);
+vlanCurrentUntagged =octetToBitsAsChars(formele["dot1qVlanCurrentUntaggedPorts$query"].value);
+vlanStaticEgress =octetToBitsAsChars(formele["dot1qVlanStaticEgressPorts$query"].value);
+if ((!vlanStaticEgress)||(vlanStaticEgress==top.queryNA))
+{
+vlanStaticEgress="";
+for (i=0;i<parseInt(top.trunkFirstIndex)+amMaxTrunkCount;i++)
+vlanStaticEgress+="0";
+}
+else
+if (vlanStaticEgress.length<parseInt(top.trunkFirstIndex)+amMaxTrunkCount)
+for (i=vlanStaticEgress.length;i<=parseInt(top.trunkFirstIndex)+amMaxTrunkCount;i++)
+vlanStaticEgress+="0";
+vlanStaticUntagged =octetToBitsAsChars(formele["dot1qVlanStaticUntaggedPorts$query"].value);
+if ((!vlanStaticUntagged)||(vlanStaticUntagged==top.queryNA))
+{
+vlanStaticUntagged="";
+for (i=0;i<parseInt(top.trunkFirstIndex)+amMaxTrunkCount;i++)
+vlanStaticUntagged+="0";
+}
+else
+if (vlanStaticUntagged.length<parseInt(top.trunkFirstIndex)+amMaxTrunkCount)
+for (i=vlanStaticUntagged.length;i<=parseInt(top.trunkFirstIndex)+amMaxTrunkCount;i++)
+vlanStaticUntagged+="0";
+vlanForbidden =octetToBitsAsChars(formele["dot1qVlanForbiddenEgressPorts$query"].value);
+if ((!vlanForbidden)||(vlanForbidden==top.queryNA))
+{
+vlanForbidden="";
+for (i=0;i<parseInt(top.trunkFirstIndex)+amMaxTrunkCount;i++)
+vlanForbidden+="0";
+}
+else
+if (vlanForbidden.length<parseInt(top.trunkFirstIndex)+amMaxTrunkCount)
+for (i=vlanForbidden.length;i<=parseInt(top.trunkFirstIndex)+amMaxTrunkCount;i++)
+vlanForbidden+="0";
+amMaxVlanCount =1094;
+amMaxTrunkCount =top.NumberOfTrunks;
+currentVlan =formele["dot1qVlanIndex$query"].value;
+formele["dot1qVlanName"].value=formele["dot1qVlanStaticName$query"].value;
+if (formele["dot1qVlanStatus$query"].selectedIndex==1)
+{
+staticVLAN=true;
+formele["dot1qVlanStatus$query"].disabled=true;
+}
+if (formele["dot1qVlanStatus$query"].selectedIndex==2)
+{
+formele["dot1qVlanStatus$query"].disabled=true;
+formele["dot1qVlanStaticName$select"].selectedIndex=-1;
+formele["RemoveCBox"].disabled=true;
+formele["dot1qVlanName"].disabled=true;
+formele["dot1qVlanName"].style.backgroundColor="#cccccc";
+formele["dot1qVlanName"].value="";
+document.forms[0].Unauthorized.disabled=true;
+}
+if (formele["dot1qVlanStatus$query"].selectedIndex==0)
+{
+formele["RemoveCBox"].disabled=true;
+formele["indexNameRadio"][1].disabled=true;
+formele["dot1qVlanName"].disabled=true;
+formele["dot1qVlanName"].style.backgroundColor="#cccccc";
+formele["dot1qVlanStatus$query"].options[2]=null;
+wasDynamic=true;
+formele["dot1qVlanStaticName$select"].selectedIndex=-1;
+formele["dot1qVlanName"].value="";
+}
+for (r=0;r<portsStateArray.length;r++)
+portsStateArray[r]=5;
+if (currentVlan==formele["dot1qFdbId$query"].value)
+document.forms[0].Unauthorized.selectedIndex=0;
+else
+document.forms[0].Unauthorized.selectedIndex=1;
+}
+function dynamicToStatic()
+{
+if (formele["dot1qVlanStatus$query"].selectedIndex==1)
+{
+formele["dot1qVlanName"].disabled=false;
+formele["dot1qVlanName"].style.backgroundColor="RGB(255,255,255)";
+formele["dot1qVlanIndex$queryStatic"].value=formele["dot1qVlanIndex$query"].value;
+}
+else
+document.location.reload();
+}
+vlanMembers = new Array(amMaxPortCount)
+vlanMembersCurrent = new Array(amMaxPortCount)
+vlanMembersTrunk = new Array(amMaxTrunkCount)
+vlanMembersTrunkCurrent = new Array(amMaxTrunkCount)
+var columnsPerRow;
+var portPerRow;
+function setRow(moduleIndex)
+{
+if(top.NumberOfPortPerModuleArr[moduleIndex-1] == top.NumberOfPorts){
+columnsPerRow = parseInt(top.NumberOfPorts)+10;
+portPerRow = top.NumberOfPorts;
+}
+}
+function memberToString() {
+var memberString
+var portId
+memberString = ''
+for (portId = 0; portId < amMaxPortCount; portId++) {
+memberString += vlanMembers[portId]
+}
+return memberString
+}
+function writeSpaceLine() {
+document.writeln('<tr><td nowrap colspan="', columnsPerRow, '">&nbsp;</td></tr>')
+}
+function writeOneVlan(moduleIndex)
+{
+formele=document.VlanMemberForm.elements;
+var portBase
+var portId=0;
+var portEntry;
+memberFromString(currentVlan)
+memberFromStringCurrent(currentVlan)
+portBase = 0;
+modulestartCountFrom=0;
+for (portId=0; ((portBase+portId) < (parseInt(top.NumberOfPortPerModuleArr[moduleIndex-1])+modulestartCountFrom)); portBase += portPerRow)
+{
+document.writeln('<tr>')
+document.writeln('<td rowspan="2" nowrap valign="bottom"><font size="3" face="Helvetica"><br>\
+</font><br><font size="1" face="Helvetica">Static&nbsp;</font>\
+<font size="1" face="Helvetica"><br></font>\
+<div style="padding: 3px;"> </div>\
+<font size="1" face="Helvetica">Current&nbsp;</font> </td>');
+var portnum = parseInt(top.NumberOfPortPerModuleArr[moduleIndex-1])+modulestartCountFrom;
+if (portnum == 24) portnum += 2;
+else portnum += 4;
+document.write('<td nowrap="" bgcolor="#eeeeee" colspan="' + portnum + '">&nbsp;&nbsp;Ports</td></tr><tr>');
+for (portId = 0; ((portId < portPerRow) && (portBase+portId < (parseInt(top.NumberOfPortPerModuleArr[moduleIndex-1])+modulestartCountFrom))); portId++)
+{
+if (top.NumberOfModules==1 || (top.NumberOfModules>1 && (portBase+portId)<(parseInt(top.NumberOfPortPerModuleArr[moduleIndex-1])+modulestartCountFrom)))
+{
+if (portId !=0 && portId%10==0)
+document.writeln('<td nowrap align="center" bgcolor="#eeeeee"width="20"><font size="1" face="Helvetica">&nbsp<br></font><img src="../Images/null.gif" width="20" height="20"></td>')
+if (portId==0)
+str="Ports";
+else str="";
+portEntry=portBase+portId+top.StartingPortPerModuleArr[moduleIndex-1]-1;
+portName=(portBase+portId+1);
+displaySinglePort(portName,portEntry,str);
+}
+}
+document.writeln('</tr>')
+writeSpaceLine()
+}
+}
+function displaySinglePort(portName,portEntry,str)
+{
+if (!(relatedTrunk(portEntry+1)>0))
+{
+if (staticVLAN)
+{
+document.writeln('<td nowrap align="center" width="20" bgcolor="#eeeeee"><font size="1"\
+face="Helvetica"></font><font size="1"\
+face="Helvetica">',(portName),'<br>\
+</font><a href="javascript:void(0)"\
+onMouseOver="window.status=\'\'; raise(\'', currentVlan, '\', \'', portEntry, '\'); return true"\
+onMouseOut="flat(\'', currentVlan, '\', \'', portEntry, '\')"\
+onMouseDown="lower(\'', currentVlan, '\', \'', portEntry, '\')"\
+onMouseUp="window.status=\'\'; return true"\
+onClick="toggle(\'', currentVlan, '\', \'', portEntry, '\'); return false">\
+<img src="', cellImages[0][vlanMembers[portEntry]].src, '" border="0"\
+align="center" width="20" height="20" name="cell', currentVlan, '_', portEntry, '"></a>\
+<img src="', cellImages[0][vlanMembersCurrent[portEntry]].src, '" border="0"\
+align="center" width="20" height="20" name="cell', currentVlan, '_Current', portEntry, '"></td>')
+}
+else
+{
+document.writeln('<td nowrap align="center" width="20" bgcolor="#eeeeee"><font size="1"\
+face="Helvetica">',(portName),'<br>\
+</font><a href="javascript:void(0)"\
+onMouseOver="window.status=\'\'; raise(\'', currentVlan, '\', \'', portEntry, '\'); return true"\
+onMouseOut="flat(\'', currentVlan, '\', \'', portEntry, '\')"\
+onMouseDown="lower(\'', currentVlan, '\', \'', portEntry, '\')"\
+onMouseUp="window.status=\'\'; return true"\
+onClick="toggle(\'', currentVlan, '\', \'', portEntry, '\'); return false">\
+<img src="', cellImages[0][0].src, '" border="0"\
+align="center" width="20" height="20" name="cell', currentVlan, '_', portEntry, '"></a><img \
+src="', cellImages[0][vlanMembersCurrent[portEntry]].src, '" border="0"\
+align="center" width="20" height="20" name="cell', currentVlan, '_Current', portEntry, '"></td>')
+}
+}
+else
+{
+document.writeln('<td nowrap align="center" width="20" bgcolor="#eeeeee"><font \
+size="1" face="Helvetica">', (portName), '<br>\
+</font><img src="../Images/null.gif" width="20" height="20">\
+<img src="../Images/null.gif" width="20" height="20"></td>')
+}
+}
+function selectVLAN(){
+var name = document.VlanMemberForm.vlan_select;
+if (name.options[name.selectedIndex].text.charAt(0)=="A"){
+document.location.href='vlan_member.htm?vlan=0';
+}else{
+document.location.href='vlan_member.htm?vlan='+name.options[name.selectedIndex].text;
+}
+}
+function DrawModuleNumber(moduleIndex,numberOfModules)
+{
+document.write("<table id='vlan_member_drawModule_tbl' align='center' valign='center' border='0'><tr>");
+if ((numberOfModules==1)||(!isShowModuleNumber))
+{
+moduleIndex=" ";
+}
+else moduleIndex=top.RealModuleNameArr[moduleIndex-1];
+isShowModuleNumber=false;
+document.write("<td nowrap><font class='big'>"+moduleIndex+"</td>");
+document.write("</tr></table>");
+}
+var isShowModuleNumber;
+function writeVlan()
+{
+for (var moduleIndex=1; moduleIndex<=top.NumberOfModules; moduleIndex++)
+{
+isShowModuleNumber=true;
+setRow(moduleIndex);
+writeOneVlan(moduleIndex)
+}
+}
+function flat(currentVlan, portId) {
+if ((document.images)&&(staticVLAN)) {
+document.images['cell'+currentVlan+'_'+portId].src =
+cellImages[0][vlanMembers[portId]].src
+}
+}
+function raise(currentVlan, portId) {
+if ((document.images)&&(staticVLAN)) {
+document.images['cell'+currentVlan+'_'+portId].src =
+cellImages[1][vlanMembers[portId]].src
+}
+}
+function lower(currentVlan, portId) {
+if ((document.images)&&(staticVLAN)) {
+document.images['cell'+currentVlan+'_'+portId].src =
+cellImages[2][vlanMembers[portId]].src
+}
+}
+function toggle(currentVlan,portId)
+{
+if (staticVLAN && !top.MonitorMode)
+{
+if (portsStateArray[portId]==5)
+portsStateArray[portId]=parseInt(vlanMembers[portId]);
+vlanMembers[portId]++;
+vlanMembers[portId] %= 4;
+raise(currentVlan, portId)
+}
+}
+function writeVlanTrunk(){
+document.writeln('<tr><td nowrap>&nbsp;</td><td nowrap bgcolor="#eeeeee" colspan="'+top.NumberOfTrunks+'">&nbsp;&nbsp;LAGs</td></tr>')
+writeOneVlanTrunk(currentVlan)
+writeOneVlanTrunkCurrent(currentVlan)
+}
+function flatTrunk(currentVlan, trunkId) {
+if ((document.images)&&(staticVLAN)) {
+document.images['cell'+currentVlan+'_trunk'+trunkId].src =
+cellImages[0][vlanMembersTrunk[trunkId]].src
+}
+}
+function raiseTrunk(currentVlan, trunkId) {
+if ((document.images)&&(staticVLAN)) {
+document.images['cell'+currentVlan+'_trunk'+trunkId].src =
+cellImages[1][vlanMembersTrunk[trunkId]].src
+}
+}
+function lowerTrunk(currentVlan, trunkId) {
+if ((document.images)&&(staticVLAN)) {
+document.images['cell'+currentVlan+'_trunk'+trunkId].src =
+cellImages[2][vlanMembersTrunk[trunkId]].src
+}
+}
+function toggleTrunk(currentVlan, trunkId)
+{
+if (staticVLAN && !top.MonitorMode)
+{
+if (portsStateArray[parseInt(trunkId)+parseInt(top.trunkFirstIndex)-1]==5)
+portsStateArray[parseInt(trunkId)+parseInt(top.trunkFirstIndex)-1]=parseInt(vlanMembersTrunk[trunkId]);
+vlanMembersTrunk[trunkId]++;
+vlanMembersTrunk[trunkId] %= 4;
+raiseTrunk(currentVlan, trunkId);
+}
+}
+function writeOneVlanTrunk(currentVlan){
+var trunkBase
+var trunkId
+memberFromStringTrunk(currentVlan)
+document.writeln('<tr>')
+document.writeln('<td nowrap valign="bottom"><font size="1">Static&nbsp;</font></td>')
+for (trunkId = 0; trunkId < amMaxTrunkCount; trunkId++){
+if (true)
+{
+if (staticVLAN)
+{
+document.writeln('<td nowrap align="center" width="20" bgcolor="#eeeeee"><font size="1" face="Helvetica">',trunkId+1,'<br>\
+</font><a href="javascript:void(0)"\
+onMouseOver="window.status=\'\'; raiseTrunk(\'', currentVlan, '\', \'', trunkId, '\'); return true"\
+onMouseOut="flatTrunk(\'', currentVlan, '\', \'', trunkId, '\')"\
+onMouseDown="lowerTrunk(\'', currentVlan, '\', \'', trunkId, '\')"\
+onMouseUp="window.status=\'\'; return true"\
+onClick="toggleTrunk(\'', currentVlan, '\', \'', trunkId, '\'); return false">\
+<img src="', cellImages[0][vlanMembersTrunk[trunkId]].src, '" border="0"\
+align="center" width="20" height="20" name="cell', currentVlan, '_trunk', trunkId, '"></a></td>')
+}
+else
+{
+document.writeln('<td nowrap align="center" width="20" bgcolor="#eeeeee"><font size="1" face="Helvetica">',trunkId+1,'<br>\
+</font><a href="javascript:void(0)"\
+onMouseOver="window.status=\'\'; raiseTrunk(\'', currentVlan, '\', \'', trunkId, '\'); return true"\
+onMouseOut="flatTrunk(\'', currentVlan, '\', \'', trunkId, '\')"\
+onMouseDown="lowerTrunk(\'', currentVlan, '\', \'', trunkId, '\')"\
+onMouseUp="window.status=\'\'; return true"\
+onClick="toggleTrunk(\'', currentVlan, '\', \'', trunkId, '\'); return false">\
+<img src="', cellImages[0][0].src, '" border="0"\
+align="center" width="20" height="20" name="cell', currentVlan, '_trunk', trunkId, '"></a></td>')
+}
+}else{
+document.writeln('<td nowrap align="center" width="20" bgcolor="#eeeeee"><font \
+size="1" face="Helvetica">',trunkId+1,'<br>\
+</font><img src="../Images/null.gif" width="20"height="20"></td>')
+}
+}
+document.writeln('</tr>')
+}
+function memberFromStringCurrent(currentVlan){
+var memberString
+var portId
+memberString = vlanCurrentEgress;
+memberString2 = vlanCurrentUntagged;
+for (portId = 0; portId < amMaxPortCount; portId++) {
+vlanMembersCurrent[portId] = parseInt(memberString.charAt(portId))
+if (parseInt(memberString2.charAt(portId))=="1"){
+vlanMembersCurrent[portId] = "2"
+}
+}
+}
+function writeOneVlanTrunkCurrent(currentVlan){
+var trunkBase
+var trunkId
+memberFromStringTrunkCurrent(currentVlan)
+document.writeln('<tr>')
+document.writeln('<td nowrap valign="bottom"><font size="1">Current&nbsp;</font></td>')
+for (trunkId = 0; trunkId < amMaxTrunkCount; trunkId++){
+if (true)
+{
+document.writeln('<td nowrap align="center" width="20" bgcolor="#eeeeee">\
+<img src="', cellImages[0][vlanMembersTrunkCurrent[trunkId]].src, '" border="0"\
+align="center" width="20" height="20" name="cell', currentVlan, '_trunkCurrent', trunkId, '"></td>')
+}
+else
+{
+document.writeln('<td nowrap align="center" width="20" bgcolor="#eeeeee"><img src="../Images/null.gif" width="20"\
+height="20"></td>')
+}
+}
+document.writeln('</tr>')
+}
+function memberFromStringTrunkCurrent(currentVlan){
+var memberString
+var trunkId
+memberString = vlanCurrentEgress;
+memberString2 = vlanCurrentUntagged;
+for (trunkId = 0; trunkId < amMaxTrunkCount; trunkId++){
+vlanMembersTrunkCurrent[trunkId] = parseInt(memberString.charAt(parseInt(top.trunkFirstIndex)+trunkId-1))
+if (parseInt(memberString2.charAt(parseInt(top.trunkFirstIndex)+trunkId-1))=="1"){
+vlanMembersTrunkCurrent[trunkId] = "2"
+}
+}
+}
+function selectIndex()
+{
+var selectName=document.VlanMemberForm.elements["dot1qVlanIndex$select"];
+var newFilter="vlan_member.htm?[VlanMemberStaticVT]Query:dot1qVlanIndex=";
+newFilter+=(selectName.options[selectName.selectedIndex].text);
+newFilter+="[nameVT]Filter:dot1qVlanStaticName!=''";
+newFilter+="[VlanMemberCurrentVT]Query:dot1qVlanTimeMark=0@dot1qVlanIndex="
+newFilter+=(selectName.options[selectName.selectedIndex].text);
+newFilter+="[AuthenticatedVlanTable]Query:dot1qFdbId=";
+newFilter+=(selectName.options[selectName.selectedIndex].text);
+document.location.href=newFilter;
+}
+function selectQueryName()
+{
+nameSelect=formele["dot1qVlanStaticName$select"];
+theOption=nameSelect.options[nameSelect.selectedIndex].text;
+for (i=1;formele["dot1qVlanIndex$repeat?"+i];i++)
+if (theOption==formele["dot1qVlanStaticName$repeat?"+i].value)
+break;
+formele["dot1qVlanIndex$query"].value=formele["dot1qVlanIndex$repeat?"+i].value;
+indexSign("dot1qVlanIndex$select");
+selectIndex();
+}
+function ChangeStatus(){
+if (formele["RemoveCBox"].checked==true)
+formele["dot1qVlanStaticRowStatus$query"].value=6;
+else
+formele["dot1qVlanStaticRowStatus$query"].value=1;
+}
+function formSubmit()
+{
+if (formele["dot1qVlanStatus$query"].selectedIndex==2)
+alert ("The Default Vlan cannot be edit")
+else
+{
+memberToStaticStrings();
+top.submitVlan=1;
+formObj=document.VlanMemberForm;
+var selectName = document.VlanMemberForm.dot1qVlanIndex$select;
+var selctedVlan;
+selctedVlan = selectName.options[selectName.selectedIndex].text;
+if (document.VlanMemberForm.RemoveCBox.checked == true )
+{
+document.VlanMemberForm.dot1qVlanStaticRowStatus$query.value = 6;
+document.VlanMemberForm.dot1qVlanIndex$query.value = parseInt(selctedVlan) ;
+}
+else
+{
+document.VlanMemberForm.dot1qVlanStaticName$query.value=document.VlanMemberForm.dot1qVlanName.value;
+document.VlanMemberForm.dot1qVlanStaticRowStatus$query.value = 1;
+document.VlanMemberForm.dot1qVlanIndex$query.value = parseInt(selctedVlan) ;
+}
+if ((formele["dot1qVlanStatus$query"].selectedIndex==1)&&
+(formele["dot1qVlanStatus$query"].disabled==false))
+{
+formele["dot1qVlanIndex$add"].value = formele["dot1qVlanIndex$queryStatic"].value;
+formele["dot1qVlanStaticName$add"].value = formele["dot1qVlanName"].value;
+formele["dot1qVlanStaticEgressPorts$add"].value = formele["dot1qVlanStaticEgressPorts$query"].value;
+formele["dot1qVlanForbiddenEgressPorts$add"].value = formele["dot1qVlanForbiddenEgressPorts$query"].value;
+formele["dot1qVlanStaticUntaggedPorts$add"].value = formele["dot1qVlanStaticUntaggedPorts$query"].value;
+formele["dot1qVlanStaticRowStatus$add"].value = 4;
+disableQuery();
+}
+else
+disableAdd();
+disableHtml();
+document.VlanMemberForm.submit();
+}
+}
+function disableHtml(){
+formele["RemoveCBox"].disabled = true;
+document.VlanMemberForm.dot1qVlanStatus$query.disabled=true;
+document.VlanMemberForm.indexNameRadio[0].disabled=true;
+document.VlanMemberForm.indexNameRadio[1].disabled=true;
+document.VlanMemberForm.dot1qVlanName.disabled=true;
+formele["dot1qVlanIndex$select"].disabled = true;
+formele["dot1qVlanStaticName$select"].disabled = true;
+formele["String$select"].disabled = true;
+formele["Default$select"].disabled = true;
+formele["Unauthorized"].disabled = true;
+}
+function disableAdd()
+{
+formele["dot1qVlanIndex$add"].disabled = true;
+formele["String$add"].disabled = true;
+formele["dot1qVlanStaticName$add"].disabled = true;
+formele["Default$add"].disabled = true;
+formele["dot1qVlanStaticEgressPorts$add"].disabled = true;
+formele["dot1qVlanForbiddenEgressPorts$add"].disabled = true;
+formele["dot1qVlanStaticUntaggedPorts$add"].disabled = true;
+formele["dot1qVlanStaticRowStatus$add"].disabled = true;
+formele["VlanMemberStaticVT$endAdd"].disabled = true;
+}
+function disableQuery()
+{
+formele["VlanMemberStaticVT$query"].disabled = true;
+formele["String$query"].disabled = true;
+formele["dot1qVlanStaticName$query"].disabled = true;
+formele["Default$query"].disabled = true;
+formele["dot1qVlanIndex$queryStatic"].disabled = true;
+formele["dot1qVlanStaticEgressPorts$query"].disabled = true;
+formele["dot1qVlanStaticUntaggedPorts$query"].disabled = true;
+formele["dot1qVlanForbiddenEgressPorts$query"].disabled = true;
+formele["dot1qVlanStaticRowStatus$query"].disabled = true;
+formele["VlanMemberStaticVT$endQuery"].disabled = true;
+}
+var vlanMembers;
+var vlanMembersCurrent;
+var vlanMembersTrunk;
+var vlanMembersTrunkCurrent;
+function memberFromString()
+{
+vlanMembers = new Array(top.NumberOfPorts)
+var memberString
+var portId
+memberString = vlanStaticEgress;
+memberString2= vlanStaticUntagged;
+memberString3= vlanForbidden;
+for (portId = 0; portId < top.NumberOfPorts; portId++)
+{
+vlanMembers[portId] = memberString.charAt(portId)
+if (memberString2.charAt(portId)=="1"){
+vlanMembers[portId] = "2"
+}
+if (memberString3.charAt(portId)=="1"){
+vlanMembers[portId] = "3"
+}
+vlanMembers[portId] =parseInt(vlanMembers[portId]);
+}
+}
+function memberFromStringTrunk()
+{
+vlanMembersTrunk = new Array(top.NumberOfTrunks)
+var memberString
+var trunkId
+memberString = vlanStaticEgress;
+memberString2= vlanStaticUntagged;
+memberString3= vlanForbidden;
+for (trunkId = 0; trunkId < top.NumberOfTrunks; trunkId++)
+{
+vlanMembersTrunk[trunkId] = memberString.charAt(parseInt(top.trunkFirstIndex)+trunkId-1)
+if (memberString2.charAt(parseInt(top.trunkFirstIndex)+trunkId-1)=="1"){
+vlanMembersTrunk[trunkId] = "2"
+}
+if (memberString3.charAt(parseInt(top.trunkFirstIndex)+trunkId-1)=="1"){
+vlanMembersTrunk[trunkId] = "3"
+}
+vlanMembersTrunk[trunkId] = parseInt(vlanMembersTrunk[trunkId]);
+}
+}
+function memberToStaticStrings()
+{
+var vlanStaticEgressTemp = '' ;
+var vlanStaticUntaggedTemp = '';
+var vlanForbiddenTemp = '';
+var vlanStaticEgressChanged = false ;
+var vlanStaticUntaggedChanged = false ;
+var vlanForbiddenChanged = false ;
+var portId ;
+var portType ;
+for (portId = 0; portId < top.NumberOfPorts; portId++)
+{
+portType = (vlanMembers[portId])*1 ;
+switch (portType)
+{
+case 3:
+vlanStaticEgressTemp += '0' ;
+vlanStaticUntaggedTemp += '0' ;
+vlanForbiddenTemp += '1' ;
+break;
+case 2:
+vlanStaticEgressTemp += '1' ;
+vlanStaticUntaggedTemp += '1' ;
+vlanForbiddenTemp += '0' ;
+break;
+case 1:
+vlanStaticEgressTemp += '1' ;
+vlanStaticUntaggedTemp += '0' ;
+vlanForbiddenTemp += '0' ;
+break;
+case 0:
+vlanStaticEgressTemp += '0' ;
+vlanStaticUntaggedTemp += '0' ;
+vlanForbiddenTemp += '0' ;
+break;
+default:
+vlanStaticEgressTemp += '0' ;
+vlanStaticUntaggedTemp += '0' ;
+vlanForbiddenTemp += '0' ;
+break;
+}
+if (vlanStaticEgressTemp.charAt(vlanStaticEgressTemp.length-1)!='0')
+vlanStaticEgressChanged=true;
+if (vlanStaticUntaggedTemp.charAt(vlanStaticUntaggedTemp.length-1)!='0')
+vlanStaticUntaggedChanged=true;
+if (vlanForbiddenTemp.charAt(vlanForbiddenTemp.length-1)!='0')
+vlanForbiddenChanged=true;
+}
+for (; portId < (parseInt(top.trunkFirstIndex)-1); portId++)
+{
+vlanStaticEgressTemp += '0' ;
+vlanStaticUntaggedTemp += '0' ;
+vlanForbiddenTemp += '0' ;
+}
+var trunkId ;
+var trunkType;
+for (trunkId = 0; trunkId < top.NumberOfTrunks; trunkId++)
+{
+trunkType = (vlanMembersTrunk[trunkId])*1 ;
+switch (trunkType)
+{
+case 3:
+vlanStaticEgressTemp += '0' ;
+vlanStaticUntaggedTemp += '0' ;
+vlanForbiddenTemp += '1' ;
+break;
+case 2:
+vlanStaticEgressTemp += '1' ;
+vlanStaticUntaggedTemp += '1' ;
+vlanForbiddenTemp += '0' ;
+break;
+case 1:
+vlanStaticEgressTemp += '1' ;
+vlanStaticUntaggedTemp += '0' ;
+vlanForbiddenTemp += '0' ;
+break;
+case 0:
+vlanStaticEgressTemp += '0' ;
+vlanStaticUntaggedTemp += '0' ;
+vlanForbiddenTemp += '0' ;
+break;
+default: break;
+}
+if (vlanStaticEgressTemp.charAt(vlanStaticEgressTemp.length-1)!='0')
+vlanStaticEgressChanged=true;
+if (vlanStaticUntaggedTemp.charAt(vlanStaticUntaggedTemp.length-1)!='0')
+vlanStaticUntaggedChanged=true;
+if (vlanForbiddenTemp.charAt(vlanForbiddenTemp.length-1)!='0')
+vlanForbiddenChanged=true;
+}
+if (vlanStaticEgressChanged)
+document.VlanMemberForm.dot1qVlanStaticEgressPorts$query.value = bitsAsCharsToOctet(vlanStaticEgressTemp);
+else document.VlanMemberForm.dot1qVlanStaticEgressPorts$query.value ="";
+if (vlanStaticUntaggedChanged)
+document.VlanMemberForm.dot1qVlanStaticUntaggedPorts$query.value = bitsAsCharsToOctet(vlanStaticUntaggedTemp);
+else document.VlanMemberForm.dot1qVlanStaticUntaggedPorts$query.value ="";
+if (vlanForbiddenChanged)
+document.VlanMemberForm.dot1qVlanForbiddenEgressPorts$query.value = bitsAsCharsToOctet(vlanForbiddenTemp);
+else document.VlanMemberForm.dot1qVlanForbiddenEgressPorts$query.value ="";
+}
+function clickRadio(RdoNum)
+{
+if (RdoNum==1)
+{
+formele["dot1qVlanIndex$select"].disabled=false;
+formele["dot1qVlanStaticName$select"].disabled=true;
+}
+else
+{
+formele["dot1qVlanIndex$select"].disabled=true;
+formele["dot1qVlanStaticName$select"].disabled=false;
+}
+}
+function checkQuery()
+{
+indexSelect=document.VlanMemberForm.elements["dot1qVlanIndex$select"];
+if (top.submitVlan==1)
+{
+if ((formele["dot1qVlanIndex$queryStatic"].value!=top.queryNA)&&
+(formele["dot1qVlanIndex$query"].value!=formele["dot1qVlanIndex$queryStatic"].value))
+{
+for (i=0;((indexSelect.options[i])&&(indexSelect.options[i].text!=formele["dot1qVlanIndex$queryStatic"].value));i++);
+indexSelect.selectedIndex=i;
+top.submitVlan=0;
+selectIndex();
+}
+else if (formele["dot1qVlanIndex$query"].value==top.queryNA)
+{
+document.location.href="vlan_member.htm?[nameVT]Filter:dot1qVlanStaticName!=''";
+}
+}
+}
+function serviceFunction()
+{
+i=1;
+formele["dot1qVlanStaticName$select"].disabled=true;
+formele["dot1qVlanStaticName$select"].disabled=true;
+while (formele["dot1qVlanIndex$repeat"+i])
+{
+formele["dot1qVlanIndex$repeat"+i].disabled=true;
+formele["dot1qVlanStaticName$repeat"+i].disabled=true;
+formele["nameVT$endRepeat"+i].disabled=true;
+i++;
+}
+formele["dot1qVlanTimeMark$query"].disabled=true;
+formele["dot1qVlanIndex$query"].disabled=true;
+formele["dot1qVlanFdbId$query"].disabled=true;
+formele["dot1qVlanCurrentEgressPorts$query"].disabled=true;
+formele["dot1qVlanCurrentUntaggedPorts$query"].disabled=true;
+formele["VlanMemberCurrentVT$endQuery"].disabled=true;
+}
+var firstBval=false;
+function enableUnauthorized(idx)
+{
+document.forms[0].dot1qVlanFdbId$query.value=document.forms[0].dot1qVlanIndex$queryStatic.value;
+document.forms[0].AuthenticatedVlanTable$query.disabled=((idx==0)||firstBval);
+document.forms[0].dot1qFdbId$query.disabled=(firstBval);
+document.forms[0].AuthenticatedVlanTable$endQuery.disabled=((idx==0)||firstBval);
+document.forms[0].rldot1xUnAuthenticatedVlanStatus$query.disabled=(firstBval);
+document.forms[0].dot1qFdbId$query.value=document.forms[0].dot1qVlanIndex$queryStatic.value;
+document.forms[0].rldot1xUnAuthenticatedVlanStatus$query.value=(idx)*2+4;
+document.forms[0].AuthenticatedVlanTable$endAdd.disabled=((idx==1)||firstBval);
+firstBval=!firstBval;
+}
+function removeEmptyNames(optionsSelect)
+{
+for (var i = optionsSelect.options.length - 1 ; i >= 0 ; --i)
+{
+if (optionsSelect.options[i].text == '')
+{
+optionsSelect.remove(i);
+}
+}
+if (optionsSelect.options.length == 0)
+{
+document.getElementById('indexNameRadio2').disabled = true;
+}
+}
+//-->
+</script>
+</head>
+<body bgcolor="#FFFFFF" leftmargin="15" onload="setScreenMonitorState();" style="display:none" id="mainBody">
+<script language="JavaScript">top.Draw_Header(document.title);</script>
+
+<FORM METHOD='POST' name="VlanMemberForm"  ACTION="/config/vlan_member.htm"   >
+<INPUT  TYPE="HIDDEN" Name="restoreUrl" size=256   value="vlan=1">
+
+<script language="JavaScript">
+formele=document.VlanMemberForm.elements;
+if (document.VlanMemberForm.elements["restoreUrl"].value=="Filter:")
+document.location.href="vlan_member.htm?[nameVT]Filter:dot1qVlanStaticName!=''";
+</script>
+<div align="right" class="management-only" id="addButtonDiv">
+<table id="vlan_mamber_buttons_tbl" cellspacing="0" cellpadding="0" border="0">
+<tr>
+<td nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/lbutton.gif"></td>
+<td nowrap valign="middle" align="center" class="data-area-button"><a href="javascript:void(0)" onclick="javascript:window.open('create_new_vlan.htm','', 'width=850, height=600, left=50, top=50, scrollbars=yes, resizable=yes');" title='Add a VLAN'>&nbsp;&nbsp;Add&nbsp;&nbsp;</a></td>
+<td nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/rbutton.gif"></td>
+<td nowrap style="width: 14px; height: 25px"></td>
+</tr>
+</table>
+</div>
+<br>
+<br>
+
+<INPUT  TYPE="HIDDEN" NAME="errorCollector"   value="" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=VlanMemberStaticVT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=dot1qVlanStaticTable$VT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=dot1qVlanIndex$VT size=128   value="Type=7;Access=1;NumOfEnumerations=0;Range0=[-2147483648,2147483647]">
+<INPUT  Type=HIDDEN Name=dot1qVlanStaticName$VT size=128   value="Type=2;Access=2;NumOfEnumerations=0;Range0=[0,32]">
+<INPUT  Type=HIDDEN Name=dot1qVlanStaticEgressPorts$VT size=128   value="Type=101;Access=2;NumOfEnumerations=0;Range0=[0,160]">
+<INPUT  Type=HIDDEN Name=dot1qVlanForbiddenEgressPorts$VT size=128   value="Type=101;Access=2;NumOfEnumerations=0;Range0=[0,160]">
+<INPUT  Type=HIDDEN Name=dot1qVlanStaticUntaggedPorts$VT size=128   value="Type=101;Access=2;NumOfEnumerations=0;Range0=[0,160]">
+<INPUT  Type=HIDDEN Name=dot1qVlanStaticRowStatus$VT size=128   value="Type=0;Access=2;NumOfEnumerations=6;Range0=[1,6]">
+<INPUT  Type=HIDDEN Name=VlanMemberStaticVT$endVT   value="OK" SIZE="20" MAXLENGTH="20">
+
+<table id="vlan_mamber_show_tbl" border="0" cellspacing="0" cellpadding="0" width="100%">
+<script language="JavaScript">
+top.Draw_TableTop(2);top.Draw_TableHeader(2);
+</script>
+<tr>
+<td nowrap style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd" width=40%>Show VLAN:</td>
+<td class="data-area-canvas-odd" width=60%>
+<input type=radio name=indexNameRadio checked onClick=clickRadio(1) id="indexNameRadio1" VALUE="indexNameRadio1" class="monitorEnabled">
+VLAN ID
+
+<SELECT  Name=dot1qVlanIndex$select size="1" onChange="selectIndex()" class="monitorEnabled"
+ RpGetType=complex >
+<OPTION  value=0>1
+<OPTION  value=1>20
+<OPTION  value=2>30
+</select>
+
+
+
+<div style="display:none">
+<INPUT  Type=HIDDEN Name=nameVT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=dot1qVlanStaticTable$VTN   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=dot1qVlanIndex$VTN size=128   value="Type=7;Access=1;NumOfEnumerations=0;Range0=[-2147483648,2147483647]">
+<INPUT  Type=HIDDEN Name=dot1qVlanStaticName$VTN size=128   value="Type=2;Access=2;NumOfEnumerations=0;Range0=[0,32]">
+<INPUT  Type=HIDDEN Name=nameVT$endVT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=String$select   value="OK" SIZE="20" MAXLENGTH="20">
+</div>
+<input type=radio name=indexNameRadio onClick=clickRadio(2) id="indexNameRadio2" VALUE="indexNameRadio2" class="monitorEnabled">
+VLAN Name
+<SELECT  Name=dot1qVlanStaticName$select size="1" disabled class="monitorEnabled"
+ onChange="selectQueryName()"
+ RpGetType=complex >
+<OPTION  value=0>Lab
+<OPTION  value=1>Quarantine
+</select>
+
+<script>
+formele["dot1qVlanStaticName$select"].selectedIndex = -1;
+removeEmptyNames(formele["dot1qVlanStaticName$select"]);
+</script>
+<INPUT  TYPE=hidden NAME=Default$select   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=dot1qVlanIndex$repeat?1 disabled    value="20" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=String$repeat?1    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qVlanStaticName$repeat?1 disabled    value="Lab" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=Default$repeat?1    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=nameVT$endRepeat?1 disabled    value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=dot1qVlanIndex$repeat?2 disabled    value="30" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=String$repeat?2    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qVlanStaticName$repeat?2 disabled    value="Quarantine" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=Default$repeat?2    value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=nameVT$endRepeat?2 disabled    value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  type=hidden NAME=VlanMemberStaticVT$current    value="OK" SIZE="20" MAXLENGTH="20">
+
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px"></td>
+</tr>
+<tr>
+<td nowrap style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas" width=40%>
+VLAN Name (0-32 Characters)
+</td>
+<td nowrap class="data-area-canvas" width=60%>
+<input type=text name=dot1qVlanName MAXLENGTH=32 ID="Text1">
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px"></td>
+</tr>
+
+<INPUT  type=hidden Name=VlanMemberStaticVT$query   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=hidden NAME=String$query   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=dot1qVlanStaticName$query size=128   value="Lab">
+<INPUT  TYPE=hidden NAME=Default$query   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=dot1qVlanIndex$queryStatic   value="20" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=dot1qVlanStaticEgressPorts$query size=252   value="880000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000">
+<INPUT  TYPE=hidden NAME=dot1qVlanStaticUntaggedPorts$query size=252   value="080000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000">
+<INPUT  TYPE=hidden NAME=dot1qVlanForbiddenEgressPorts$query size=252   value="000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000">
+<INPUT  TYPE=hidden NAME=dot1qVlanStaticRowStatus$query   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=VlanMemberStaticVT$endQuery   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=dot1qVlanIndex$add size=5   value="20">
+<INPUT  TYPE=hidden NAME=String$add   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=dot1qVlanStaticName$add size=128   value="Lab">
+<INPUT  TYPE=hidden NAME=Default$add   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=dot1qVlanStaticEgressPorts$add size=252   value="880000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000">
+<INPUT  TYPE=hidden NAME=dot1qVlanForbiddenEgressPorts$add size=252   value="000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000">
+<INPUT  TYPE=hidden NAME=dot1qVlanStaticUntaggedPorts$add size=252   value="080000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000">
+<INPUT  TYPE=hidden NAME=dot1qVlanStaticRowStatus$add   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=VlanMemberStaticVT$endAdd   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=VlanMemberCurrentVT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=dot1qVlanCurrentTable$VT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=dot1qVlanTimeMark$VT size=128   value="Type=0;Access=1;NumOfEnumerations=0;Range0=[-2147483648,2147483647]">
+<INPUT  Type=HIDDEN Name=dot1qVlanIndex$VTCurrent size=128   value="Type=7;Access=1;NumOfEnumerations=0;Range0=[-2147483648,2147483647]">
+<INPUT  Type=HIDDEN Name=dot1qVlanFdbId$VT size=128   value="Type=7;Access=1;NumOfEnumerations=0;Range0=[-2147483648,2147483647]">
+<INPUT  Type=HIDDEN Name=dot1qVlanCurrentEgressPorts$VT size=160   value="Type=101;Access=1;NumOfEnumerations=0;Range0=[0,160]">
+<INPUT  Type=HIDDEN Name=dot1qVlanCurrentUntaggedPorts$VT size=160   value="Type=101;Access=1;NumOfEnumerations=0;Range0=[0,160]">
+<INPUT  Type=HIDDEN Name=dot1qVlanStatus$VT size=160   value="Type=0;Access=1;NumOfEnumerations=3;Range0=[1,3]">
+<INPUT  Type=HIDDEN Name=VlanMemberCurrentVT$endVT   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  type=hidden Name=VlanMemberCurrentVT$query   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=dot1qVlanTimeMark$query disabled   value="0" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=dot1qVlanIndex$query disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=dot1qVlanFdbId$query disabled   value="1" SIZE="20" MAXLENGTH="20">
+
+<tr style="display:none;">
+<td nowrap style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd" width=40%>Status
+</td>
+<td nowrap class="data-area-canvas-odd" width=60%>
+
+<SELECT  NAME=dot1qVlanStatus$query SIZE=1 onChange="dynamicToStatic()" disabled
+ >
+
+<OPTION value=3> Dynamic
+
+<OPTION value=2> Static
+
+<OPTION value=1 selected> Default
+
+</select>
+
+
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px"></td>
+</tr>
+<tr>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas-odd" width=40%>Unauthorized Users</td>
+<td class="data-area-canvas-odd" width=60%>
+<select name=Unauthorized onChange=enableUnauthorized(this.selectedIndex) ID="Select1">
+<option>Enable
+<option>Disable</select></td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<script language="JavaScript">
+checkQuery();
+</script>
+<script language="JavaScript">top.Draw_TableBottom(2)</script>
+</table>
+
+<INPUT  TYPE=hidden NAME=dot1qVlanCurrentEgressPorts$query size=252 disabled   value="f7ef000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001fe">
+<INPUT  TYPE=hidden NAME=dot1qVlanCurrentUntaggedPorts$query size=252 disabled   value="f7ef000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001fe">
+
+<br>
+<table id="vlan_member_remove_tbl" border="0" border="0" cellspacing="0" cellpadding="0" width="100%">
+<script language="JavaScript">
+top.Draw_TableTop(2);
+top.Draw_TableHeader(2);
+</script>
+<tr>
+<td nowrap style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd" width="50%"><b>Remove VLAN</b>
+</td>
+<td nowrap class="data-area-canvas-odd" align="left" width="50%">
+<input type="checkbox" name="RemoveCBox" OnClick="ChangeStatus()" ID="Checkbox1">
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px"></td>
+</tr>
+
+<INPUT  type=hidden Name=VlanMemberCurrentVT$endQuery disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<script language="JavaScript">top.Draw_TableBottom(2)</script>
+</table>
+<INPUT  Type=HIDDEN Name=vlanPortTable   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=vlanPortModeTable$VT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=ifIndex$VT SIZE=128   value="Type=0;Access=1;NumOfEnumerations=0;Range0=[1,2147483647]">
+<INPUT  Type=HIDDEN Name=vlanPortModeState$VT SIZE=128   value="Type=0;Access=2;NumOfEnumerations=0;Range0=[-2147483648,2147483647]">
+<INPUT  Type=HIDDEN Name=vlanPortTable$endVT   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=hidden NAME=vlanPortModeState$repeat?1  disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=vlanPortTable$endRepeat?1  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=hidden NAME=vlanPortModeState$repeat?2  disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=vlanPortTable$endRepeat?2  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=hidden NAME=vlanPortModeState$repeat?3  disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=vlanPortTable$endRepeat?3  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=hidden NAME=vlanPortModeState$repeat?4  disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=vlanPortTable$endRepeat?4  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=hidden NAME=vlanPortModeState$repeat?5  disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=vlanPortTable$endRepeat?5  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=hidden NAME=vlanPortModeState$repeat?6  disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=vlanPortTable$endRepeat?6  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=hidden NAME=vlanPortModeState$repeat?7  disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=vlanPortTable$endRepeat?7  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=hidden NAME=vlanPortModeState$repeat?8  disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=vlanPortTable$endRepeat?8  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=hidden NAME=vlanPortModeState$repeat?9  disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=vlanPortTable$endRepeat?9  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=hidden NAME=vlanPortModeState$repeat?10  disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=vlanPortTable$endRepeat?10  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=hidden NAME=vlanPortModeState$repeat?11  disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=vlanPortTable$endRepeat?11  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=hidden NAME=vlanPortModeState$repeat?12  disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=vlanPortTable$endRepeat?12  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=hidden NAME=vlanPortModeState$repeat?13  disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=vlanPortTable$endRepeat?13  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=hidden NAME=vlanPortModeState$repeat?14  disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=vlanPortTable$endRepeat?14  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=hidden NAME=vlanPortModeState$repeat?15  disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=vlanPortTable$endRepeat?15  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=hidden NAME=vlanPortModeState$repeat?16  disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=vlanPortTable$endRepeat?16  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=hidden NAME=vlanPortModeState$repeat?17  disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=vlanPortTable$endRepeat?17  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=hidden NAME=vlanPortModeState$repeat?18  disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=vlanPortTable$endRepeat?18  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=hidden NAME=vlanPortModeState$repeat?19  disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=vlanPortTable$endRepeat?19  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=hidden NAME=vlanPortModeState$repeat?20  disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=vlanPortTable$endRepeat?20  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=hidden NAME=vlanPortModeState$repeat?21  disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=vlanPortTable$endRepeat?21  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=hidden NAME=vlanPortModeState$repeat?22  disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=vlanPortTable$endRepeat?22  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=hidden NAME=vlanPortModeState$repeat?23  disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=vlanPortTable$endRepeat?23  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=hidden NAME=vlanPortModeState$repeat?24  disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=vlanPortTable$endRepeat?24  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+
+<INPUT  Type=HIDDEN Name=AuthenticatedVlanTable   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rldot1xUnAuthenticatedVlanTable$VT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=dot1qFdbId$VT SIZE=128   value="Type=7;Access=1;NumOfEnumerations=0;Range0=[-2147483648,2147483647]">
+<INPUT  Type=HIDDEN Name=rldot1xUnAuthenticatedVlanStatus$VT SIZE=128   value="Type=0;Access=2;NumOfEnumerations=6;Range0=[1,6]">
+<INPUT  Type=HIDDEN Name=AuthenticatedVlanTable$endVT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=AuthenticatedVlanTable$query   value=" " SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=dot1qFdbId$query disabled   value=" " SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=rldot1xUnAuthenticatedVlanStatus$query disabled   value=" " SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=AuthenticatedVlanTable$endQuery disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=AuthenticatedVlanTable$endAdd disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<script language="JavaScript">
+indexSign("dot1qVlanIndex$select");
+indexSign("dot1qVlanStaticName$select");
+putDataToVriables();
+</script>
+<br>
+<table id="vlan_member_writeVlan_tbl" border="0" cellpadding="0" cellspacing="0">
+<script language="javascript">writeVlan()</script>
+</table><tbody id=port></tbody>
+<br>
+<table id="vlan_member_writeVlanTrunk_tbl" border="0" cellpadding="0" cellspacing="0">
+<script language="javascript">writeVlanTrunk()</script>
+</table><tbody id=trunk></tbody>
+<br>
+<script>document.getElementById("mainBody").style.display="";</script>
+
+<div class="management-only">
+
+<div align="center"><table id="apply_tbl" cellspacing="0" cellpadding="0" border="0"><tr>
+<td nowrap nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/lbutton.gif"></td>
+<td nowrap nowrap valign="middle" align="center" class="data-area-button"><a href="javascript:preSubmit();">Apply Changes</a></td>
+<td nowrap nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/rbutton.gif"></td>
+</tr></table></div><br>
+<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
+<!--
+if(document.forms[0] && document.forms[0].elements.length<=1000)
+{
+for(i=0;(document.forms[0] && i<document.forms[0].elements.length);i++)
+{
+if(document.forms[0] && document.forms[0].elements[i].type=="select-one")
+if(document.forms[0] && document.forms[0].elements[i].length==0)
+document.forms[0].elements[i].style.width="70px";
+}
+}
+//-->
+</SCRIPT>
+
+</div>
+
+
+</form>
+</body>
+</html>

@@ -1,0 +1,574 @@
+
+
+<html>
+<head>
+
+<script>
+if(top.DeviceType && top.DeviceType==1)
+{
+document.write("<title>Integrated Cable Test</title>");
+}
+else
+{
+document.write("<title>Integrated Cable Test for Copper Cables</title>");
+}
+</script>
+
+
+<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
+<!--
+if(top.location==self.location )
+{
+var refStr=self.location + " ";
+var ind=0;
+refStr.toLowerCase();
+ind=refStr.indexOf("config");
+var locationStr=refStr.substring(0,ind);
+if (opener)
+{
+if (opener.opener)
+{
+if(opener.opener.top.location==opener.opener.location)
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+else
+{
+if(opener.top.location==opener.location)
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+}
+else
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+//-->
+</SCRIPT>
+
+
+<link rel="stylesheet" href="../device/style.css" type="text/css">
+<script src="../js/globalFunctions.js"></script>
+<script language="JavaScript">
+<!-- Beginng of JavaScript Applet
+if(top.MonitorMode) {
+document.write("<link rel='stylesheet' href='../device/monitorMode.css' type='text/css'>")
+}
+var TestResult;
+var CableFaultDistance;
+var CableLength=0;
+var TimeStamp;
+var index;
+FieldsToCheck = new Array(8);
+FieldsToCheck[ 0] = "ifIndex$repeat";
+FieldsToCheck[ 1] = "rlPhyTestGetType$repeat";
+FieldsToCheck[ 2] = "rlPhyTestGetStatus$repeat";
+FieldsToCheck[ 3] = "rlPhyTestGetResult$repeat";
+FieldsToCheck[ 4] = "rlPhyTestGetUnits$repeat";
+FieldsToCheck[ 5] = "rlPhyTestGetAlarm$repeat";
+FieldsToCheck[ 6] = "rlPhyTestGetTimeStamp$repeat";
+FieldsToCheck[ 7] = "PhyTestGet$endRepeat";
+CableFaultDistance = "";
+function submitQuery()
+{
+var selectName = document.generalHealthCopperForm.elements["rlPhdPortsIfIndex$select"];
+var newFilter="general_health_copper.htm?[PhyTestSet]Query:ifIndex=";
+newFilter+=selectName.options[selectName.selectedIndex].value;
+newFilter+="[PhyTestGet]Filter:ifIndex=";
+newFilter+=selectName.options[selectName.selectedIndex].value;
+newFilter+="[ifTableVT]Query:ifIndex=";
+newFilter+=selectName.options[selectName.selectedIndex].value;
+filterString=newFilter;
+document.location.href=filterString;
+}
+function GetItem(ind){
+var type = document.generalHealthCopperForm.elements["rlPhyTestGetType$repeat?"+ind].value;
+var value = document.generalHealthCopperForm.elements["rlPhyTestGetResult$repeat?"+ind].value;
+var GetStatus = document.generalHealthCopperForm.elements["rlPhyTestGetStatus$repeat?"+ind].value;
+var typeStatus = "2";
+index=ind;
+switch(type) {
+case typeStatus:
+switch(GetStatus) {
+case "1":
+TestResult = 7;
+break;
+case "2":
+TestResult = value;
+TimeStamp = document.generalHealthCopperForm.elements["rlPhyTestGetTimeStamp$repeat?"+ind].value;
+break;
+case "4":
+TestResult = 8;
+break;
+default:
+TimeStamp = "";
+break;
+}
+break;
+case "3":
+CableFaultDistance = value;
+break;
+case "4":
+CableLength = value;
+TimeStamp = document.generalHealthCopperForm.elements["rlPhyTestGetTimeStamp$repeat?"+ind].value;
+break;
+default:
+}
+}
+function DisplayTestResult()
+{
+var TestResultText = "";
+switch(TestResult)
+{
+case "1":
+TestResultText = "OK";
+break;
+case "2":
+TestResultText = "Two Pair Cable";
+break;
+case "3":
+TestResultText = "No Cable";
+break;
+case "4":
+TestResultText = "Open Cable";
+break;
+case "5":
+TestResultText = "Short Cable";
+break;
+case "7":
+TestResultText = "Not Tested";
+break;
+case "8":
+TestResultText = "Fiber";
+break;
+default:
+TestResultText = "Unknown Test Result";
+break;
+}
+document.write(TestResultText);
+}
+function DisplayCableFaultDistance(){
+document.write(CableFaultDistance);
+}
+function DisplayLastUpdate(){
+document.write(TimeStamp);
+}
+function GetCableLength()
+{
+var formele=document.forms[0].elements;
+var portType = formele["swIfType$query1"].value;
+var portLink = formele["ifOperStatus$query1"].value;
+var flag = false;
+var found = false;
+if ( portType == "3" && portLink != "6")
+{
+for (i=1;formele["ifIndex$repeat?" +i]; i++)
+{
+if((formele["rlPhyTestGetType$repeat?" + i].value == '2') &&
+((formele["rlPhyTestGetResult$repeat?" + i].value == '1') || (formele["rlPhyTestGetResult$repeat?" + i].value == '2')) &&
+(formele["rlPhyTestGetUnits$repeat?" + i].value == '14'))
+{
+flag = true;
+}
+}
+for (i=1;formele["ifIndex$repeat?"+i];i++)
+{
+if((formele["rlPhyTestGetType$repeat?" + i].value == '4') && (formele["rlPhyTestGetStatus$repeat?" + i].value == '2'))
+{
+found = true;
+break;
+}
+else if ((formele["rlPhyTestGetType$repeat?" + i].value == '4') && (formele["rlPhyTestGetStatus$repeat?" + i].value == '3'))
+{
+if (top.numberOfRefreshsCounter>0)
+{
+top.numberOfRefreshsCounter--;
+document.location.reload();
+}
+}
+else if (formele["rlPhyTestGetType$repeat?" + i].value == '4')
+{
+found = true;
+}
+}
+if (flag && !found)
+{
+if (top.numberOfRefreshsCounter>0)
+{
+top.numberOfRefreshsCounter--;
+document.location.reload();
+}
+}
+DisplayCableLength();
+}
+else
+{
+DisplayCableLength();
+}
+}
+function DisplayCableLength(){
+var CableLengthText = "";
+switch(CableLength)
+{
+case "1":
+CableLengthText = "Less than 50m";
+break;
+case "2":
+CableLengthText = "Between 50-80m";
+break;
+case "3":
+CableLengthText = "Between 80-110m";
+break;
+case "4":
+CableLengthText = "Between 110-140m";
+break;
+case "5":
+CableLengthText = "More than 140m";
+break;
+default:
+CableLengthText = "Unknown length";
+}
+document.write(CableLengthText);
+}
+function formSubmit(){
+var formele=document.generalHealthCopperForm.elements;
+formele["rlPhyTestSetType$query"].value = 2;
+disableHtml();
+document.generalHealthCopperForm.submit();
+}
+function indexPort1(){
+var i=0;
+formele=document.generalHealthCopperForm.elements;
+selectName=formele["rlPhdPortsIfIndex$select"];
+while (selectName.options[i]!=null)
+{
+if (formele["ifIndex$repeat?1"])
+{
+if (selectName.options[i].value == formele["ifIndex$repeat?1"].value)
+{
+selectName.selectedIndex=i;
+break;
+}
+i++;
+}
+}
+}
+function indexPort(){
+var i=0;
+formele=document.generalHealthCopperForm.elements;
+selectName=formele["rlPhdPortsIfIndex$select"];
+while (selectName.options[i]!=null)
+{
+if (selectName.options[i].value == formele["ifIndex$query"].value)
+{
+selectName.selectedIndex=i;
+break;
+}
+i++;
+}
+}
+function disableHtml(){
+var formele=document.generalHealthCopperForm.elements;
+formele["rlPhdPortsIfIndex$select"].disabled = true;
+}
+function DrawCloseDiv(){
+document.write("</div>");
+}
+function DrawOpenDiv(){
+document.write("<div id=loading align=center style='position:absolute; top:150; left:100; '>");
+document.write("</div>");
+document.write("<div id=site style='display:none;'>");
+}
+function re()
+{
+document.getElementById("loading").style.display = "none";
+document.getElementById("site").style.display = "";
+top.numberOfRefreshsCounter = top.numberOfRefreshsValue;
+}
+function hidePage()
+{
+document.getElementById("loading").style.display = "";
+document.getElementById("site").style.display = "none";
+}
+// --End of Java code -->
+</script>
+</head>
+<body bgcolor="#FFFFFF" leftmargin="15" onload="setScreenMonitorState();re();">
+<script language="JavaScript">top.Draw_Header(document.title);</script>
+<div align="right"><table id="general_health_copper_buttons_tbl" cellspacing="0" cellpadding="0" border="0">
+<tr>
+<td nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/lbutton.gif"></td>
+<td nowrap valign="middle" align="center" class="data-area-button"><a href="javascript:void(0)" onclick="javascript:window.open('vct_table.htm?[PhDPorts]Filter:((rlPhdPortsModuleNumber=1)&&(rlPhdPortsMediaType=1||rlPhdPortsMediaType=3)&&(swIfTransceiverType!=2))[PhyTestGet]Filter:(rlPhdPortsModuleNumber=1)','', 'width=850, height=600, left=50, top=50, scrollbars=yes, resizable=yes');"
+title='Show VCT Results'>Show All</a></td>
+<td nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/rbutton.gif"></td>
+<td nowrap style="width: 14px; height: 25px"></td>
+</tr>
+</table>
+</div>
+<br>
+
+<FORM METHOD='POST'  ACTION="/config/general_health_copper.htm" name="generalHealthCopperForm"   >
+<INPUT  Type="HIDDEN" Name="restoreUrl" ID="restoreUrl" SIZE=256   value="[PhyTestSet]Query:ifIndex=1[PhyTestGet]Filter:ifIndex=1[ifTableVT]Query:ifIndex=1">
+<INPUT  TYPE="HIDDEN" NAME="errorCollector" ID="errorCollector"   value="" SIZE="20" MAXLENGTH="20">
+<script>DrawOpenDiv();</script>
+<INPUT  Type=HIDDEN Name=ifTableVT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=ifTable$VT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=ifIndex$VT SIZE=128   value="Type=0;Access=1;NumOfEnumerations=0;Range0=[1,2147483647]">
+<INPUT  Type=HIDDEN Name=ifOperStatus$VT SIZE=128   value="Type=0;Access=1;NumOfEnumerations=7;Range0=[1,7]">
+<INPUT  Type=HIDDEN Name="swIfIndex=ifIndex$VT" size=128   value="Type=0;Access=1;NumOfEnumerations=0;Range0=[-2147483648,2147483647]">
+<INPUT  Type=HIDDEN Name=swIfType$VT SIZE=128   value="Type=0;Access=1;NumOfEnumerations=5;Range0=[1,5]">
+<INPUT  Type=HIDDEN Name=ifTableVT$endVT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=ifTableVT$query1 id="ifTableVT$query1"   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=ifIndex$query1 disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=swIfType$query1 disabled   value="3" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=ifOperStatus$query1 disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=ifTableVT$endQuery1 ID="ifTableVT$endQuery1"   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=PhyTestGet   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rlPhyTestGetTable$VT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=ifIndex$VT SIZE=128   value="Type=0;Access=1;NumOfEnumerations=0;Range0=[1,2147483647]">
+<INPUT  Type=HIDDEN Name=rlPhyTestGetType$VT SIZE=128   value="Type=0;Access=1;NumOfEnumerations=24;Range0=[1,24]">
+<INPUT  Type=HIDDEN Name=rlPhyTestGetStatus$VT SIZE=128   value="Type=0;Access=1;NumOfEnumerations=7;Range0=[1,7]">
+<INPUT  Type=HIDDEN Name=rlPhyTestGetResult$VT SIZE=128   value="Type=0;Access=1;NumOfEnumerations=0;Range0=[-2147483648,2147483647]">
+<INPUT  Type=HIDDEN Name=rlPhyTestGetUnits$VT SIZE=128   value="Type=0;Access=1;NumOfEnumerations=19;Range0=[1,19]">
+<INPUT  Type=HIDDEN Name=rlPhyTestGetAlarm$VT SIZE=128   value="Type=0;Access=1;NumOfEnumerations=6;Range0=[1,6]">
+<INPUT  Type=HIDDEN Name=rlPhyTestGetTimeStamp$VT SIZE=128   value="Type=100;Access=1;NumOfEnumerations=0;Range0=[1,32]">
+<INPUT  Type=HIDDEN Name=PhyTestGet$endVT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=PhyTestSet   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rlPhyTestSetTable$VT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=ifIndex$VT SIZE=128   value="Type=0;Access=1;NumOfEnumerations=0;Range0=[1,2147483647]">
+<INPUT  Type=HIDDEN Name=rlPhyTestSetType$VT SIZE=128   value="Type=0;Access=2;NumOfEnumerations=24;Range0=[1,24]">
+<INPUT  Type=HIDDEN Name=PhyTestSet$endVT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=PhyTestSet$query id="PhyTestSet$query"   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=ifIndex$query   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestSetType$query   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=PhyTestSet$endQuery id="PhyTestSet$endQuery"   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=PhyTestGet$curr id="PhyTestGet$curr"   value="OK" SIZE="20" MAXLENGTH="20">
+
+<table id="general_health_copper_tbl" border="0" cellspacing="0" cellpadding="0" width="100%">
+<script language="JavaScript">
+top.Draw_TableTop(2);top.Draw_TableHeader();
+</script>
+<tr>
+<td nowrap style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd" width="40%">Port</td>
+<td nowrap class="data-area-canvas-odd">
+<select name="rlPhdPortsIfIndex$select" onChange="submitQuery()" class="monitorEnabled" ID="Select1">
+<option></option>
+</select>
+<script language="JavaScript">
+addPresentPortsSelectionList(document.generalHealthCopperForm,'rlPhdPortsIfIndex$select','','n');
+</script>
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+
+
+<INPUT  TYPE=HIDDEN NAME=ifIndex$repeat?1 disabled    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetType$repeat?1 disabled    value="4" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetStatus$repeat?1 disabled    value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetResult$repeat?1 disabled    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetUnits$repeat?1 disabled    value="13" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetAlarm$repeat?1 disabled    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetTimeStamp$repeat?1 disabled  size=40   value="01-Jan-2000&nbsp;02:31:02&nbsp;">
+<script>GetItem(1);</script>
+<INPUT  type=hidden Name=PhyTestGet$endRepeat?1 disabled id="PhyTestGet$endRepeat"    value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=ifIndex$repeat?2 disabled    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetType$repeat?2 disabled    value="13" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetStatus$repeat?2 disabled    value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetResult$repeat?2 disabled    value="0" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetUnits$repeat?2 disabled    value="18" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetAlarm$repeat?2 disabled    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetTimeStamp$repeat?2 disabled  size=40   value="01-Jan-2000&nbsp;02:31:02&nbsp;">
+<script>GetItem(2);</script>
+<INPUT  type=hidden Name=PhyTestGet$endRepeat?2 disabled id="PhyTestGet$endRepeat"    value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=ifIndex$repeat?3 disabled    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetType$repeat?3 disabled    value="14" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetStatus$repeat?3 disabled    value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetResult$repeat?3 disabled    value="0" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetUnits$repeat?3 disabled    value="18" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetAlarm$repeat?3 disabled    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetTimeStamp$repeat?3 disabled  size=40   value="01-Jan-2000&nbsp;02:31:02&nbsp;">
+<script>GetItem(3);</script>
+<INPUT  type=hidden Name=PhyTestGet$endRepeat?3 disabled id="PhyTestGet$endRepeat"    value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=ifIndex$repeat?4 disabled    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetType$repeat?4 disabled    value="15" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetStatus$repeat?4 disabled    value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetResult$repeat?4 disabled    value="0" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetUnits$repeat?4 disabled    value="18" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetAlarm$repeat?4 disabled    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetTimeStamp$repeat?4 disabled  size=40   value="01-Jan-2000&nbsp;02:31:02&nbsp;">
+<script>GetItem(4);</script>
+<INPUT  type=hidden Name=PhyTestGet$endRepeat?4 disabled id="PhyTestGet$endRepeat"    value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=ifIndex$repeat?5 disabled    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetType$repeat?5 disabled    value="16" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetStatus$repeat?5 disabled    value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetResult$repeat?5 disabled    value="0" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetUnits$repeat?5 disabled    value="18" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetAlarm$repeat?5 disabled    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetTimeStamp$repeat?5 disabled  size=40   value="01-Jan-2000&nbsp;02:31:02&nbsp;">
+<script>GetItem(5);</script>
+<INPUT  type=hidden Name=PhyTestGet$endRepeat?5 disabled id="PhyTestGet$endRepeat"    value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=ifIndex$repeat?6 disabled    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetType$repeat?6 disabled    value="17" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetStatus$repeat?6 disabled    value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetResult$repeat?6 disabled    value="0" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetUnits$repeat?6 disabled    value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetAlarm$repeat?6 disabled    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetTimeStamp$repeat?6 disabled  size=40   value="01-Jan-2000&nbsp;02:31:02&nbsp;">
+<script>GetItem(6);</script>
+<INPUT  type=hidden Name=PhyTestGet$endRepeat?6 disabled id="PhyTestGet$endRepeat"    value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=ifIndex$repeat?7 disabled    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetType$repeat?7 disabled    value="18" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetStatus$repeat?7 disabled    value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetResult$repeat?7 disabled    value="0" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetUnits$repeat?7 disabled    value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetAlarm$repeat?7 disabled    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetTimeStamp$repeat?7 disabled  size=40   value="01-Jan-2000&nbsp;02:31:02&nbsp;">
+<script>GetItem(7);</script>
+<INPUT  type=hidden Name=PhyTestGet$endRepeat?7 disabled id="PhyTestGet$endRepeat"    value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=ifIndex$repeat?8 disabled    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetType$repeat?8 disabled    value="19" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetStatus$repeat?8 disabled    value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetResult$repeat?8 disabled    value="0" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetUnits$repeat?8 disabled    value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetAlarm$repeat?8 disabled    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetTimeStamp$repeat?8 disabled  size=40   value="01-Jan-2000&nbsp;02:31:02&nbsp;">
+<script>GetItem(8);</script>
+<INPUT  type=hidden Name=PhyTestGet$endRepeat?8 disabled id="PhyTestGet$endRepeat"    value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=ifIndex$repeat?9 disabled    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetType$repeat?9 disabled    value="20" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetStatus$repeat?9 disabled    value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetResult$repeat?9 disabled    value="0" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetUnits$repeat?9 disabled    value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetAlarm$repeat?9 disabled    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetTimeStamp$repeat?9 disabled  size=40   value="01-Jan-2000&nbsp;02:31:02&nbsp;">
+<script>GetItem(9);</script>
+<INPUT  type=hidden Name=PhyTestGet$endRepeat?9 disabled id="PhyTestGet$endRepeat"    value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=ifIndex$repeat?10 disabled    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetType$repeat?10 disabled    value="21" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetStatus$repeat?10 disabled    value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetResult$repeat?10 disabled    value="0" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetUnits$repeat?10 disabled    value="19" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetAlarm$repeat?10 disabled    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetTimeStamp$repeat?10 disabled  size=40   value="01-Jan-2000&nbsp;02:31:02&nbsp;">
+<script>GetItem(10);</script>
+<INPUT  type=hidden Name=PhyTestGet$endRepeat?10 disabled id="PhyTestGet$endRepeat"    value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=ifIndex$repeat?11 disabled    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetType$repeat?11 disabled    value="22" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetStatus$repeat?11 disabled    value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetResult$repeat?11 disabled    value="0" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetUnits$repeat?11 disabled    value="19" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetAlarm$repeat?11 disabled    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetTimeStamp$repeat?11 disabled  size=40   value="01-Jan-2000&nbsp;02:31:03&nbsp;">
+<script>GetItem(11);</script>
+<INPUT  type=hidden Name=PhyTestGet$endRepeat?11 disabled id="PhyTestGet$endRepeat"    value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=ifIndex$repeat?12 disabled    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetType$repeat?12 disabled    value="23" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetStatus$repeat?12 disabled    value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetResult$repeat?12 disabled    value="0" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetUnits$repeat?12 disabled    value="19" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetAlarm$repeat?12 disabled    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetTimeStamp$repeat?12 disabled  size=40   value="01-Jan-2000&nbsp;02:31:03&nbsp;">
+<script>GetItem(12);</script>
+<INPUT  type=hidden Name=PhyTestGet$endRepeat?12 disabled id="PhyTestGet$endRepeat"    value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=ifIndex$repeat?13 disabled    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetType$repeat?13 disabled    value="24" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetStatus$repeat?13 disabled    value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetResult$repeat?13 disabled    value="8" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetUnits$repeat?13 disabled    value="19" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetAlarm$repeat?13 disabled    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlPhyTestGetTimeStamp$repeat?13 disabled  size=40   value="01-Jan-2000&nbsp;02:31:03&nbsp;">
+<script>GetItem(13);</script>
+<INPUT  type=hidden Name=PhyTestGet$endRepeat?13 disabled id="PhyTestGet$endRepeat"    value="OK" SIZE="20" MAXLENGTH="20">
+
+
+<tr>
+<td nowrap style="width: 10px;height:24px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas">Test Result</td>
+<td nowrap class="data-area-canvas">
+<script language="JavaScript">
+indexPort();
+DisplayTestResult();
+</script>
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="width: 10px;height:24px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd">Cable Fault Distance</td>
+<td nowrap class="data-area-canvas-odd">&nbsp;
+<script language="JavaScript">
+DisplayCableFaultDistance();
+</script>
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="width: 10px; height:25px" valign="bottom" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas">Last Update</td>
+<td nowrap class="data-area-canvas">&nbsp;
+<script language="JavaScript">
+DisplayLastUpdate();
+</script>
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<script language="JavaScript">top.Draw_TableBottom(2)</script>
+</table>
+<br>
+<div align="center" class="management-only"><table id="general_health_copper_test_tbl" cellspacing="0" cellpadding="0" border="0">
+<tr>
+<td nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/lbutton.gif"></td>
+<td nowrap valign="middle" align="center" class="data-area-button"><a href="javascript:formSubmit();">Test
+Now</a></td>
+<td nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/rbutton.gif"></td>
+</tr>
+</table>
+</div>
+<br>
+<table id="general_health_copper_length_tbl" border="0" cellspacing="0" cellpadding="0"
+width="100%">
+<script language="JavaScript">
+top.Draw_TableTop(2);top.Draw_TableHeader();
+</script>
+<tr>
+<td nowrap style="width: 10px;height:24px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd" width="40%">Approximate Cable Length</td>
+<td nowrap class="data-area-canvas-odd">
+<script language="JavaScript">
+GetCableLength();
+</script>
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<script language="JavaScript">top.Draw_TableBottom(2)</script>
+</table>
+<br>
+
+<script>DrawCloseDiv();</script>
+</form>
+</body>
+</html>

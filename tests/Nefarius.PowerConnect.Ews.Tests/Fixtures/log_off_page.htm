@@ -1,0 +1,179 @@
+
+
+<html>
+
+<head>
+<title>Authentication Page</title>
+<link rel="stylesheet" href="../device/style.css" type="text/css">
+<script language="JavaScript">
+<!-- Beginng of JavaScript Applet
+if ((top.location==self.location)&&(!opener))
+top.location.href="../config/authentication_page.htm";
+visible = false;
+function formSubmit()
+{
+document.forms[0].submit();
+}
+function setVisibility()
+{
+if (((top.main)&&(top.main.location==document.location))||(opener))
+{
+DivLocation = document.getElementsByTagName('div')[0];
+DivLocation.style.visibility = "visible";
+visible = true;
+}
+}
+function checkURL()
+{
+if ((!opener)&&((top.tree)||(top.main && top.main.location!=document.location)))
+top.location.href="../home.htm";
+try
+{
+if ((!top.main)&&(opener))
+{
+alert('Parent Window is missing window will be closed.')
+window.close();
+}
+}
+catch(e)
+{
+}
+try
+{
+if (opener.top.main)
+{
+window.close();
+}
+}
+catch(e)
+{
+}
+try
+{
+if ((!top.main)&&(!opener))
+{
+window.close();
+}
+}
+catch(e)
+{
+}
+urlStr=document.location.href;
+targetStr="";
+j=0;
+bVal=false;
+for (i=0;i<urlStr.length;i++)
+{
+if ((urlStr.charAt(i)=='U')&&(urlStr.charAt(i+1)=='S')&&(urlStr.charAt(i+2)=='/'))
+{
+bVal=true;
+i+=3;
+while (urlStr.charAt(i)!='/')
+i++;
+}
+else
+targetStr+=urlStr.charAt(i);
+}
+if (bVal)
+document.location.href= targetStr;
+}
+function move(e)
+{
+whKey = e.keyCode;
+if(whKey=='13')
+{
+document.logOffForm.password$query.focus();
+}
+}
+function onEnterSub(e)
+{
+whKey = e.keyCode;
+if(whKey=='13')
+{
+formSubmit();
+}
+}
+// --End of Java code -->
+</script>
+</head>
+<body bgcolor="#FFFFFF" leftmargin="15" onLoad="setVisibility();checkURL();if (visible)document.logOffForm.userName$query.focus();">
+<div id="displayForm" style="visibility:hidden">
+<script>
+document.writeln('<table id="home_drawHeader_tbl" cellspacing="0" cellpadding="0" border="0">');
+document.writeln('<br><tr><td><span id="pagetitle" class="data-area-page-title">Log In</span></td><td style="width: 15px"></td></tr>');
+document.writeln('<tr><td>&nbsp;</td></tr>');
+document.writeln('<tr><td>&nbsp;</td></tr>');
+document.writeln('<tr><td>If a screen does not appear, please refresh.</td></tr>');
+document.writeln('</table>');
+</script>
+
+<FORM METHOD='POST' name="logOffForm"  ACTION="/config/log_off_page.htm" target="_top"  >
+<INPUT  TYPE="HIDDEN" Name="restoreUrl"   value="" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE="HIDDEN" NAME="errorCollector"   value="" SIZE="20" MAXLENGTH="20">
+<BR>
+<BR>
+<div align="center">
+<table id="add_user_name_tbl" border="0" cellspacing="0" cellpadding="0" width="50%" align="center">
+<tr>
+<td valign="bottom"><img style="width: 10px; height: 10px" src="../Images/tl.gif"></td>
+<td colspan="2" width=100% class="data-area-canvas"><font style="font-size: 8px">&nbsp;</font></td>
+<td valign="bottom"><img style="width: 10px; height: 10px" src="../Images/tr.gif"></td>
+<td style="width: 5px"></td>
+</tr>
+<tr>
+<td nowrap style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas" colspan="2"><b>&nbsp;Type in Username and Password, then click OK</b></td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="height: 1px; width: 10px" class="data-area-canvas"></td>
+<td nowrap colspan="2" style="height: 1px" class="data-area-separator"></td>
+<td nowrap style="height: 1px" class="data-area-canvas"></td>
+<td nowrap style="height: 1px; width: 5px"></td>
+</tr>
+<tr>
+<td nowrap style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd">&nbsp;Username</td>
+<td nowrap class="data-area-canvas-odd">
+
+<INPUT  TYPE=text NAME=userName$query SIZE=20 MAXLENGTH=20 onkeypress="move(event)"   value="">
+
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 10px">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas">&nbsp;Password</td>
+<td nowrap class="data-area-canvas">
+
+<INPUT  TYPE=password NAME=password$query MAXLENGTH=160 onkeypress="onEnterSub(event)"   value="">
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 10px">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas" colspan="2">&nbsp;</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 10px">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap><img width="10px" height="10px" src="../Images/bl.gif"></td>
+<td nowrap colspan="2" width=100% class="data-area-canvas"><font style="font-size: 8px">&nbsp;</font></td>
+<td nowrap><img width="10px" height="10px" src="../Images/br.gif"></td>
+<td nowrap style="width: 5px"></td>
+</tr>
+</table></div>
+<br>
+<div align="center"><table id="add_user_name_apply_tbl" cellspacing="0" cellpadding="0" border="0"><tr>
+<td nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/lbutton.gif"></td>
+<td nowrap valign="middle" align="center" class="data-area-button"><a href="javascript:formSubmit();">OK</a></td>
+<td nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/rbutton.gif"></td>
+</tr></table></div>
+<br>
+</form>
+</div>
+</body>
+</html>

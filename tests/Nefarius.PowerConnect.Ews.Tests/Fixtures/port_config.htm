@@ -1,0 +1,1191 @@
+
+
+<html>
+<head>
+<title>Port Configuration</title>
+
+<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
+<!--
+if(top.location==self.location )
+{
+var refStr=self.location + " ";
+var ind=0;
+refStr.toLowerCase();
+ind=refStr.indexOf("config");
+var locationStr=refStr.substring(0,ind);
+if (opener)
+{
+if (opener.opener)
+{
+if(opener.opener.top.location==opener.opener.location)
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+else
+{
+if(opener.top.location==opener.location)
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+}
+else
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+//-->
+</SCRIPT>
+
+
+<link rel="stylesheet" href="../device/style.css" type="text/css">
+<script src="../js/globalFunctions.js"></script>
+<script language="JavaScript">
+<!-- Beginng of JavaScript Applet
+if(top.MonitorMode) {
+document.write("<link rel='stylesheet' href='../device/monitorMode.css' type='text/css'>")
+}
+var ArrayOfPorts= new Array(top.NumberOfPorts);
+var trunkIndex=0;
+var portIndex=0;
+var vlanCounter = 0;
+var IpCounter = 0;
+var linkUpCounter=1;
+var linkUpArray = new Array();
+FieldsToCheck = new Array(2);
+FieldsToCheck[0] = new Array(19);
+FieldsToCheck[0][0] = "swIfOperMdix$query";
+FieldsToCheck[0][1] = "ifAdminStatus$query";
+FieldsToCheck[0][2] = "ifOperStatus$query";
+FieldsToCheck[0][3] = "swIfSpeedAdminMode$query";
+FieldsToCheck[0][4] = "ifSpeed$query";
+FieldsToCheck[0][5] = "swIfDuplexAdminMode$query";
+FieldsToCheck[0][6] = "swIfDuplexOperMode$query";
+FieldsToCheck[0][7] = "swIfSpeedDuplexAutoNegotiation$query";
+FieldsToCheck[0][8] = "swIfBackPressureMode$query";
+FieldsToCheck[0][9] = "swIfFlowControlMode$query";
+FieldsToCheck[0][10] = "swIfAdminMdix$query";
+FieldsToCheck[0][11] ="swIfType$query";
+FieldsToCheck[0][12] ="swIfOperSpeedDuplexAutoNegotiation$query";
+FieldsToCheck[0][13] ="swIfOperBackPressureMode$query";
+FieldsToCheck[0][14] ="swIfOperFlowControlMode$query";
+FieldsToCheck[0][15] ="ifAlias$query";
+FieldsToCheck[0][16] ="swIfOperSuspendedStatus$query";
+FieldsToCheck[0][17] ="swIfTransceiverType$query";
+FieldsToCheck[0][18] ="rlPhdPortsModuleNumber$query";
+FieldsToCheck[1] = new Array(0);
+var grahamProj="GRAHAM";
+var fonsecaProj="FONSECA";
+var otherProj="OTHER";
+var projName="";
+var interfaceIndex;
+function setPort(){
+var Query = window.location.search.split("=");
+interfaceIndex = parseInt(Query[1], 10);
+formele["ifIndex$select"].value = interfaceIndex;
+}
+function setReactivate()
+{
+var formele=document.PortConfigForm.elements;
+if (portIndex>=(parseInt(top.oobFirstIndex)) && portIndex<(parseInt(top.oobFirstIndex)+parseInt(top.oobNumOfPorts)))
+{
+formele["swIfReActivateCB"].checked=false;
+formele["swIfReActivateCB"].disabled=true;
+}
+else
+{
+if (formele["swIfReActivate$query"].value==1)
+formele["swIfReActivateCB"].checked=true;
+else
+formele["swIfReActivateCB"].checked=false;
+}
+}
+function formSubmit()
+{
+var formele=document.PortConfigForm.elements;
+top.PortConfigRefFlag=false;
+checkAdvertiseChckForAllUncheck();
+if (formele["swIfReActivateCB"].checked==true)
+formele["swIfReActivate$query"].value="1";
+else formele["swIfReActivate$query"].value="2";
+if (formele["swIfSpeedDuplexAutoNegotiation$query"].value==2)
+{
+formele["swIfSpeedAdminMode$query"].value=Math.pow(10,(formele["swIfSpeedAdminMode$select"].selectedIndex+1))*1000000;
+formele["swIfDuplexAdminMode$query"].value=formele["swIfDuplexAdminMode$select"].options[formele["swIfDuplexAdminMode$select"].selectedIndex].value;
+}
+formele["ifOperStatus$query"].disabled=true;
+formele["ifSpeed$query"].disabled=true;
+formele["swIfDuplexOperMode$query"].disabled=true;
+formele["swIfReActivateCB"].disabled=true;
+disableHtml();
+disableUnchangeFields(formele,FieldsToCheck,"query");
+document.PortConfigForm.submit();
+}
+function translateSpeedAdmin()
+{
+switch (document.forms[0].elements["swIfSpeedAdminMode$query"].value)
+{
+case "0":
+document.forms[0].elements["swIfSpeedAdminMode$select"].selectedIndex=0;
+break;
+case "10000000":
+document.forms[0].elements["swIfSpeedAdminMode$select"].selectedIndex=0;
+break;
+case "100000000":
+document.forms[0].elements["swIfSpeedAdminMode$select"].selectedIndex=1;
+break;
+case "1000000000":
+document.PortConfigForm.elements["swIfSpeedAdminMode$select"].selectedIndex=2;
+break;
+default: break;
+}
+}
+function displayOperSpeed()
+{
+if (document.PortConfigForm.elements["ifOperStatus$query"].value!=2)
+{
+if (document.PortConfigForm.elements["ifSpeed$query"].value==10000000)
+document.write("10M")
+else if (document.PortConfigForm.elements["ifSpeed$query"].value==100000000)
+document.write("100M")
+else if (document.PortConfigForm.elements["ifSpeed$query"].value==1000000000)
+document.write("1000M")
+else document.write("Unknown");
+}
+}
+function displayOperMode()
+{
+var formele=document.PortConfigForm.elements;
+if (formele["ifOperStatus$query"].value!=2)
+{
+if (formele["swIfDuplexOperMode$query"].value==1)
+document.write("Half")
+else if (formele["swIfDuplexOperMode$query"].value==2)
+document.write("Full");
+}
+}
+function displayOperStatus(){
+formele=document.PortConfigForm.elements;
+if (formele["ifOperStatus$query"].value==1)
+document.write("Up")
+else if (formele["ifOperStatus$query"].value==2)
+document.write("Down");
+}
+function displayOperSuspendedStatus()
+{
+formele=document.PortConfigForm.elements;
+if (formele["swIfOperSuspendedStatus$query"].value=="1")
+{
+document.write("Suspended")
+}
+else
+{
+document.write("Active");
+}
+}
+function displayOperFlowCtrl()
+{
+var formele=document.PortConfigForm.elements;
+if (!(portIndex>=(parseInt(top.oobFirstIndex)) && portIndex<(parseInt(top.oobFirstIndex)+parseInt(top.oobNumOfPorts))))
+{
+if (formele["ifOperStatus$query"].value!=2)
+{
+if (formele["swIfOperFlowControlMode$query"].value=="1")
+document.write("Enable");
+else if (formele["swIfOperFlowControlMode$query"].value=="2")
+document.write("Disable");
+else if (formele["swIfOperFlowControlMode$query"].value=="3")
+document.write("Rx Only");
+else if (formele["swIfOperFlowControlMode$query"].value=="4")
+document.write("Tx Only");
+}
+}
+}
+function displayOperMDIX()
+{
+var formele=document.PortConfigForm.elements;
+if (!(portIndex>=(parseInt(top.oobFirstIndex)) && portIndex<(parseInt(top.oobFirstIndex)+parseInt(top.oobNumOfPorts))))
+{
+if (formele["ifOperStatus$query"].value!=2)
+{
+if (formele["swIfOperMdix$query"].value=="1")
+document.write("MDIX");
+else if (formele["swIfOperMdix$query"].value=="2")
+document.write("MDI");
+else if (formele["swIfOperMdix$query"].value=="3")
+document.write("Auto");
+}
+}
+}
+function displayAdminAdvertisement() {
+var i;
+var flags = document.getElementsByName("adminAdvertisementFlags");
+for(i=0; i<flags.length; i++) {
+flags[i].checked = false;
+}
+var transceiverType = document.PortConfigForm.elements["swIfTransceiverType$query"].value;
+var flagsCtrl = document.PortConfigForm.elements["swIfAdminSpeedDuplexAutoNegotiationLocalCapabilities$query"];
+if(transceiverType == "2" || flagsCtrl == null) {
+disableAdvertiseCheckboxes(true);
+return;
+}
+var flagsString = flagsCtrl.value;
+if(flagsString.charAt(0) == "1") {
+disableAdvertiseCheckboxes(true);
+if (document.PortConfigForm.elements["swIfSpeedDuplexAutoNegotiation$query"].value=="1")
+{
+flags[0].disabled = false;
+}
+flags[0].checked = true;
+return;
+}
+for (i=2; i<6; i++) {
+if(flagsString.charAt(i) == "1") {
+flags[i-1].checked = true;
+}
+}
+if(flagsString.charAt(7) == "1") {
+flags[5].checked = true;
+}
+disableAdvertiseCheckboxes(document.PortConfigForm.elements["swIfSpeedDuplexAutoNegotiation$query"].value=="2");
+handleFlowControlAndBackPressure();
+}
+function changeAdminAdvertisement() {
+var flags = document.getElementsByName("adminAdvertisementFlags");
+var bitset = new Array ("0", "0", "0", "0", "0", "0", "0", "0");
+var i;
+if(flags[0].checked) {
+disableAdvertiseCheckboxes(true);
+flags[0].disabled = false;
+bitset[0] = "1";
+for (i=1; i<6; i++) {
+flags[i].checked = false;
+}
+} else {
+disableAdvertiseCheckboxes(false);
+for (i=2; i<6; i++) {
+if(flags[i-1].checked) {
+bitset[i] = "1";
+}
+}
+if(flags[5].checked) {
+bitset[7] = "1";
+}
+}
+var str = "";
+for (i=0; i<8; i++) {
+str += bitset[i];
+}
+document.PortConfigForm.elements["swIfAdminSpeedDuplexAutoNegotiationLocalCapabilities$query"].value = str;
+handleFlowControlAndBackPressure();
+}
+function disableAdvertiseCheckboxes (disable) {
+var flags = document.getElementsByName("adminAdvertisementFlags");
+for(i=0; i<flags.length; i++) {
+flags[i].disabled = disable;
+}
+}
+function checkAdvertiseChckForAllUncheck() {
+var flags = document.getElementsByName("adminAdvertisementFlags");
+var flag = true;
+for(i=0; i<flags.length; i++) {
+if(flags[i].checked) flag=false;
+}
+if(flag) {
+flags[0].checked = true;
+changeAdminAdvertisement();
+checkNegotiationStatus();
+}
+}
+function handleFlowControlAndBackPressure() {
+var flags = document.getElementsByName("adminAdvertisementFlags");
+var full = false, half = false;
+if (flags[0].checked) { full = true; half = true; }
+if (flags[1].checked) half = true;
+if (flags[2].checked) full = true;
+if (flags[3].checked) half = true;
+if (flags[4].checked) full = true;
+if (flags[5].checked) full = true;
+}
+function writeAdvertisement( name ) {
+var status = document.PortConfigForm.elements["ifOperStatus$query"].value;
+if (status != 1) {
+document.write("Unknown");
+return;
+}
+var flagsString = document.PortConfigForm.elements[name].value;
+if (flagsString == top.queryNA || flagsString == "")
+{
+document.write("Unknown");
+return;
+}
+var output = "";
+if (flagsString.charAt(0) == "1") {
+output = "Max Capability";
+} else if (flagsString.charAt(1) == "1") {
+output = "Unknown";
+} else {
+if (flagsString.charAt(2) == "1")
+output += "10 Half ";
+if (flagsString.charAt(3) == "1")
+output += "10 Full ";
+if (flagsString.charAt(4) == "1")
+output += "100 Half ";
+if (flagsString.charAt(5) == "1")
+output += "100 Full ";
+if (flagsString.charAt(7) == "1")
+output += "1000 Full ";
+}
+document.write(output);
+}
+function disableHtml()
+{
+formele=document.PortConfigForm.elements;
+formele["swIfSpeedAdminMode$select"].disabled = true;
+formele["swIfDuplexAdminMode$select"].disabled = true;
+formele["ifIndex$select"].disabled = true;
+disableFlags(true);
+}
+function disableFlags(disableFlag)
+{
+formele=document.PortConfigForm.elements;
+formele["flag1"].disabled = disableFlag;
+formele["flag2"].disabled = disableFlag;
+formele["flag3"].disabled = disableFlag;
+formele["flag4"].disabled = disableFlag;
+formele["flag5"].disabled = disableFlag;
+formele["flag6"].disabled = disableFlag;
+}
+function checkNegotiationStatus(){
+formele=document.PortConfigForm.elements;
+var isCon=true;
+formele["swIfBackPressureMode$query"].disabled = true;
+if (formele["swIfSpeedDuplexAutoNegotiation$query"].value==1)
+{
+formele["swIfDuplexAdminMode$select"].disabled=true;
+formele["swIfSpeedAdminMode$select"].disabled=true;
+disableFlags(false);
+if ( formele["adminAdvertisementFlags"][0].checked || formele["adminAdvertisementFlags"][1].checked || formele["adminAdvertisementFlags"][3].checked)
+formele["swIfBackPressureMode$query"].disabled = false;
+else
+formele["swIfBackPressureMode$query"].disabled = true;
+if ( formele["adminAdvertisementFlags"][0].checked || formele["adminAdvertisementFlags"][2].checked || formele["adminAdvertisementFlags"][4].checked)
+formele["swIfFlowControlMode$query"].disabled = false;
+else
+formele["swIfFlowControlMode$query"].disabled = true;
+}
+else
+{
+disableFlags(true);
+if ((projName==grahamProj)&&(formele["swIfType$query"].value==2)&&(formele["swIfAdminMdix$query"].value=="3"))
+{
+var msg="Auto MDI/MDIX mode is supported only when Auto-Negotiation is Enabled."
+alert(msg);
+}
+formele["swIfSpeedAdminMode$query"].disabled=false;
+formele["swIfDuplexAdminMode$select"].disabled=false;
+if ( formele["swIfDuplexAdminMode$select"].value == "3")
+{
+formele["swIfBackPressureMode$query"].disabled = true;
+formele["swIfFlowControlMode$query"].disabled = false;
+}
+else
+{
+formele["swIfBackPressureMode$query"].disabled = false;
+formele["swIfFlowControlMode$query"].disabled = true;
+}
+if (formele["swIfSpeedAdminMode$select"].selectedIndex!=2)
+{
+formele["swIfDuplexAdminMode$select"].disabled=false;
+formele["swIfFlowControlMode$query"].disabled = false;
+}
+else formele["swIfDuplexAdminMode$select"].disabled=true;
+formele["swIfSpeedAdminMode$select"].disabled=false;
+}
+}
+function mdixSelect()
+{
+var formele=document.PortConfigForm.elements;
+if ((formele["swIfAdminMdix$query"].selectedIndex==2)&&(formele["swIfSpeedDuplexAutoNegotiation$query"].value==2)&&
+(projName==grahamProj)&&(formele["swIfType$query"].value==2))
+{
+var msg="Auto MDI/MDIX mode is supported only when Auto-Negotiation is Enabled."
+alert(msg);
+}
+}
+function displayOperAutoNeg()
+{
+var formele=document.PortConfigForm.elements;
+if (formele["ifOperStatus$query"].value!=2)
+{
+if (formele["swIfOperSpeedDuplexAutoNegotiation$query"].value==1)
+document.write("Enable")
+else if (formele["swIfOperSpeedDuplexAutoNegotiation$query"].value==2)
+document.write("Disable");
+}
+}
+function displayOperBackPressure()
+{
+var formele=document.PortConfigForm.elements;
+if (!(portIndex>=(parseInt(top.oobFirstIndex)) && portIndex<(parseInt(top.oobFirstIndex)+parseInt(top.oobNumOfPorts))))
+{
+if (formele["ifOperStatus$query"].value!=2)
+{
+if (formele["swIfOperBackPressureMode$query"].value==1)
+document.write("Enable")
+else if (formele["swIfOperBackPressureMode$query"].value==2)
+document.write("Disable");
+}
+}
+}
+function findPortinTrunkArray()
+{
+formele = document.PortConfigForm.elements;
+var trunk = formele["dot3adAggPortActorAdminKey$query"].value;
+if (trunk == '0' || trunk == "")
+trunk = "";
+else
+trunk = parseInt(trunk) - top.trunkFirstIndex + 1;
+return trunk;
+}
+function selectQuery(){
+var selectName=document.PortConfigForm.elements["ifIndex$select"];
+var newFilter="port_config.htm?[PortConfigTable]Query:ifIndex=";
+newFilter+=(selectName.options[selectName.selectedIndex].text);
+document.location.href=newFilter;
+}
+function displayType()
+{
+var formele=document.PortConfigForm.elements;
+var typeStr="";
+switch (formele["swIfType$query"].value)
+{
+case "1":
+typeStr="10M";
+break;
+case "2":
+typeStr="100M";
+break;
+case "3":
+typeStr="1000M";
+break;
+case "4":
+typeStr="10G";
+break;
+case "5":
+typeStr="Unknown";
+break;
+}
+if (typeStr!="Unknown")
+{
+switch (formele["swIfTransceiverType$query"].value)
+{
+case "1":
+typeStr+="-copper";
+break;
+case "2":
+typeStr+="-FiberOptics";
+break;
+case "3":
+typeStr+="-ComboC";
+break;
+case "4":
+typeStr+="-ComboF";
+break;
+}
+}
+document.write(typeStr);
+}
+function selectIfSpeedAdminMode()
+{
+var formele=document.PortConfigForm.elements;
+if (!(portIndex>=(parseInt(top.oobFirstIndex)) && portIndex<(parseInt(top.oobFirstIndex)+parseInt(top.oobNumOfPorts))))
+{
+if (formele["swIfSpeedAdminMode$select"].options[formele["swIfSpeedAdminMode$select"].selectedIndex].value==3)
+{
+document.PortConfigForm.elements["swIfDuplexAdminMode$select"].selectedIndex=1;
+document.PortConfigForm.elements["swIfDuplexAdminMode$select"].disabled=true;
+duplexModeSelect();
+}
+else
+{
+document.PortConfigForm.elements["swIfDuplexAdminMode$select"].disabled=false;
+}
+}
+}
+function duplexModeSelect()
+{
+if (!(portIndex>=(parseInt(top.oobFirstIndex)) && portIndex<(parseInt(top.oobFirstIndex)+parseInt(top.oobNumOfPorts))))
+{
+if (formele["swIfDuplexAdminMode$select"].selectedIndex==0)
+{
+formele["swIfFlowControlMode$query"].disabled=true;
+formele["swIfBackPressureMode$query"].disabled=false;
+}
+else
+{
+formele["swIfFlowControlMode$query"].disabled=false;
+formele["swIfBackPressureMode$query"].disabled=true;
+}
+}
+}
+function openShowAllWindow(){
+if(top.Units==true){
+top.portConfigTableUrl = 'port_config_table.htm?Filter:(((rlPhdPortsModuleNumber='+top.RealModuleNameArr[0]+')&&(ifOperStatus!=6))||(ifIndex>='+(parseInt(top.oobFirstIndex))+'&&ifIndex<'+(parseInt(top.oobFirstIndex)+parseInt(top.oobNumOfPorts))+'))';
+window.open(top.portConfigTableUrl,'', 'width=850, height=600, left=50, top=50, scrollbars=yes, resizable=yes');
+}
+else{
+if (top.NumberOfPorts>12)
+top.portConfigTableUrl = 'port_config_table.htm?partialKey:From-ifIndex=0-Counter-12';
+else
+top.portConfigTableUrl = 'port_config_table.htm?partialKey:From-ifIndex=0-Counter-' + top.NumberOfPorts;
+window.open(top.portConfigTableUrl,'', 'width=850, height=600, left=50, top=50, scrollbars=yes, resizable=yes');
+}
+}
+function checkHref()
+{
+var formele=document.PortConfigForm.elements;
+var currentURL=formele["restoreUrl"].value;
+if (currentURL.indexOf("Query:")!=-1){
+return true;
+}
+else{
+return false;
+}
+}
+function checkFirstFilter()
+{
+var formele=document.PortConfigForm.elements;
+if (!checkHref())
+{
+var queryString="port_config.htm?[PortConfigTable]Query:ifIndex="+formele["ifIndex$select"].options[formele["ifIndex$select"].selectedIndex].value;
+document.location.href=queryString;
+return true;
+}
+return false;
+}
+function refreshPage()
+{
+clearTimeout();
+refresh();
+}
+function checkRefreshPage()
+{
+if (top.portConfigRefFlag)
+{
+top.portConfigRefFlag=true;
+setTimeout('refreshPage()',4000);
+}
+document.body.style.display="block";
+}
+function validatePVE(sender){
+var bitIndex = parseInt(selectedPort[1])-1;
+var Vlan1 = 100000;
+var InterfaceIPIndex = parseInt(selectedPort[1]);
+var isVlanMember = false;
+var isHaveIP = false;
+for(var z=1;z<=vlanCounter;z++){
+var bitString = octetToBitsAsChars(formele["dot1qVlanCurrentEgressPorts$repeat?"+z].value);
+if (bitString.charAt(bitIndex) == "1"){
+var VlanIndex = parseInt(formele["dot1qVlanIndex$repeat?"+z].value);
+InterfaceIPIndex = (Vlan1+VlanIndex)-1;
+isVlanMember = true;
+for(var s=1;s<=IpCounter;s++){
+var AddrInterface = formele["ipAdEntIfIndex$repeat?"+s].value;
+if (AddrInterface == InterfaceIPIndex){
+isHaveIP = true;
+}
+}
+}
+}
+return true;
+}
+function selectUplink()
+{
+}
+// --End of Java code -->
+</script>
+</head>
+<body bgcolor="#FFFFFF" leftmargin="15" onLoad="checkRefreshPage();setScreenMonitorState();"
+style="display:none">
+<script language="JavaScript">top.Draw_Header(document.title);</script>
+
+<FORM METHOD='POST' name="PortConfigForm"  ACTION="/config/port_config.htm"   >
+<INPUT  Type="HIDDEN" Name="restoreUrl"   value="[PortConfigTable]Query:ifIndex=1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN Name="(rlPhdNumberOfUnits EXISTS)" disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<script>
+var formele=document.PortConfigForm.elements;
+var queryText = formele["restoreUrl"].value;
+var selectedPort = queryText.split("=");
+</script>
+<div align="right"><table id="port_config_buttons_tbl" cellspacing="0" cellpadding="0" border="0">
+<tr>
+<td nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/lbutton.gif"></td>
+<td nowrap valign="middle" align="center" class="data-area-button"><a href="javascript:void(0)" onclick="javascript:openShowAllWindow()" title='Show Port Configuration Table'>Show
+All</a></td>
+<td nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/rbutton.gif"></td>
+<td nowrap style="width: 14px; height: 25px"></td>
+</tr>
+</table>
+</div>
+<br>
+<INPUT  TYPE="HIDDEN" NAME="errorCollector"   value="" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=PortConfigTable   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=ifTable   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=ifIndex$VT   value="Type=0;Access=1;NumOfEnumerations=0;Range0=[1,2147483647]" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rlPhdPortsModuleNumber$VT   value="Type=0;Access=1;NumOfEnumerations=0;Range0=[-2147483648,2147483647]" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=swIfType$VT   value="Type=0;Access=1;NumOfEnumerations=5;Range0=[1,5]" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=swIfTransceiverType$VT   value="Type=0;Access=1;NumOfEnumerations=4;Range0=[1,4]" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=ifAdminStatus$VT   value="Type=0;Access=2;NumOfEnumerations=3;Range0=[1,3]" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=ifOperStatus$VT   value="Type=0;Access=1;NumOfEnumerations=7;Range0=[1,7]" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=swIfSpeedAdminMode$VT   value="Type=0;Access=2;NumOfEnumerations=0;Range0=[-2147483648,2147483647];Default value=0" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=ifSpeed$VT   value="Type=7;Access=1;NumOfEnumerations=0;Range0=[-2147483648,2147483647]" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=swIfDuplexAdminMode$VT   value="Type=0;Access=2;NumOfEnumerations=3;Range0=[1,3];Default value=1" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=swIfDuplexOperMode$VT   value="Type=0;Access=1;NumOfEnumerations=4;Range0=[1,4]" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=swIfSpeedDuplexAutoNegotiation$VT   value="Type=0;Access=2;NumOfEnumerations=2;Range0=[1,2];Default value=1" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=swIfOperSpeedDuplexAutoNegotiation$VT   value="Type=0;Access=1;NumOfEnumerations=4;Range0=[1,4]" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=swIfBackPressureMode$VT   value="Type=0;Access=2;NumOfEnumerations=2;Range0=[1,2];Default value=2" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=swIfOperBackPressureMode$VT   value="Type=0;Access=1;NumOfEnumerations=4;Range0=[1,4]" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=swIfFlowControlMode$VT   value="Type=0;Access=2;NumOfEnumerations=5;Range0=[1,5];Default value=2" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=swIfOperFlowControlMode$VT   value="Type=0;Access=1;NumOfEnumerations=4;Range0=[1,4]" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=ifAlias$VT   value="Type=100;Access=2;NumOfEnumerations=0;Range0=[0,64];Default value=" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=swIfOperSuspendedStatus$VT   value="Type=0;Access=1;NumOfEnumerations=2;Range0=[1,2]" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=swIfAdminMdix$VT   value="Type=0;Access=2;NumOfEnumerations=3;Range0=[1,3];Default value=3" SIZE="20" MAXLENGTH="20">
+<INPUT  type="hidden" Name=swIfAdminSpeedDuplexAutoNegotiationLocalCapabilities$VT   value="Type=1;Access=2;NumOfEnumerations=8;Default value=10000000" SIZE="20" MAXLENGTH="20">
+<INPUT  type="hidden" Name=swIfOperSpeedDuplexAutoNegotiationLocalCapabilities$VT   value="Type=1;Access=1;NumOfEnumerations=8" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=vlanPortModeState$VT   value="Type=0;Access=2;NumOfEnumerations=0;Range0=[-2147483648,2147483647]" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=swIfSpeedDuplexNegotiationRemoteCapabilities$VT   value="Type=1;Access=1;NumOfEnumerations=8" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=swIfOperMdix$VT   value="Type=0;Access=1;NumOfEnumerations=3;Range0=[1,3]" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=dot3adAggPortActorAdminKey$VT   value="Type=0;Access=2;NumOfEnumerations=0;Range0=[0,65535];Default value=0" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=swIfReActivate$VT   value="Type=0;Access=2;NumOfEnumerations=2;Range0=[1,2];Default value=2" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=PortConfigTable$endVT   value="OK" SIZE="20" MAXLENGTH="20">
+
+<table id="port_config_tbl" border="0" cellspacing="0" cellpadding="0" width="100%">
+<script language="JavaScript">
+top.Draw_TableTop(2);top.Draw_TableHeader();
+</script>
+<tr>
+<td nowrap style="width: 10px; height: 24px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd">Port</td>
+<td nowrap class="data-area-canvas-odd">
+<select name="ifIndex$select" size="1" onChange="selectPort1Index('PortConfigTable')" class="monitorEnabled">
+<option value=""></option>
+</select>
+<script language="javaScript">
+formObj=document.PortConfigForm;
+addPresentPortsSelectionList(formObj,"ifIndex$select","","n","","",true);
+</script>
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px"></td>
+</tr>
+
+<INPUT  type=hidden Name=PortConfigTable$query   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=ifIndex$query   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type="hidden" name=swIfAdminSpeedDuplexAutoNegotiationLocalCapabilities$query   value="10000000" SIZE="20" MAXLENGTH="20">
+<INPUT  type="hidden" name=swIfOperSpeedDuplexAutoNegotiationLocalCapabilities$query disabled   value="00111101" SIZE="20" MAXLENGTH="20">
+
+<script>
+portIndex=parseInt(formele["ifIndex$query"].value);
+</script>
+<tr>
+<td nowrap style="width: 10px; height:24px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas">Description (0-64 Characters)
+</td>
+<td nowrap class="data-area-canvas">
+
+<INPUT  TYPE=HIDDEN NAME=rlPhdPortsModuleNumber$query   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=text NAME=ifAlias$query size=10 maxLength=64  onblur=checkValidation('','','',true)   value="">
+
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px"></td>
+</tr>
+<tr>
+<td nowrap style="width: 10px; height:24px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd">Port Type</td>
+<td nowrap class="data-area-canvas-odd">
+
+<INPUT  TYPE=HIDDEN NAME=swIfType$query   value="3" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=swIfTransceiverType$query   value="1" SIZE="20" MAXLENGTH="20">
+
+<script language="javascript">
+displayType();
+</script>
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px"></td>
+</tr>
+<tr>
+<td nowrap style="width: 10px; height: 24px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas">Admin Status</td>
+<td nowrap class="data-area-canvas">
+
+<SELECT  NAME=ifAdminStatus$query SIZE=1
+ >
+
+<OPTION value=1 selected> Up
+
+<OPTION value=2> Down
+
+</select>
+
+
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px"></td>
+</tr>
+<tr>
+<td nowrap style="width: 10px; height:24px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd">Current Port Status</td>
+<td nowrap class="data-area-canvas-odd">
+
+<INPUT  TYPE=HIDDEN NAME=ifOperStatus$query   value="1" SIZE="20" MAXLENGTH="20">
+
+<script language="javascript">
+displayOperStatus();
+</script>
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px"></td>
+</tr>
+<tr>
+<td nowrap style="width: 10px; height: 24px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas">Re-Activate Suspended Port</td>
+<td nowrap class="data-area-canvas">
+<INPUT  TYPE=HIDDEN NAME=swIfReActivate$query   value="2" SIZE="20" MAXLENGTH="20">
+
+<input type="checkbox" id=swIfReActivateCB name=swIfReActivateCB>
+<script>
+setReactivate();
+</script>
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="width: 10px; height: 24px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd">Operational Status</td>
+<td nowrap class="data-area-canvas-odd">
+
+<INPUT  TYPE=HIDDEN NAME=swIfOperSuspendedStatus$query   value="2" SIZE="20" MAXLENGTH="20">
+
+<script language="javascript">
+displayOperSuspendedStatus();
+</script>
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="width: 10px; height: 24px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas">Admin Speed</td>
+<td nowrap class="data-area-canvas">
+
+<INPUT  TYPE=HIDDEN NAME=swIfSpeedAdminMode$query   value="0" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN name="(((swIfSpeedAdminMode=0)||(swIfSpeedAdminMode=1000000000))&&(swIfType=3))" disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+
+
+<select name="swIfSpeedAdminMode$select" onChange="selectIfSpeedAdminMode()">
+<option value="1">
+10M
+<option value="2">
+100M
+<option value="3" selected>
+1000M
+</select>
+
+
+
+
+
+<INPUT  TYPE=HIDDEN name="((swIfSpeedAdminMode=10000000)&&(swIfType=3))" disabled    value="OK" SIZE="20" MAXLENGTH="20">
+
+
+
+
+
+
+<INPUT  TYPE=HIDDEN name="((swIfSpeedAdminMode=100000000)&&(swIfType=3))" disabled    value="OK" SIZE="20" MAXLENGTH="20">
+
+
+
+
+
+
+<INPUT  TYPE=HIDDEN name="(((swIfSpeedAdminMode=0)||(swIfSpeedAdminMode=100000000))&&(swIfType!=3))" disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+
+
+
+
+
+<INPUT  TYPE=HIDDEN name="((swIfSpeedAdminMode=10000000)&&(swIfType!=3))" disabled    value="OK" SIZE="20" MAXLENGTH="20">
+
+
+
+
+
+
+
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px"></td>
+</tr>
+<tr>
+<td nowrap style="width: 10px; height:24px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd">Current Port Speed</td>
+<td nowrap class="data-area-canvas-odd">
+
+<INPUT  TYPE=HIDDEN NAME=ifSpeed$query   value="1000000000" SIZE="20" MAXLENGTH="20">
+
+</select>
+<script language="javascript">
+displayOperSpeed();
+</script>
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px"></td>
+</tr>
+<tr>
+<td nowrap style="width: 10px; height: 24px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas">Admin Duplex</td>
+<td nowrap class="data-area-canvas">
+
+<INPUT  TYPE=HIDDEN NAME=swIfDuplexAdminMode$query   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN name="((swIfDuplexAdminMode=1)||(swIfDuplexAdminMode=3))"   value="OK" SIZE="20" MAXLENGTH="20">
+
+
+
+<select name="swIfDuplexAdminMode$select" size="1" onChange="duplexModeSelect()">
+<option value="2">Half</option>
+<option value="3" selected>Full</option>
+</select>
+
+
+
+
+
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px"></td>
+</tr>
+<tr>
+<td nowrap style="width: 10px; height:24px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd">Current Duplex Mode</td>
+<td nowrap class="data-area-canvas-odd">
+
+<INPUT  TYPE=HIDDEN NAME=swIfDuplexOperMode$query   value="2" SIZE="20" MAXLENGTH="20">
+
+<script language="javascript">
+displayOperMode();
+</script>
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px"></td>
+</tr>
+<tr>
+<td nowrap style="width: 10px; height: 24px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas">Auto Negotiation</td>
+<td nowrap class="data-area-canvas">
+
+<SELECT  NAME=swIfSpeedDuplexAutoNegotiation$query SIZE=1
+ onChange="checkNegotiationStatus()"
+ >
+
+<OPTION value=1 selected> Enable
+
+<OPTION value=2> Disable
+
+</select>
+
+
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px"></td>
+</tr>
+<tr>
+<td nowrap style="width: 10px; height:24px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd">Current Auto Negotiation</td>
+<td nowrap class="data-area-canvas-odd">
+
+<INPUT  TYPE=HIDDEN NAME=swIfOperSpeedDuplexAutoNegotiation$query   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=swIfSpeedDuplexNegotiationRemoteCapabilities$query disabled   value="00111101" SIZE="20" MAXLENGTH="20">
+<script language="javascript">
+displayOperAutoNeg();
+</script>
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px"></td>
+</tr>
+<tr>
+<td style="width: 10px; HEIGHT: 24px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas">Admin Advertisement</td>
+<td class="data-area-canvas">
+<input type="checkbox" name="adminAdvertisementFlags" id="flag1" onClick="changeAdminAdvertisement(); checkNegotiationStatus();">&nbsp;Max
+Capability&nbsp; <input type="checkbox" name="adminAdvertisementFlags" id="flag2" onClick="changeAdminAdvertisement(); checkNegotiationStatus();">&nbsp;10
+Half&nbsp; <input type="checkbox" name="adminAdvertisementFlags" id="flag3" onClick="changeAdminAdvertisement(); checkNegotiationStatus();">&nbsp;10
+Full&nbsp; <input type="checkbox" name="adminAdvertisementFlags" id="flag4" onClick="changeAdminAdvertisement(); checkNegotiationStatus();">&nbsp;100
+Half&nbsp; <input type="checkbox" name="adminAdvertisementFlags" id="flag5" onClick="changeAdminAdvertisement(); checkNegotiationStatus();">&nbsp;100
+Full&nbsp; <input type="checkbox" name="adminAdvertisementFlags" id="flag6" onClick="changeAdminAdvertisement(); checkNegotiationStatus();">&nbsp;1000
+Full
+<script language="JavaScript">
+displayAdminAdvertisement();
+</script>
+</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td style="width: 10px; height: 24px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas-odd">Current Advertisement</td>
+<td class="data-area-canvas-odd">
+<script language="JavaScript">
+writeAdvertisement("swIfOperSpeedDuplexAutoNegotiationLocalCapabilities$query");
+</script>
+</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td style="width: 10px; height: 25px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas">Neighbor Advertisement</td>
+<td class="data-area-canvas">
+<script>writeAdvertisement("swIfSpeedDuplexNegotiationRemoteCapabilities$query");</script>
+</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px; height: 25px">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="width: 10px; height: 24px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd">Back Pressure</td>
+<td nowrap class="data-area-canvas-odd">
+
+<SELECT  NAME=swIfBackPressureMode$query SIZE=1
+ >
+
+<OPTION value=1> Enable
+
+<OPTION value=2 selected> Disable
+
+</select>
+
+
+<script>
+var formele=document.PortConfigForm.elements;
+</script>
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px"></td>
+</tr>
+<tr>
+<td nowrap style="width: 10px; height:24px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas">Current Back Pressure</td>
+<td nowrap class="data-area-canvas">
+
+<INPUT  TYPE=HIDDEN NAME=swIfOperBackPressureMode$query   value="2" SIZE="20" MAXLENGTH="20">
+<script language="javascript">
+displayOperBackPressure();
+</script>
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px"></td>
+</tr>
+<tr>
+<td nowrap style="width: 10px; height: 24px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd">Flow Control</td>
+<td nowrap class="data-area-canvas-odd">
+
+<INPUT  TYPE=HIDDEN Name="(rlPhdNumberOfUnits EXISTS)" disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+
+<SELECT  NAME=swIfFlowControlMode$query SIZE=1
+ >
+
+<OPTION value=1 selected> Enable
+
+<OPTION value=2> Disable
+
+<OPTION value=3> Auto-negotiation
+
+</select>
+
+
+
+<script>
+var formele=document.PortConfigForm.elements;
+if (portIndex>=(parseInt(top.oobFirstIndex)) && portIndex<(parseInt(top.oobFirstIndex)+parseInt(top.oobNumOfPorts)))
+{
+formele["swIfFlowControlMode$query"].selectedIndex=0;
+formele["swIfFlowControlMode$query"].options[0].text="";
+if (notIE)
+formele["swIfFlowControlMode$query"].options[0].innerHTML="";
+formele["swIfFlowControlMode$query"].disabled=true;
+}
+else if (formele["swIfDuplexAdminMode$select"].selectedIndex==0)
+{
+formele["swIfFlowControlMode$query"].disabled=true;
+}
+</script>
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px"></td>
+</tr>
+<tr>
+<td nowrap style="width: 10px; height: 24px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas">Current Flow Control</td>
+<td nowrap class="data-area-canvas">
+
+<INPUT  TYPE=HIDDEN NAME=swIfOperFlowControlMode$query   value="1" SIZE="20" MAXLENGTH="20">
+
+<script language="javascript">
+displayOperFlowCtrl();
+</script>
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px"></td>
+</tr>
+<tr>
+<td nowrap style="width: 10px; height: 24px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd">MDI/MDIX</td>
+<td nowrap class="data-area-canvas-odd">
+
+<SELECT  NAME=swIfAdminMdix$query SIZE=1 onChange="mdixSelect()"
+ >
+
+<OPTION value=1> MDIX
+
+<OPTION value=2> MDI
+
+<OPTION value=3 selected> Auto
+
+</select>
+
+
+<script>
+var formele=document.PortConfigForm.elements;
+if ((portIndex>=(parseInt(top.oobFirstIndex)) && portIndex<(parseInt(top.oobFirstIndex)+parseInt(top.oobNumOfPorts)))||
+(formele["swIfTransceiverType$query"].value=="2"))
+{
+formele["swIfAdminMdix$query"].selectedIndex=0;
+formele["swIfAdminMdix$query"].options[0].text="";
+if (notIE)
+formele["swIfAdminMdix$query"].options[0].innerHTML="";
+formele["swIfAdminMdix$query"].disabled=true;
+}
+</script>
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="width: 10px; height: 24px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas">Current MDI/MDIX</td>
+<td nowrap class="data-area-canvas">
+
+<INPUT  TYPE=HIDDEN NAME=swIfOperMdix$query   value="2" SIZE="20" MAXLENGTH="20">
+
+<script language="javascript">
+displayOperMDIX();
+</script>
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+
+<tr>
+<td nowrap style="width: 10px; height:24px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd">LAG</td>
+<td nowrap class="data-area-canvas-odd">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminKey$query   value="0" SIZE="20" MAXLENGTH="20">
+<script language="javascript">
+if (document.PortConfigForm.elements["ifOperStatus$query"].value!=2)
+{
+document.write(findPortinTrunkArray());
+}
+</script>
+&nbsp;
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<script language="JavaScript">top.Draw_TableBottom(2)</script>
+</table>
+<br>
+<script language="javascript">
+if (!checkFirstFilter())
+portSign("ifIndex$select");
+checkNegotiationStatus();
+setPort();
+</script>
+<INPUT  type=hidden Name=PortConfigTable$endQuery   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=VlanStatic   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=dot1qVlanCurrentTable$VTN   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=dot1qVlanTimeMark$VTN size=128   value="Type=0;Access=1;NumOfEnumerations=0;Range0=[-2147483648,2147483647]">
+<INPUT  Type=HIDDEN Name=dot1qVlanIndex$VTN size=128   value="Type=7;Access=1;NumOfEnumerations=0;Range0=[-2147483648,2147483647]">
+<INPUT  Type=HIDDEN Name=dot1qVlanCurrentEgressPorts$VTN size=128   value="Type=101;Access=1;NumOfEnumerations=0;Range0=[0,160]">
+<INPUT  Type=HIDDEN Name=dot1qVlanCurrentUntaggedPorts$VTN size=128   value="Type=101;Access=1;NumOfEnumerations=0;Range0=[0,160]">
+<INPUT  Type=HIDDEN Name=VlanStatic$endVTN   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=hidden NAME=dot1qVlanTimeMark$repeat?1  disabled   value="0" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=dot1qVlanIndex$repeat?1  disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=dot1qVlanCurrentEgressPorts$repeat?1  disabled   value="f7ef000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001fe" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=dot1qVlanCurrentUntaggedPorts$repeat?1  disabled   value="f7ef000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001fe" SIZE="20" MAXLENGTH="20">
+<script>vlanCounter++;</script>
+<INPUT  type=hidden Name=VlanStatic$endRepeat?1  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=hidden NAME=dot1qVlanTimeMark$repeat?2  disabled   value="0" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=dot1qVlanIndex$repeat?2  disabled   value="20" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=dot1qVlanCurrentEgressPorts$repeat?2  disabled   value="880000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=dot1qVlanCurrentUntaggedPorts$repeat?2  disabled   value="080000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000" SIZE="20" MAXLENGTH="20">
+<script>vlanCounter++;</script>
+<INPUT  type=hidden Name=VlanStatic$endRepeat?2  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=hidden NAME=dot1qVlanTimeMark$repeat?3  disabled   value="0" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=dot1qVlanIndex$repeat?3  disabled   value="30" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=dot1qVlanCurrentEgressPorts$repeat?3  disabled   value="801000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=dot1qVlanCurrentUntaggedPorts$repeat?3  disabled   value="001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000" SIZE="20" MAXLENGTH="20">
+<script>vlanCounter++;</script>
+<INPUT  type=hidden Name=VlanStatic$endRepeat?3  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  Type=HIDDEN Name=IPTable   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=ipAddrTable$VT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=ipAdEntAddr$VT size=128   value="Type=5;Access=1;NumOfEnumerations=0">
+<INPUT  Type=HIDDEN Name=ipAdEntIfIndex$VT size=128   value="Type=0;Access=2;NumOfEnumerations=0;Range0=[1,2147483647]">
+<INPUT  Type=HIDDEN Name=IPTable$endVT   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=hidden NAME=ipAdEntAddr$repeat?1  disabled   value="192.168.2.17" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=ipAdEntIfIndex$repeat?1  disabled   value="100000" SIZE="20" MAXLENGTH="20">
+<script>IpCounter++;</script>
+<INPUT  type=hidden Name=IPTable$endRepeat?1  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<div class="management-only">
+
+<div align="center"><table id="apply_tbl" cellspacing="0" cellpadding="0" border="0"><tr>
+<td nowrap nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/lbutton.gif"></td>
+<td nowrap nowrap valign="middle" align="center" class="data-area-button"><a href="javascript:preSubmit();">Apply Changes</a></td>
+<td nowrap nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/rbutton.gif"></td>
+</tr></table></div><br>
+<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
+<!--
+if(document.forms[0] && document.forms[0].elements.length<=1000)
+{
+for(i=0;(document.forms[0] && i<document.forms[0].elements.length);i++)
+{
+if(document.forms[0] && document.forms[0].elements[i].type=="select-one")
+if(document.forms[0] && document.forms[0].elements[i].length==0)
+document.forms[0].elements[i].style.width="70px";
+}
+}
+//-->
+</SCRIPT>
+
+</div>
+</form>
+</body>
+</html>

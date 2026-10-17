@@ -1,0 +1,488 @@
+
+
+
+<html>
+<head>
+<title>Rapid Spanning Tree (RSTP)</title>
+
+
+<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
+<!--
+if(top.location==self.location )
+{
+var refStr=self.location + " ";
+var ind=0;
+refStr.toLowerCase();
+ind=refStr.indexOf("config");
+var locationStr=refStr.substring(0,ind);
+if (opener)
+{
+if (opener.opener)
+{
+if(opener.opener.top.location==opener.opener.location)
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+else
+{
+if(opener.top.location==opener.location)
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+}
+else
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+//-->
+</SCRIPT>
+
+
+<link rel="stylesheet" href="../device/style.css" type="text/css">
+<script src="../js/globalFunctions.js"></script>
+</head>
+<script language="JavaScript">
+if(top.MonitorMode) {
+document.write("<link rel='stylesheet' href='../device/monitorMode.css' type='text/css'>")
+}
+<!--
+function displayState() {
+formele=document.staTreeForm.elements;
+var value = formele["dot1dStpPortState$query"].value;
+var textValue = "";
+var case2="Blocking";
+var case3="Listening";
+var stpOpMode=formele["dot1dStpVersion"].value;
+if(parseInt(stpOpMode)==2){
+case2="Discarding";
+case3="Discarding";
+}
+switch(value)
+{
+case "1":
+textValue = "Disabled";
+break;
+case "2":
+textValue = case2;
+break;
+case "3":
+textValue = case3;
+break;
+case "4":
+textValue = "Learning";
+break;
+case "5":
+textValue = "Forwarding";
+break;
+default:
+break;
+}
+var trunkStr = relatedTrunk(document.staTreeForm.elements["dot1dStpPort$query"].value);
+if (parseInt(trunkStr)!=0)
+{
+textValue='N/A';
+}
+document.write(textValue);
+}
+function disableHtml() {
+formele=document.staTreeForm.elements;
+formele["CBoxMigration"].disabled=true;
+formele["port$select"].disabled=true;
+formele["dot3adAggIndex$select"].disabled = true;
+formele["PortTrunkSelect"][0].disabled = true;
+formele["PortTrunkSelect"][1].disabled = true;
+}
+function disableTrunkList() {
+var formele = document.staTreeForm.elements;
+formele["port$select"].disabled = false;
+formele["dot3adAggIndex$select"].disabled = true;
+selectIndex();
+}
+function disablePortList() {
+var formele = document.staTreeForm.elements;
+formele["port$select"].disabled = true;
+formele["dot3adAggIndex$select"].disabled = false;
+selectIndex();
+}
+function selectIndex() {
+var interfaceValue;
+var selectList;
+var formele=document.staTreeForm.elements;
+if(formele["PortTrunkSelect"][0].checked) {
+selectList=formele["port$select"];
+interfaceValue = parseInt(selectList[selectList.selectedIndex].value);
+}
+else {
+selectList=formele["dot3adAggIndex$select"];
+interfaceValue = parseInt(selectList[selectList.selectedIndex].value);
+}
+var newFilter="sta_tree.htm?Query:dot1dStpPort=";
+newFilter+=interfaceValue;
+filterString=newFilter;
+disableHtml();
+document.location.href=filterString;
+}
+function indexSign() {
+var i=0;
+var formele=document.staTreeForm.elements;
+var selectList;
+formele["PortTrunkSelect"][0].checked=false;
+formele["PortTrunkSelect"][1].checked=false;
+selectName=formele["dot3adAggIndex$select"];
+var index = formele["dot1dStpPort$query"].value;
+var i=0;
+var optionValue;
+var textValue;
+while (selectName.options[i]!=null)
+{
+if (selectName.options[i].value == index)
+{
+selectName.selectedIndex=i;
+formele["port$select"].selectedIndex=0;
+formele["PortTrunkSelect"][1].checked=true;
+formele["port$select"].disabled=true;
+return;
+}
+i++;
+}
+i=0;
+selectName = formele["port$select"];
+while (selectName.options[i]!=null)
+{
+if (selectName.options[i].value == index)
+{
+selectName.selectedIndex=i;
+formele["dot3adAggIndex$select"].selectedIndex=0;
+formele["PortTrunkSelect"][0].checked=true;
+formele["dot3adAggIndex$select"].disabled=true;
+return;
+}
+i++;
+}
+}
+function formSubmit(){
+formele=document.staTreeForm.elements;
+disableHtml();
+document.staTreeForm.submit();
+}
+function ChangeMigration(){
+formele=document.staTreeForm.elements;
+var stpOpMode = parseInt(formele["dot1dStpVersion"].value);
+if (stpOpMode == 2 || stpOpMode == 3) {
+if (formele["CBoxMigration"].checked==true) {
+formele["dot1dStpPortProtocolMigration$query"].value=1;
+} else {
+formele["dot1dStpPortProtocolMigration$query"].value=2;
+}
+} else {
+alert("Activate Protocol Migration is available only for RSTP mode.");
+formele["CBoxMigration"].checked=false;
+}
+}
+function displayMigration(){
+formele=document.staTreeForm.elements;
+if (formele["dot1dStpPortProtocolMigration$query"].value==1)
+formele["CBoxMigration"].checked=true;
+}
+function displayEdge(){
+formele=document.staTreeForm.elements;
+var value = formele["dot1dStpPortOperEdgePort$query"].value;
+var textValue = "";
+switch(value) {
+case "1":
+textValue = "Enable";
+break;
+case "2":
+textValue = "Disable";
+break;
+default:
+break;
+}
+document.write(textValue);
+}
+function displayRole(){
+formele=document.staTreeForm.elements;
+var value = formele["rldot1dStpPortRole$query"].value;
+var textValue = "";
+switch(value) {
+case "0":
+textValue = "Unknown";
+break;
+case "1":
+textValue = "Disable";
+break;
+case "2":
+textValue = "Alternate";
+break;
+case "3":
+textValue = "Backup";
+break;
+case "4":
+textValue = "Root";
+break;
+case "5":
+textValue = "Designated";
+break;
+default:
+break;
+}
+document.write(textValue);
+}
+function displayMode(){
+formele=document.staTreeForm.elements;
+var textValue = "";
+var stpMode = formele["dot1dStpVersion"].value;
+if(stpMode==0){
+textValue = "STP";
+}
+else{
+var value = formele["rldot1dStpBpduType$query"].value;
+switch(value) {
+case "0":
+textValue = "STP";
+break;
+case "1":
+textValue = "RSTP";
+break;
+default:
+textValue = "Unknown";
+break;
+}
+}
+document.write(textValue);
+}
+function dispalyPtoPOper() {
+formele=document.staTreeForm.elements;
+var value = formele["dot1dStpPortOperPointToPoint$query"].value;
+var textValue = "";
+switch(value) {
+case "1":
+textValue = "Enable";
+break;
+case "2":
+textValue = "Disable";
+break;
+default:
+break;
+}
+document.write(textValue);
+}
+function openShowAllWindow(){
+if(top.Units==true){
+top.arrayRSTPTable.length = 0;
+window.open('rstp_table.htm?[rstpTableAllVT](partialKey:From-dot1dStpPort=0-Counter-12)&Filter:(((rlPhdPortsModuleNumber=1)&&(ifOperStatus!=6)&&(dot1dStpPort<'+top.trunkFirstIndex+'))||(dot1dStpPort>'+parseInt(top.NumberOfPorts)+'))[rstpLAGTableVT]Filter:((dot1dStpPort>='+top.trunkFirstIndex+')&&(dot1dStpPort<='+( parseInt(top.trunkFirstIndex)+ parseInt(top.NumberOfTrunks))+'))','', 'width=850, height=600, left=50, top=50, scrollbars=yes, resizable=yes');
+}
+else
+{
+top.arrayRSTPTable.length = 0;
+window.open('rstp_table.htm?[rstpTableAllVT](partialKey:From-dot1dStpPort=0-Counter-12)&Filter:(dot1dStpPort<'+top.trunkFirstIndex+')[rstpLAGTableVT]Filter:((dot1dStpPort>='+top.trunkFirstIndex+')&&(dot1dStpPort<='+( parseInt(top.trunkFirstIndex)+ parseInt(top.NumberOfTrunks))+'))','', 'width=850, height=600, left=50, top=50, scrollbars=yes, resizable=yes');
+}
+}
+//-->
+</script>
+<body bgcolor="#FFFFFF" leftmargin="15" onload="setScreenMonitorState();">
+<script language="JavaScript">top.Draw_Header(document.title);</script>
+<div align="right"><table id="sta_tree_buttons_tbl" cellspacing="0" cellpadding="0" border="0"><tr>
+<td nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/lbutton.gif"></td>
+<td nowrap valign="middle" align="center" class="data-area-button"><a href="javascript:void(0)"
+onclick="javascript:openShowAllWindow();" title='Show RSTP Table'>Show All</a></td>
+<td nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/rbutton.gif"></td>
+<td nowrap style="width: 14px; height: 25px"></td>
+</tr></table></div><br>
+
+<FORM METHOD='POST' name="staTreeForm"  ACTION="/config/sta_tree.htm"  >
+<INPUT  Type="HIDDEN" Name="restoreUrl" SIZE=256   value="Filter:(ifOperStatus!=6)||(dot1dStpPort>16)">
+
+<table id="sta_tree_tbl" border="0" cellspacing="0" cellpadding="0" width="100%">
+<script language="JavaScript">
+top.Draw_TableTop(2);top.Draw_TableHeader();
+</script>
+<tr>
+<td nowrap style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd" width="40%">Interface</td>
+<td nowrap class="data-area-canvas-odd">
+<input type="radio" id=radioPort name="PortTrunkSelect" value="1" checked onClick="disableTrunkList(); selectIndex()" class="monitorEnabled">
+Port
+<select name="port$select" size="1" onChange="selectIndex()" class="monitorEnabled"><option>&nbsp;</option></select>
+<script language="JavaScript">
+addPresentPortsSelectionList(document.staTreeForm,'port$select','','n');
+</script>
+<input type="radio" id=radioTrunk name="PortTrunkSelect" value="2" onClick="disablePortList(); selectIndex();" class="monitorEnabled">
+LAG
+
+<SELECT  Name=dot3adAggIndex$select size="1" onChange="selectIndex()" class="monitorEnabled"
+ RpGetType=complex >
+<OPTION  value=0>1000
+<OPTION  value=1>1001
+<OPTION  value=2>1002
+<OPTION  value=3>1003
+<OPTION  value=4>1004
+<OPTION  value=5>1005
+<OPTION  value=6>1006
+<OPTION  value=7>1007
+</select>
+
+
+<script language="javaScript">
+changeTrunkListText("dot3adAggIndex$select");
+</script>
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px"></td>
+</tr>
+
+<INPUT  TYPE="HIDDEN" NAME="errorCollector"   value="" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rstpTable   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=dot1dStpPortTable$VT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=dot1dStpPort$VT SIZE=128   value="Type=0;Access=1;NumOfEnumerations=0;Range0=[1,65535]">
+<INPUT  Type=HIDDEN Name=rlPhdPortsIfIndexName$VT SIZE=128   value="Type=100;Access=1;NumOfEnumerations=0;Range0=[1,20]">
+<INPUT  Type=HIDDEN Name=dot1dStpPortOperEdgePort$VT SIZE=128   value="Type=0;Access=1;NumOfEnumerations=2;Range0=[1,2];Default value=2">
+<INPUT  Type=HIDDEN Name=dot1dStpPortAdminPointToPoint$VT SIZE=128   value="Type=0;Access=2;NumOfEnumerations=3;Range0=[0,2];Default value=2">
+<INPUT  Type=HIDDEN Name=dot1dStpPortOperPointToPoint$VT SIZE=128   value="Type=0;Access=1;NumOfEnumerations=2;Range0=[1,2];Default value=1">
+<INPUT  Type=HIDDEN Name=dot1dStpPortProtocolMigration$VT SIZE=128   value="Type=0;Access=2;NumOfEnumerations=2;Range0=[1,2];Default value=2">
+<INPUT  Type=HIDDEN Name=rldot1dStpPortRole$VT SIZE=128   value="Type=0;Access=1;NumOfEnumerations=6;Range0=[0,5]">
+<INPUT  Type=HIDDEN Name=rldot1dStpBpduType$VT SIZE=128   value="Type=0;Access=1;NumOfEnumerations=2;Range0=[0,1]">
+<INPUT  TYPE=HIDDEN NAME=ifOperStatus$VT SIZE=128   value="Type=0;Access=1;NumOfEnumerations=7;Range0=[1,7]">
+<INPUT  Type=HIDDEN Name=dot1dStpPortState$VT SIZE=128   value="Type=0;Access=1;NumOfEnumerations=6;Range0=[1,6]">
+<INPUT  Type=HIDDEN Name=rstpTable$endVT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=hidden Name=dot1dStpVersion   value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=rstpTable$query   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=dot1dStpPort$query   value="1" SIZE="20" MAXLENGTH="20">
+
+<tr>
+<td nowrap style="width: 10px;height:24px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas">Role</td>
+<td nowrap class="data-area-canvas">
+
+<INPUT  TYPE=hidden NAME=rldot1dStpPortRole$query   value="1" SIZE="20" MAXLENGTH="20">
+
+<script language="JavaScript">
+displayRole();
+</script>
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="width: 10px;height:24px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd">Mode</td>
+<td nowrap class="data-area-canvas-odd">
+
+<INPUT  TYPE=hidden NAME=rldot1dStpBpduType$query   value="1" SIZE="20" MAXLENGTH="20">
+
+<script language="JavaScript">
+displayMode();
+</script>
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="width: 10px;height:24px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas">Fast Link Operational Status</td>
+<td nowrap class="data-area-canvas">
+
+<INPUT  TYPE=hidden NAME=dot1dStpPortOperEdgePort$query   value="2" SIZE="20" MAXLENGTH="20">
+
+<script language="JavaScript">
+displayEdge();
+</script>
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+
+<INPUT  TYPE=hidden NAME=dot1dStpPortState$query   value="1" SIZE="20" MAXLENGTH="20">
+
+<script language="JavaScript">
+</script>
+<tr>
+<td nowrap style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd" width="40%">Point-to-Point Admin Status</td>
+<td nowrap class="data-area-canvas-odd">
+
+<SELECT  Name=dot1dStpPortAdminPointToPoint$select size="1"
+ >
+
+<OPTION value=0> Enable
+
+<OPTION value=1> Disable
+
+<OPTION value=2 selected> Auto
+
+</select>
+</select>
+
+
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="width: 10px;height:24px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas">Point-to-Point Operational Status</td>
+<td nowrap class="data-area-canvas">
+
+<INPUT  TYPE=hidden NAME=dot1dStpPortOperPointToPoint$query   value="1" SIZE="20" MAXLENGTH="20">
+
+<script language="JavaScript">
+dispalyPtoPOper();
+</script>
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd" width="40%">Activate Protocol Migration Test</td>
+<td nowrap class="data-area-canvas-odd">
+
+<INPUT  TYPE=hidden NAME=dot1dStpPortProtocolMigration$query   value="2" SIZE="20" MAXLENGTH="20">
+
+<input type="checkbox" name="CBoxMigration" onClick=ChangeMigration()>
+<script language="JavaScript">
+displayMigration();
+</script>
+</td>
+
+<INPUT  type=hidden Name=rstpTable$endQuery   value="OK" SIZE="20" MAXLENGTH="20">
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<script language="JavaScript">top.Draw_TableBottom(2)</script>
+<script language="JavaScript">
+indexSign();
+</script>
+</table><br>
+
+<div class="management-only">
+
+<div align="center"><table id="apply_tbl" cellspacing="0" cellpadding="0" border="0"><tr>
+<td nowrap nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/lbutton.gif"></td>
+<td nowrap nowrap valign="middle" align="center" class="data-area-button"><a href="javascript:preSubmit();">Apply Changes</a></td>
+<td nowrap nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/rbutton.gif"></td>
+</tr></table></div><br>
+<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
+<!--
+if(document.forms[0] && document.forms[0].elements.length<=1000)
+{
+for(i=0;(document.forms[0] && i<document.forms[0].elements.length);i++)
+{
+if(document.forms[0] && document.forms[0].elements[i].type=="select-one")
+if(document.forms[0] && document.forms[0].elements[i].length==0)
+document.forms[0].elements[i].style.width="70px";
+}
+}
+//-->
+</SCRIPT>
+
+</div>
+</form>
+</body>
+</html>

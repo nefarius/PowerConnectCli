@@ -1,0 +1,83 @@
+
+
+<html>
+<head>
+<title>Secure Mode</title>
+
+<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
+<!--
+if(top.location==self.location )
+{
+var refStr=self.location + " ";
+var ind=0;
+refStr.toLowerCase();
+ind=refStr.indexOf("config");
+var locationStr=refStr.substring(0,ind);
+if (opener)
+{
+if (opener.opener)
+{
+if(opener.opener.top.location==opener.opener.location)
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+else
+{
+if(opener.top.location==opener.location)
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+}
+else
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+//-->
+</SCRIPT>
+
+<link rel="stylesheet" href="../device/style.css" type="text/css">
+<script src="../js/globalFunctions.js"></script>
+<script language="JavaScript">
+<!--
+function SwitchReset() {
+if(confirm("Secure Mode will end the HTTP session and make the switch unmanageable. Would you like to proceed?")) {
+document.getElementById("operMode").value = "2";
+document.forms[0].submit();
+}
+}
+// --End of Java code -->
+</script>
+</head>
+<body bgcolor="#FFFFFF" leftmargin="15">
+<script language="JavaScript">top.Draw_Header(document.title);</script>
+<span class="data-area-prompt-text">Secure the switch configuration by selecting 'Secure'.</span>
+<br>
+<br>
+<FORM METHOD='POST' name="ResetForm"  ACTION="/config/secure_mode.htm"  >
+<INPUT  type="hidden" name="restoreUrl"   value="" SIZE="20" MAXLENGTH="20">
+<INPUT  type="hidden" name="errorCollector"   value="" SIZE="20" MAXLENGTH="20">
+<INPUT  type="hidden" name="rlOperationalModeState" id="operMode"   value="0" SIZE="20" MAXLENGTH="20">
+</form>
+<table id="switch_reset_tbl" cellspacing="0" cellpadding="0" border="0">
+<tr>
+<td nowrap width="100%">
+<div align="left">
+<table id="switch_reset__rButton_tbl" cellspacing="0" cellpadding="0" border="0">
+<tr>
+<td nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/lbutton.gif"></td>
+<td nowrap valign="middle" align="center" class="data-area-button"><a href="javascript:SwitchReset();">Secure</a></td>
+<td nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/rbutton.gif"></td>
+</tr>
+</table>
+</div>
+</td>
+</tr>
+</table>
+</body>
+</html>

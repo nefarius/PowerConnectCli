@@ -1,0 +1,648 @@
+
+
+
+<html>
+<head>
+<title>Notification Recipients </title>
+<link rel="stylesheet" href="../device/style.css" type="text/css">
+<script src="../js/globalFunctions.js"></script>
+<script language="JavaScript">
+<!-- Beginng of JavaScript Applet
+if(top.MonitorMode) {
+document.write("<link rel='stylesheet' href='../device/monitorMode.css' type='text/css'>")
+}
+win_class = "snmp_community"; opener_top = top;
+top.FirstTd=0;
+var isIE = (navigator.appName.indexOf("Microsoft") != -1);
+var defaultString = "Default";
+var defaultSuperString = "DefaultSuper";
+var initialCommunityMode;
+var oobExistFlag;
+var routerExistFlag;
+var oobChecked = false;
+function buildIPSelect()
+{
+var formele = document.forms[0].elements;
+var ipSelect = formele["snmpManagement$select"];
+var octetStr;
+var ipStr;
+var ipStrText;
+var octetLength;
+var ind=1;
+var newOption;
+while(formele["rndCommunityMngStationAddr$repeat11?"+ind]) {
+ipStr = formele["rndCommunityMngStationAddr$repeat11?"+ind].value;
+if(ipStr == "0.0.0.0")
+{
+ipStrText = "All";
+}
+else
+ipStrText = ipStr;
+newOption = new Option(ipStrText,ipStr);
+ipSelect.options[ipSelect.options.length] = newOption;
+ind = ind + 1;
+}
+filterSelectObject('snmpManagement$select');
+}
+function buildCommunitySelect()
+{ var formele = document.forms[0].elements;
+var ipSelect = formele["snmpManagement$select"];
+var communitySelect = formele["communityString$select"];
+var octetStr;
+var tagStr;
+var ipStr;
+var communityStr;
+var octetLength;
+var ind=1;
+var newOption;
+var currentTag;
+var tagLength;
+var oobStart;
+if (ipSelect.length == 0)
+return false;
+var ipSelected = ipSelect.options[ipSelect.selectedIndex].text;
+if (ipSelected == "All")
+ipSelected = "0.0.0.0";
+while(communitySelect.options[ind-1] != null)
+communitySelect.options[ind-1] = null;
+ind=1;
+while(formele["rndCommunityMngStationAddr$repeat11?"+ind])
+{
+ipStr = formele["rndCommunityMngStationAddr$repeat11?"+ind].value;
+if (ipSelected == ipStr)
+{
+communityStr = formele["rndCommunityString$repeat11?"+ind].value;
+newOption = new Option(communityStr);
+communitySelect.options[communitySelect.options.length] = newOption;
+}
+ind = ind + 1;
+}
+}
+function Octet2Str( Octet )
+{
+var str = "";
+var len = Octet.length;
+for(var i = 0; i < len; i += 2)
+{
+var chCode = parseInt(Octet.slice(i,i+2),16);
+if (chCode > 0) str += String.fromCharCode( chCode );
+}
+return str ;
+}
+function selectCommunity() {
+var formele = document.forms[0].elements;
+var ipSelect = formele["snmpManagement$select"];
+var communitySelect = formele["communityString$select"];
+var ipSelected = ipSelect.options[ipSelect.selectedIndex].text;
+if (ipSelected == "All")
+ipSelected = "0.0.0.0";
+var comSelected = communitySelect.options[communitySelect.selectedIndex].text;
+var comOctet = comSelected;
+var oobTag;
+//getting current state --> OOB or Router/Switch
+var filterStr;
+var newFilter;
+newFilter="snmp_note.htm?";
+newFilter+= "[ComQueryVT]Query:rndCommunityMngStationAddr=";
+filterStr = ipSelected;
+newFilter+= filterStr+"@rndCommunityString=";
+filterStr=adjustStringToQuery(comSelected);
+newFilter+= filterStr+"[ComVT]Filter:(rndCommunityOwner=\'monitor\'||rndCommunityOwner=\'monitor_manager\')";
+filterString=newFilter;
+disableHtml();
+disableSnmpCommunityQuery();
+disableAddAccessEntries();
+document.location.href=filterString;
+}
+function changeOOB()
+{
+var tagOctet;
+var ipOctet;
+var comOctet;
+var octetStr;
+var octetLen;
+var communityIndex;
+var oobOctet;
+var filterStr;
+var newFilter = "s_v3.htm?";
+var ind = 1;
+if(top.oobNumOfPorts!=0)
+{
+if (formele["oob$cb"].checked)
+{
+oobTag = "O";
+oobChecked = true;
+}
+else
+{
+oobTag = "R";
+oobChecked = false;
+}
+}
+else
+{
+oobTag = "R";
+}
+oobTag = (Str2OctetReturn(oobTag)).toLowerCase();
+while (formele["vacmSecurityName$repeat11?"+ind])
+{
+octetStr = formele["vacmSecurityName$repeat11?"+ind].value;
+octetLen = octetStr.length;
+ipOctet = octetStr.substring(octetLen-8, octetLen);
+comOctet = octetStr.substring(8,octetLen-8);
+oobOctet = octetStr.substring(4,6);
+if (oobTag == oobOctet)
+{
+if (ipOctet == "00000000")
+{
+tagOctet = octetStr.substring(0,8);
+tagOctet = "53" + tagOctet;
+communityIndex = tagOctet + comOctet + ipOctet;
+}
+else
+communityIndex = octetStr;
+newFilter+="[vS2]Filter:vacmSecurityModel=1";
+newFilter+= "[sC]Query:snmpCommunityIndex=";
+newFilter+= communityIndex;
+newFilter+= "[sT]Query:snmpTargetAddrName=";
+newFilter+=(Str2OctetReturn("In")+oobOctet+Str2OctetReturn("-")).toLowerCase() + ipOctet + comOctet;
+newFilter+= "[vS1]Filter:vacmSecurityName=0x'";
+newFilter += (Str2OctetReturn("SN")+oobOctet+Str2OctetReturn("-") + comOctet + ipOctet).toLowerCase() + "'";
+newFilter+= "[vA]Filter:vacmGroupName=0x'";
+newFilter += (Str2OctetReturn("V_SN")+oobOctet+Str2OctetReturn("-")).toLowerCase() + comOctet + ipOctet + "'";
+prefix = Str2OctetReturn("G_");
+prefix = prefix.toLowerCase();
+maxStr = prefix + "7f";
+newFilter+="[tA33]Filter:((vacmGroupName >=0x'";
+newFilter+= prefix + "')";
+newFilter+="&&(vacmGroupName < 0x'";
+newFilter+= maxStr + "'))";
+filterString=newFilter;
+document.location.href=filterString;
+break;
+}
+ind = ind + 1;
+}
+disableSnmpCommunityQuery();
+disableHtml();
+disableAddAccessEntries();
+}
+function changeCommunityMode() {
+if (formele["radioBasicMode"].checked) {
+formele["notificationVersion$select"].disabled = false;
+formele["view$cb"].disabled = false;
+enableViewList();
+formele["vacmGroupName$select"].disabled = true;
+}
+else {
+formele["notificationVersion$select"].disabled = true;
+formele["view$cb"].disabled = true;
+formele["vacmViewTreeFamilyViewName$select"].disabled = true;
+formele["vacmGroupName$select"].disabled = false;
+}
+}
+function selectAccessMode() {
+var accessList = formele["notificationVersion$select"];
+var selectedVal = accessList.options[accessList.selectedIndex].value;
+formele["rndCommunityTrapsEnable$query"].value= selectedVal;
+}
+function enableViewList() {
+if (formele["view$cb"].checked)
+formele["vacmViewTreeFamilyViewName$select"].disabled = false;
+else
+formele["vacmViewTreeFamilyViewName$select"].disabled = true;
+}
+function indexSign()
+{
+var ipComOctet;
+var ipStr;
+var communityStr;
+var octetLength;
+var i;
+var ipSelect = formele["snmpManagement$select"];
+var communitySelect = formele["communityString$select"];
+var notificationList = formele["notificationVersion$select"];
+var query = formele["restoreUrl"].value;
+var firstFilter;
+var currAccessVal=formele["rndCommunityTrapsEnable$query"].value;
+var firstLoad;
+if (query.indexOf("Query:")==-1)
+{if (formele["rndCommunityMngStationAddr$repeat11?1"])
+{
+firstFilter='snmp_note.htm?[ComQueryVT]Query:rndCommunityMngStationAddr='+formele["rndCommunityMngStationAddr$repeat11?1"].value+'@rndCommunityString='+adjustStringToQuery(formele["rndCommunityString$repeat11?1"].value);
+firstFilter+="[ComVT]Filter:(rndCommunityOwner=\'monitor\'||rndCommunityOwner=\'monitor_manager\')";
+formele["restoreUrl"].value=firstFilter;
+document.location.href=firstFilter;
+}
+}
+var isIPv6;
+var tagLength;
+var oobStart;
+if( ipSelect.options.length==0)
+{
+ipSelect.disabled=true;
+communitySelect.disabled=true;
+notificationList.disabled=true;
+if (formele["remove$cb"]) formele["remove$cb"].disabled = true;
+return;
+}
+ipComOctet = query.substring(query.indexOf("=")+1,query.indexOf("@"));
+ipStr = ipComOctet
+current_ip = ipStr;
+if(ipStr == "0.0.0.0")
+{
+ipStr = "All";
+}
+query=query.substring(query.indexOf("@"),query.length);
+communityStr = query.substring(query.indexOf("=")+1,query.indexOf("["));
+i = 0;
+while (ipSelect.options[i] != null)
+{
+if (ipStr == ipSelect.options[i].text){
+ipSelect.selectedIndex = i;
+buildCommunitySelect();
+break;
+}
+i = i + 1;
+}
+i = 0;
+while (communitySelect.options[i] != null) {
+if (communityStr == communitySelect.options[i].text){
+communitySelect.selectedIndex = i;
+break;
+}
+i = i + 1;
+}
+notificationList.value=currAccessVal;
+}
+function setAllValues() {
+var ipSelectList = formele["snmpManagement$select"];
+var communitySelectList = formele["communityString$select"];
+var ipStr, communityStr;
+if( ipSelectList.length == 0)
+return false;
+formele["vacmSecurityToGroupStatus$repeat1?"+1].value = "6";
+formele["vacmSecurityToGroupStatus$repeat1?"+2].value = "6";
+if (initialCommunityMode == "basicMode") {
+formele["vacmAccessStatus$repeat?"+1].value = "6";
+formele["vacmAccessStatus$repeat?"+2].value = "6";
+}
+if (formele["remove$cb"].checked == true) {
+formele["snmpCommunityStatus$query"].value = "6";
+enableTargetAddrQuery();
+formele["snmpTargetAddrRowStatus$query"].value = "6";
+top.communityAfterRemoveFlag = 1;
+disableAddSecurityToGroupEntries();
+disableAddAccessEntries();
+return;
+}
+ipStr = ipSelectList.options[ipSelectList.selectedIndex].text;
+communityStr = communitySelectList.options[communitySelectList.selectedIndex].text;
+if (ipStr == "All")
+ipStr = "0.0.0.0";
+var isIPv6 = ipStr.indexOf(":") >= 0 ? true : false;
+ipStr = (isIPv6==true) ? getMagicFromIPv6(ipStr) : ipToOctet(ipStr);
+var oobTag;
+if(top.oobNumOfPorts!=0){
+if (formele["oob$cb"].checked)
+oobTag = (isIPv6==true) ? "V60" : "O";
+else
+oobTag = (isIPv6==true) ? "V6R" : "R";
+}
+else{
+oobTag = (isIPv6==true) ? "V6R" : "R";
+}
+communityStr = Str2OctetReturn(communityStr);
+if (formele["radioBasicMode"].checked) {
+groupName = Str2OctetReturn("V_SN"+oobTag+"-") + communityStr + ipStr;
+addEntryToSecurityToGroupTable(communityStr, ipStr, groupName, oobTag);
+addEntryToAccessTable(communityStr, ipStr, oobTag);
+}
+else {
+groupList = formele["vacmGroupName$select"];
+groupName = groupList.options[groupList.selectedIndex].text;
+groupName = "G_" + groupName;
+groupName = Str2OctetReturn(groupName);
+addEntryToSecurityToGroupTable(communityStr, ipStr, groupName, oobTag);
+disableAddAccessEntries();
+}
+var contextName;
+if(top.oobNumOfPorts!=0){
+if(formele["manageOOB$cb"].checked)
+contextName = "OOB";
+else
+contextName = '';
+}
+else
+contextName = '';
+formele["snmpCommunityContextName$query"].value = Str2OctetReturn(contextName);
+}
+function addEntryToSecurityToGroupTable(community, ip, groupName, oobTag) {
+var secGroupTag = "SN";
+secGroupTag += oobTag;
+secGroupTag += "-";
+secGroupTag = Str2OctetReturn(secGroupTag);
+formele["vacmSecurityModel$add1"].value = "1";
+formele["vacmSecurityName$add1"].value = (secGroupTag + community + ip);
+formele["vacmGroupName$add1"].value = groupName;
+formele["vacmSecurityToGroupStatus$add1"].value = "4";
+formele["vacmSecurityModel$add2"].value = "2";
+formele["vacmSecurityName$add2"].value = (secGroupTag + community + ip);
+formele["vacmGroupName$add2"].value = groupName;
+formele["vacmSecurityToGroupStatus$add2"].value = "4";
+}
+function addEntryToAccessTable(community, ip, oobTag) {
+var accessList = formele["notificationVersion$select"];
+var accessVal = accessList.options[accessList.selectedIndex].text;
+var viewList = formele["vacmViewTreeFamilyViewName$select"];
+var selectedView = viewList.options[viewList.selectedIndex].text;
+var readView, writeView, notifyView;
+var accessTag = "V_SN";
+accessTag += oobTag;
+accessTag += "-";
+accessTag = Str2OctetReturn(accessTag);
+if (!(formele["view$cb"].checked)) {
+var accessList = formele["notificationVersion$select"];
+var accessVal = accessList.options[accessList.selectedIndex].value;
+switch(accessVal) {
+case "1":
+readView = Str2OctetReturn(defaultString);
+writeView = Str2OctetReturn('');
+notifyView = readView;
+break;
+case "2":
+readView = Str2OctetReturn(defaultString);
+writeView = readView;
+notifyView = readView;
+break;
+case "3":
+readView = Str2OctetReturn(defaultSuperString);
+writeView = readView;
+notifyView = readView;
+break;
+default:
+break;
+}
+}
+else if (accessVal == "Read Only") {
+readView = Str2OctetReturn(selectedView);
+writeView = Str2OctetReturn('');
+notifyView = readView;
+}
+else if (accessVal == "Read Write") {
+readView = writeView = notifyView = Str2OctetReturn(selectedView);
+}
+else if (accessVal = "SNMP Admin") {
+return false;
+}
+formele["vacmGroupName$add11"].value = (accessTag + community+ ip);
+formele["vacmAccessContextPrefix$add11"].value = Str2OctetReturn('');
+formele["vacmAccessSecurityModel$add11"].value = "1";
+formele["vacmAccessSecurityLevel$add11"].value = "1";
+formele["vacmAccessContextMatch$add11"].value = "2";
+formele["vacmAccessReadViewName$add11"].value = readView;
+formele["vacmAccessWriteViewName$add11"].value = writeView;
+formele["vacmAccessNotifyViewName$add11"].value = notifyView;
+formele["vacmAccessStatus$add11"].value = "4";
+formele["vacmGroupName$add22"].value = (accessTag + community + ip);
+formele["vacmAccessContextPrefix$add22"].value = Str2OctetReturn('');
+formele["vacmAccessSecurityModel$add22"].value = "2";
+formele["vacmAccessSecurityLevel$add22"].value = "1";
+formele["vacmAccessContextMatch$add22"].value = "2";
+formele["vacmAccessReadViewName$add22"].value = readView;
+formele["vacmAccessWriteViewName$add22"].value = writeView;
+formele["vacmAccessNotifyViewName$add22"].value = notifyView;
+formele["vacmAccessStatus$add22"].value = "4";
+}
+function disableAddSecurityToGroupEntries() {
+formele["vacmSecurityModel$add1"].disabled = true;
+formele["vacmSecurityName$add1"].disabled = true;
+formele["vacmGroupName$add1"].disabled = true;
+formele["vacmSecurityToGroupStatus$add1"].disabled = true;
+formele["vS1$endAdd1"].disabled = true;
+formele["vacmSecurityModel$add2"].disabled = true;
+formele["vacmSecurityName$add2"].disabled = true;
+formele["vacmGroupName$add2"].disabled = true;
+formele["vacmSecurityToGroupStatus$add2"].disabled = true;
+formele["vS1$endAdd2"].disabled = true;
+}
+function disableAddAccessEntries() {
+}
+function disableAdd() {
+}
+function disableSnmpCommunityQuery() {
+formele["ComQueryVT$query"].disabled = true;
+formele["rndCommunityMngStationAddr$query"].disabled = true;
+formele["rndCommunityString$query"].disabled = true;
+formele["rndCommunityStatus$query"].disabled = true;
+formele["ComQueryVT$endQuery"].disabled = true;
+}
+function enableTargetAddrQuery() {
+formele["sT$query"].disabled = false;
+formele["snmpTargetAddrName$query"].disabled = false;
+formele["snmpTargetAddrRowStatus$query"].disabled = false;
+formele["sT$endQuery"].disabled = false;
+}
+function disableHtml() {
+formele["snmpManagement$select"].disabled = true;
+formele["communityString$select"].disabled = true;
+formele["notificationVersion$select"].disabled = true;
+formele["rndCommunityStatus$query"].disabled = true;
+formele["rndCommunityTrapsEnable$query"].disabled = false;
+formele["rndCommunityString$query"].disabled = false;
+formele["rndCommunityMngStationAddr$query"].disabled = false;
+formele["remove$cb"].disabled = true;
+}
+function formSubmit() {
+var ipSelect = formele["snmpManagement$select"];
+if(ipSelect.length == 0)
+return;
+disableHtml();
+if (formele["remove$cb"].checked)
+{
+if(formele["rndCommunityOwner$query"].value=="monitor")
+formele["rndCommunityStatus$query"].value=2;
+else{
+formele["rndCommunityStatus$query"].value=1;
+formele["rndCommunityOwner$query"].value="manager";
+formele["rndCommunityTrapsEnable$query"].value=4;
+}
+formele["rndCommunityStatus$query"].disabled=false;
+formele["restoreUrl"].value="../config/snmp_note.htm?[ComVT]Filter:(rndCommunityOwner=\'monitor\'||rndCommunityOwner=\'monitor_manager\')";
+}
+document.SnmpNotificationForm.submit();
+}
+// --End of Java code -->
+</script>
+</head>
+<body bgcolor="#ffffff" id="body" leftmargin="15" style="display:none" onload="setScreenMonitorState();">
+
+<FORM METHOD='POST' name="SnmpNotificationForm"  ACTION="/config/snmp_note.htm"  >
+<INPUT  Type="hidden" Name="restoreUrl" SIZE=256   value="[ComVT]Filter:(rndCommunityOwner='monitor'||rndCommunityOwner='monitor_manager')">
+<INPUT  TYPE="HIDDEN" NAME="errorCollector"   value="" SIZE="20" MAXLENGTH="20">
+<script>
+var formele = document.SnmpNotificationForm.elements;
+</script>
+<INPUT  Type=HIDDEN Name=ComVT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rndCommunityTable$VT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rndCommunityMngStationAddr$VT SIZE=128 disabled   value="Type=5;Access=2;NumOfEnumerations=0">
+<INPUT  Type=HIDDEN Name=rndCommunityString$VT SIZE=128 disabled   value="Type=100;Access=2;NumOfEnumerations=0;Range0=[1,20]">
+<INPUT  Type=HIDDEN Name=rndCommunityTrapsEnable$VT SIZE=128 disabled   value="Type=0;Access=2;NumOfEnumerations=4;Range0=[1,4];Default value=4">
+<INPUT  Type=HIDDEN Name= rndCommunityOwner$VT SIZE=128 disabled   value="Type=100;Access=2;NumOfEnumerations=0;Range0=[1,32];Default value=monitor">
+<INPUT  Type=HIDDEN Name= rndCommunityStatus$VT SIZE=128 disabled   value="Type=0;Access=2;NumOfEnumerations=2;Range0=[1,2];Default value=1">
+<INPUT  Type=HIDDEN Name=ComVT$endVT   value="OK" SIZE="20" MAXLENGTH="20">
+
+
+<INPUT  TYPE=hidden NAME=rndCommunityMngStationAddr$repeat11?1  disabled   value="0.0.0.0" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=rndCommunityString$repeat11?1  MAXLENGTH=64 disabled   value="Dell_Network_Manager">
+<INPUT  TYPE=hidden NAME=rndCommunityOwner$repeat11?1  MAXLENGTH=64 disabled   value="monitor_manager">
+<INPUT  type=hidden Name=ComVT$endRepeat?1  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  Type=HIDDEN Name=ComQueryVT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rndCommunityTable$VT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rndCommunityMngStationAddr$VT SIZE=128 disabled   value="Type=5;Access=2;NumOfEnumerations=0">
+<INPUT  Type=HIDDEN Name=rndCommunityString$VT SIZE=128 disabled   value="Type=100;Access=2;NumOfEnumerations=0;Range0=[1,20]">
+<INPUT  Type=HIDDEN Name=rndCommunityTrapsEnable$VT SIZE=128 disabled   value="Type=0;Access=2;NumOfEnumerations=4;Range0=[1,4];Default value=4">
+<INPUT  Type=HIDDEN Name=rndCommunityOwner$VT SIZE=128 disabled   value="Type=100;Access=2;NumOfEnumerations=0;Range0=[1,32];Default value=monitor">
+<INPUT  Type=HIDDEN Name= rndCommunityStatus$VT SIZE=128 disabled   value="Type=0;Access=2;NumOfEnumerations=2;Range0=[1,2];Default value=1">
+<INPUT  Type=HIDDEN Name=ComQueryVT$endVT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=ComQueryVT$query   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rndCommunityMngStationAddr$query MAXLENGTH=64   value="0.0.0.0">
+<INPUT  TYPE=hidden NAME=rndCommunityString$query   value="Dell_Network_Manager" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=rndCommunityTrapsEnable$query   value="4" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=rndCommunityOwner$query   value="monitor_manager" SIZE="20" MAXLENGTH="20">
+<script> var initQueryAccess = formele["rndCommunityTrapsEnable$query"].value;</script>
+<INPUT  TYPE=HIDDEN NAME=rndCommunityStatus$query   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=ComQueryVT$endQuery   value="OK" SIZE="20" MAXLENGTH="20">
+
+<script language="JavaScript">top.Draw_Header(document.title);</script>
+<div align="right">
+<table cellspacing="0" cellpadding="0" border="0" ID="Table1">
+<tr>
+<div class="management-only" id="addButtonDiv">
+<td width="14" height="25" class="management-only"><img style="WIDTH: 14px; HEIGHT: 25px" src="../Images/lbutton.gif" width="14" height="25"></td>
+<td valign="middle" align="center" class="data-area-button-management-only"><a href="javascript:void(0)" onClick="javascript:window.open('add_notification_v3.htm','', 'width=850, height=600, left=50, top=50, scrollbars=yes, resizable=yes');"
+title="Add SNMP Community">&nbsp;&nbsp;Add&nbsp;&nbsp;</a></td>
+<td width="14" height="25" class="management-only"><img style="WIDTH: 14px; HEIGHT: 25px" src="../Images/rbutton.gif" width="14" height="25"></td>
+</div>
+<td width="14" height="25"><img style="WIDTH: 14px; HEIGHT: 25px" src="../Images/lbutton.gif" width="14" height="25"></td>
+<td valign="middle" align="center" class="data-area-button"><a href="javascript:void(0)" onClick="javascript:window.open('snmp_note_table_v3.htm?[ComVT]Filter:(rndCommunityOwner=\'monitor\'||rndCommunityOwner=\'monitor_manager\')','', 'width=850, height=600, left=50, top=50, scrollbars=yes, resizable=yes');"
+title="Show Community Table">Show All</a></td>
+<td width="14" height="25"><img style="WIDTH: 14px; HEIGHT: 25px" src="../Images/rbutton.gif" width="14" height="25"></td>
+<td width="14" height="25"></td>
+</tr>
+</table>
+</div>
+<br>
+<table border="0" cellspacing="0" cellpadding="0" width="100%" ID="Table2">
+<script language="JavaScript">top.Draw_TableTop(2);top.Draw_TableHeader();</script>
+<script>
+if(top.oobNumOfPorts!=0)
+{
+document.write("<tr>");
+document.write("<td style='width: 10px;height:24px;' class='data-area-canvas'>&nbsp;</td>");
+document.write("<td class='data-area-canvas-odd'>OOB Management Stations</td>");
+document.write("<td class='data-area-canvas-odd'><input type='checkbox' name='oob$cb' onClick='changeOOB()'></td>");
+document.write("<td class='data-area-canvas'>&nbsp;</td>");
+document.write("<td style='width: 15px'>&nbsp;</td>");
+document.write("</tr>");
+}
+</script>
+<tr>
+<td class="data-area-canvas" width="10">&nbsp;</td>
+<td class="data-area-canvas-odd">Recipient IP</td>
+<td class="data-area-canvas-odd">
+<select name="snmpManagement$select" size="1" onChange="buildCommunitySelect(); selectCommunity();" ID="Select1">
+</select>
+</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td width="15">&nbsp;</td>
+</tr>
+<script> buildIPSelect();</script>
+<tr>
+<td class="data-area-canvas" width="10">&nbsp;</td>
+<td class="data-area-canvas" width="45%">Community String</td>
+<td class="data-area-canvas">
+<select name="communityString$select" size="1" onChange="selectCommunity()" ID="Select2">
+</select>
+</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td width="15">&nbsp;</td>
+</tr>
+<script>buildCommunitySelect();</script>
+<tr>
+<td class="data-area-canvas" width="10">&nbsp;</td>
+<td class="data-area-canvas-odd" width="45%">Notification Version</td>
+<td class="data-area-canvas-odd">
+<select name="notificationVersion$select" onChange="selectAccessMode()" ID="Select3">
+<option value="1" selected>SNMPv1</option>
+<option value="2">SNMPv2</option>
+</select>
+</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td width="15">&nbsp;</td>
+</tr>
+<script language="JavaScript">top.Draw_TableBottom(2);</script>
+</table>
+<br>
+<script>
+if(top.oobNumOfPorts!=0)
+{
+document.write("<table border='0' cellspacing='0' cellpadding='0' width='100%'>");
+top.Draw_TableTop(2);
+document.write("<tr>");
+document.write("<td style='width: 10px' class='data-area-canvas'>&nbsp;</td>");
+document.write("<td class='data-area-canvas-odd' width='45%'><b>Manage OOB</b></td>");
+document.write("<td class='data-area-canvas-odd'><input type='checkbox' name=manageOOB$cb></td>");
+document.write("<td class='data-area-canvas'>&nbsp;</td>");
+document.write("<td style='width: 15px'>&nbsp;</td>");
+document.write("</tr>");
+top.Draw_TableBottom(2);
+document.write("</table><br>");
+}
+</script>
+<table border="0" cellspacing="0" cellpadding="0" width="100%" ID="Table3">
+<script language="JavaScript">top.Draw_TableTop(2);</script>
+<tr>
+<td class="data-area-canvas" width="10">&nbsp;</td>
+<td class="data-area-canvas-odd" width="45%"><b>Remove Notification Recipient</b></td>
+<td class="data-area-canvas-odd">
+<input type="checkbox" name="remove$cb" ID="Checkbox1">
+</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td width="15">&nbsp;</td>
+</tr>
+<script language="JavaScript"> indexSign();
+</script>
+<script language="JavaScript">top.Draw_TableBottom(2);</script>
+</table>
+<br>
+<script language="JavaScript">
+document.getElementById("body").style.display="";
+</script>
+
+<div class="management-only">
+
+<div align="center"><table id="apply_tbl" cellspacing="0" cellpadding="0" border="0"><tr>
+<td nowrap nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/lbutton.gif"></td>
+<td nowrap nowrap valign="middle" align="center" class="data-area-button"><a href="javascript:preSubmit();">Apply Changes</a></td>
+<td nowrap nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/rbutton.gif"></td>
+</tr></table></div><br>
+<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
+<!--
+if(document.forms[0] && document.forms[0].elements.length<=1000)
+{
+for(i=0;(document.forms[0] && i<document.forms[0].elements.length);i++)
+{
+if(document.forms[0] && document.forms[0].elements[i].type=="select-one")
+if(document.forms[0] && document.forms[0].elements[i].length==0)
+document.forms[0].elements[i].style.width="70px";
+}
+}
+//-->
+</SCRIPT>
+
+</div>
+</form>
+</body>
+</html>

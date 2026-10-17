@@ -1,0 +1,112 @@
+
+
+
+<html>
+<head>
+<title>Restore Defaults</title>
+
+
+<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
+<!--
+if(top.location==self.location )
+{
+var refStr=self.location + " ";
+var ind=0;
+refStr.toLowerCase();
+ind=refStr.indexOf("config");
+var locationStr=refStr.substring(0,ind);
+if (opener)
+{
+if (opener.opener)
+{
+if(opener.opener.top.location==opener.opener.location)
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+else
+{
+if(opener.top.location==opener.location)
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+}
+else
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+//-->
+</SCRIPT>
+
+
+<link rel="stylesheet" href="../device/style.css" type="text/css">
+<script src="../js/globalFunctions.js"></script>
+<script language="JavaScript">
+if(top.MonitorMode) {
+document.write("<link rel='stylesheet' href='../device/monitorMode.css' type='text/css'>")
+}
+function formSubmit(){
+if ( document.softwareAciveForm.ResetConfig.checked ){
+if( confirm("Selecting the factory defaults option, erases the Startup Configuration file, and reapplies the factory defaults to the device. \nThe factory defaults are applied only after the device is reset.\nDo you want to proceed?","") ){
+document.getElementById('rndAction').disabled = false;
+document.getElementById('rndAction').value = "20";
+document.softwareAciveForm.elements["ResetConfig"].disabled = true;
+document.softwareAciveForm.submit();
+}
+}
+return false;
+}
+// End of Java code -->
+</script>
+</head>
+<body bgcolor="#FFFFFF" leftmargin="15" onload="setScreenMonitorState();">
+<script language="JavaScript">top.Draw_Header(document.title);</script>
+<FORM METHOD='POST' name="softwareAciveForm"  ACTION="/config/software_active.htm"   >
+<INPUT  Type="HIDDEN" Name="restoreUrl" SIZE=256   value="">
+<INPUT  TYPE="HIDDEN" NAME="errorCollector"   value="" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=hidden Name=rndAction id = "rndAction"    value="26" SIZE="20" MAXLENGTH="20">
+<table id="software_active_restore_tbl" border="0" cellspacing="0" cellpadding="0" width="100%">
+<script language="JavaScript">
+top.Draw_TableTop(2);
+</script>
+<tr>
+<td nowrap nowrap style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td nowrap nowrap nowrap class="data-area-canvas-odd" width="35%"><input type="checkbox" name="ResetConfig"><b>Restore Configuration Factory Defaults</b></td>
+<td nowrap nowrap class="data-area-canvas-odd" align="left">&nbsp;</td>
+<td nowrap nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<script language="JavaScript">
+top.Draw_TableBottom(2);
+</script>
+</table><br>
+<div class="management-only">
+
+<div align="center"><table id="apply_tbl" cellspacing="0" cellpadding="0" border="0"><tr>
+<td nowrap nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/lbutton.gif"></td>
+<td nowrap nowrap valign="middle" align="center" class="data-area-button"><a href="javascript:preSubmit();">Apply Changes</a></td>
+<td nowrap nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/rbutton.gif"></td>
+</tr></table></div><br>
+<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
+<!--
+if(document.forms[0] && document.forms[0].elements.length<=1000)
+{
+for(i=0;(document.forms[0] && i<document.forms[0].elements.length);i++)
+{
+if(document.forms[0] && document.forms[0].elements[i].type=="select-one")
+if(document.forms[0] && document.forms[0].elements[i].length==0)
+document.forms[0].elements[i].style.width="70px";
+}
+}
+//-->
+</SCRIPT>
+
+</div>
+</form>
+</body>
+</html>

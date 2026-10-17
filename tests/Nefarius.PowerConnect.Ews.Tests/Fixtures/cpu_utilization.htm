@@ -1,0 +1,101 @@
+
+
+<html>
+<head>
+
+
+<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
+<!--
+if(top.location==self.location )
+{
+var refStr=self.location + " ";
+var ind=0;
+refStr.toLowerCase();
+ind=refStr.indexOf("config");
+var locationStr=refStr.substring(0,ind);
+if (opener)
+{
+if (opener.opener)
+{
+if(opener.opener.top.location==opener.opener.location)
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+else
+{
+if(opener.top.location==opener.location)
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+}
+else
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+//-->
+</SCRIPT>
+
+
+<title>CPU Utilization</title>
+<link rel="stylesheet" href="../device/style.css" type="text/css">
+<script>
+top.inPanel=0;
+var mIsChartFrameLoaded = false;
+var mRefreshRate = 15000;
+var mTimeoutId = 0;
+var mData = new Array();
+function refreshRateChanged()
+{
+mRefreshRate = chart_gui.document.PortsChartForm.refresh_rate_select.value;
+if( mRefreshRate == -1)
+clearInterval( mTimeoutId );
+else
+mTimeoutId = setTimeout("Polling();", mRefreshRate );
+Polling();
+}
+function resetTimer()
+{
+if( 0 != mTimeoutId )
+clearInterval( mTimeoutId );
+}
+function Polling()
+{
+reloadSamples();
+try
+{
+chart_properties.document.location.reload();
+}
+catch(e)
+{
+}
+if( mRefreshRate != -1 )
+mTimeoutId = setTimeout("Polling();", mRefreshRate );
+}
+function reloadSamples()
+{
+var i=0;
+var length = mData.length;
+try
+{
+if( null != chart_gui.document.applets['GRAPH'] )
+for( i = 0; i < length; i++ )
+chart_gui.document.applets['GRAPH'].set_datavalue(i,0,mData[i], true);
+}
+catch(e)
+{
+}
+}
+</script>
+</head>
+<frameset framespacing="0" frameborder="no" border="0" rows="1,*">
+<frame scrolling="no" name="chart_properties" src="../config/cpu_utilization_properties.htm">
+<frame name="chart_gui" src="../config/cpu_utilization_chart.htm">
+</frameset>
+</html>
+

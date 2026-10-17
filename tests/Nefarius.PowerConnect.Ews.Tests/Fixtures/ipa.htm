@@ -1,0 +1,241 @@
+
+
+<html>
+<head>
+<title>IP Interface Parameters</title>
+<link rel="stylesheet" href="../device/style.css" type="text/css">
+<script type="text/javascript" src="../js/globalFunctions.js"></script>
+<script type="text/javascript" src="../js/common_methods.js"></script>
+<script type="text/javascript">
+if(top.MonitorMode) {
+document.write("<link rel='stylesheet' href='../device/monitorMode.css' type='text/css'>")
+}
+function validateIP(control, defaultValue, allowEmpty) {
+var success = true;
+if ( control.value != "") {
+if ( !checkIpAddress(control.value, false) ) {
+alert("'" + control.value + "' is not valid IP address");
+success = false;
+}
+} else if (!allowEmpty) {
+alert("Blank value is not allowed");
+success = false;
+}
+if(!success) {
+control.focus();
+control.value = defaultValue;
+}
+return success;
+}
+function validateMask(control) {
+var success = true;
+if ( control.value != "") {
+if ( !checkIpMask(control.value, false) ) {
+alert("'" + control.value + "' is not valid IP mask");
+success = false;
+}
+} else {
+alert("Blank value is not allowed");
+success = false;
+}
+if(!success) {
+control.focus();
+control.value = formele["rlGlobalIpAdEntNetMask$add"].value;
+}
+return success;
+}
+function onDhcpChange (value) {
+var staticIpText = document.getElementById("staticIpText");
+var staticMaskText = document.getElementById("staticMaskText");
+var staticGatewayText = document.getElementById("staticGatewayText");
+if (value == "1") {
+if(formele["rlDhcpSrvEnable"].value == 1){
+alert("DHCP client can not be enabled when DHCP server is enabled.");
+document.getElementById("dhcpStatusSelect").selectedIndex=1;
+return;
+}
+disableTextControl(staticIpText);
+disableTextControl(staticMaskText);
+disableTextControl(staticGatewayText);
+staticIpText.value = "";
+staticMaskText.value = "";
+staticGatewayText.value = "";
+} else {
+enableTextControl(staticIpText);
+enableTextControl(staticMaskText);
+enableTextControl(staticGatewayText);
+staticIpText.value = formele["rlGlobalIpAdEntAddr$add"].value;
+staticMaskText.value = formele["rlGlobalIpAdEntNetMask$add"].value;
+staticGatewayText.value = formele["rlGlobalIpAdDefaultGateway$add"].value;
+}
+}
+function formSubmit() {
+if (document.getElementById("dhcpStatusSelect").selectedIndex==0) {
+if (confirm("After applying Web session will be disconnected.\nWould you like to proceed?"))
+setDhcpRequest();
+}
+else
+changeStaticEntry();
+}
+function setDhcpRequest() {
+formele["rlGlobalIpAdIndex$add"].disabled = false;
+formele["rlGlobalIpAdOwner$add"].disabled = false;
+formele["rlGlobalIpAdOwner$add"].value = 2;
+document.forms[0].submit();
+}
+function reloadWithNewIP(ip) {
+top.newIPa = location.protocol + "//" + ip + "/home.htm"
+top.newIPf = function () {
+top.location = top.newIPa;
+}
+top.setTimeout(top.newIPf, 3000);
+}
+function changeStaticEntry() {
+var ipAddressCtrl = document.getElementById("staticIpText");
+var maskCtrl = document.getElementById("staticMaskText");
+var gatewayCtrl = document.getElementById("staticGatewayText");
+var isIpChanged=(formele["rlGlobalIpAdEntAddr$add"].value != ipAddressCtrl.value) ||
+(formele["rlGlobalIpAdOwner$add"].value == "2");
+if ((formele["rlGlobalIpAdEntNetMask$add"].value == maskCtrl.value) &&
+(formele["rlGlobalIpAdDefaultGateway$add"].value == gatewayCtrl.value) && !isIpChanged)
+return;
+if (!validateIP(ipAddressCtrl, formele["rlGlobalIpAdEntAddr$add"].value, false)) {
+return;
+}
+formele["rlGlobalIpAdEntAddr$add"].value = ipAddressCtrl.value;
+if (!validateMask(maskCtrl)) {
+return;
+}
+formele["rlGlobalIpAdEntNetMask$add"].value = maskCtrl.value;
+var defGateway = (formele["rlGlobalIpAdDefaultGateway$add"].value != " ") ? formele["rlGlobalIpAdDefaultGateway$add"].value : "";
+if (!validateIP(gatewayCtrl, defGateway, true)) {
+return;
+}
+if (gatewayCtrl.value != "") {
+formele["rlGlobalIpAdDefaultGateway$add"].value = gatewayCtrl.value;
+}
+formele["rlGlobalIpAdOwner$add"].value=1;
+enableControls("ipTableAddControls");
+if(isIpChanged)
+reloadWithNewIP(ipAddressCtrl.value);
+document.forms[0].submit();
+}
+</script>
+</head>
+<body bgcolor="#ffffff" leftmargin="15" onload="setScreenMonitorState();" id="docBody">
+<FORM METHOD='POST' name="ipAddressingForm"  ACTION="/config/ipa.htm"   >
+<INPUT  Type="HIDDEN" Name="restoreUrl" SIZE=256   value="">
+<INPUT  TYPE="HIDDEN" NAME="errorCollector"   value="" SIZE="20" MAXLENGTH="20">
+<div id="allServerControls">
+<div id="ipTableVTControls">
+<INPUT  Type=HIDDEN Name=IpTable   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rlGlobalIpAddrTable$VT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rlGlobalIpAdIndex$VT   value="Type=0;Access=1;NumOfEnumerations=0;Range0=[1,1]" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rlGlobalIpAdEntAddr$VT   value="Type=5;Access=2;NumOfEnumerations=0;Default value=0.0.0.0" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rlGlobalIpAdEntNetMask$VT   value="Type=5;Access=2;NumOfEnumerations=0;Default value=0.0.0.0" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rlGlobalIpAdDefaultGateway$VT   value="Type=5;Access=2;NumOfEnumerations=0;Default value=0.0.0.0" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rlGlobalIpAdOwner$VT   value="Type=0;Access=2;NumOfEnumerations=3;Range0=[1,3];Default value=3" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=IpTable$endVT   value="OK" SIZE="20" MAXLENGTH="20">
+</div>
+<div id="ipTableAddControls">
+
+<INPUT  Type=hidden Name=rlGlobalIpAdIndex$add   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=hidden Name=rlGlobalIpAdEntAddr$add   value="192.168.2.17" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=hidden Name=rlGlobalIpAdEntNetMask$add   value="255.255.255.0" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=hidden Name=rlGlobalIpAdDefaultGateway$add   value="192.168.2.1" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=hidden Name=rlGlobalIpAdOwner$add   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=IpTable$endRepeat?1    value="OK" SIZE="20" MAXLENGTH="20">
+
+</div>
+</div>
+<INPUT  TYPE=hidden NAME="rlDhcpSrvEnable" disabled    value="2" SIZE="20" MAXLENGTH="20">
+</form>
+<script type="text/javascript">
+var formele = document.forms[0].elements;
+disableControls("allServerControls");
+var dhcpChecked = (formele["rlGlobalIpAdOwner$add"].value == "2" );
+</script>
+<script type="text/javascript">
+top.Draw_Header(document.title);
+</script>
+<table border="0" cellspacing="0" cellpadding="0" width="100%">
+<script language="JavaScript">
+top.Draw_TableTop(2);
+top.Draw_TableHeader();
+</script>
+<tr>
+<td style="WIDTH: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas-odd" width="40%">DHCP</td>
+<td class="data-area-canvas-odd">
+<select id="dhcpStatusSelect" onChange="onDhcpChange(this.value);">
+<option value="1">Enable</option>
+<option value="2">Disable</option>
+</select>
+<script type="text/javascript">
+document.getElementById("dhcpStatusSelect").value = dhcpChecked ? "1" : "2";
+</script>
+</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="WIDTH: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td style="WIDTH: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas">IP Address</td>
+<td class="data-area-canvas">
+<input id="staticIpText" type="text"> (X.X.X.X)
+<script type="text/javascript">
+var staticIpText = document.getElementById("staticIpText");
+staticIpText.value = formele["rlGlobalIpAdEntAddr$add"].value;
+if(dhcpChecked) {
+disableTextControl(staticIpText);
+}
+</script>
+</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="WIDTH: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td style="WIDTH: 10px; HEIGHT: 24px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas-odd">Subnet Mask</td>
+<td class="data-area-canvas-odd">
+<input id="staticMaskText" type="text"> (X.X.X.X)</td>
+<script type="text/javascript">
+var staticMaskText = document.getElementById("staticMaskText");
+staticMaskText.value = formele["rlGlobalIpAdEntNetMask$add"].value;
+if(dhcpChecked) {
+disableTextControl(staticMaskText);
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="WIDTH: 15px"></td>
+</tr>
+<tr>
+<td style="WIDTH: 10px; HEIGHT: 24px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas">Default Gateway</td>
+<td class="data-area-canvas">
+<input id="staticGatewayText" type="text"> (X.X.X.X)</td>
+<script type="text/javascript">
+var staticGatewayText = document.getElementById("staticGatewayText");
+var gateway = formele["rlGlobalIpAdDefaultGateway$add"].value;
+if(gateway != "" && gateway != " ") {
+staticGatewayText.value = gateway;
+}
+if(dhcpChecked) {
+disableTextControl(staticGatewayText);
+}
+</script>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="WIDTH: 15px"></td>
+</tr>
+<script language="JavaScript">
+top.Draw_TableBottom(2)
+</script>
+</table>
+<br>
+<div class="management-only">
+<script language="JavaScript">
+top.Draw_ButtonApply("formSubmit")
+</script>
+</div>
+</body>
+</html>

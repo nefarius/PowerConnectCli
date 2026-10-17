@@ -1,0 +1,190 @@
+
+
+<html>
+<head>
+<title>VLAN LAG Settings</title>
+<link rel="stylesheet" href="../device/style.css" type="text/css">
+<script src="../js/globalFunctions.js"></script>
+<script src="../js/common_methods.js"></script>
+<script language="JavaScript">
+<!-- Beginng of JavaScript Applet
+if(top.MonitorMode) {
+document.write("<link rel='stylesheet' href='../device/monitorMode.css' type='text/css'>")
+}
+if(top.MonitorMode) {
+document.write("<link rel='stylesheet' href='../device/monitorMode.css' type='text/css'>")
+}
+function openShowAllPage() {
+window.open("vlan_lag_table.htm?[dot1qPortVlanTableVT]Filter:((dot1dBasePort>=1)&&(dot1dBasePort<=12))", "", "width=850, height=600, left=50, top=50, scrollbars=yes, resizable=yes");
+}
+function selectInterface() {
+var portIndex = getInteface();
+var queryStr = "vlan_trunk.htm?[dot1qPortVlanTableVT]Query:dot1dBasePort=" + portIndex;
+document.location.href = queryStr;
+}
+function getInteface() {
+var portSelect = document.getElementById("portSelect");
+return (portSelect.options[portSelect.selectedIndex].value);
+}
+function selectChosenInterface() {
+var portIndex = parseInt(vlanTrunkForm.elements["dot1dBasePort$query"].value);
+var portSelect = document.getElementById("portSelect");
+var i=0;
+while (portSelect.options[i].value != portIndex) {
+i++;
+}
+portSelect.selectedIndex = i
+}
+function showPVID() {
+var pvidText = document.getElementById("pvidText");
+pvidText.value = vlanTrunkForm.elements["dot1qPvid$query"].value;
+}
+function displayFrameType() {
+var combo = document.getElementById("frameTypeSelect");
+combo.value = vlanTrunkForm.elements["dot1qPortAcceptableFrameTypes$query"].value;
+}
+function displayFiltering() {
+var combo = document.getElementById("filteringSelect");
+combo.value = vlanTrunkForm.elements["dot1qPortIngressFiltering$query"].value;
+}
+function changeFrameType() {
+var combo = document.getElementById("frameTypeSelect");
+vlanTrunkForm.elements["dot1qPortAcceptableFrameTypes$query"].value = combo.value;
+}
+function changeFiltering() {
+var combo = document.getElementById("filteringSelect");
+vlanTrunkForm.elements["dot1qPortIngressFiltering$query"].value = combo.value;
+}
+function formSubmit(){
+var pvidCtrl = document.getElementById("pvidText");
+var val = pvidCtrl.value;
+if ( !checkInteger( val ) )
+{
+alert("The '" + val + "' must be an integer");
+return;
+}
+var pvid = parseInt(val);
+if(isNaN(pvid) || pvid < 1 || pvid > 4095) {
+alert("Please enter a valid value for PVID");
+pvidCtrl.select();
+return;
+}
+vlanTrunkForm.elements["dot1qPvid$query"].value = pvidCtrl.value;
+vlanTrunkForm.submit();
+}
+// --End of Java code -->
+</script>
+</head>
+<body bgcolor="#ffffff" leftmargin="15" onload="setScreenMonitorState();">
+<FORM METHOD='POST'  ACTION="/config/vlan_trunk.htm" name="vlanTrunkForm"   >
+<INPUT  type="hidden" name="restoreUrl" size="256"   value="Query:dot1dBasePort=1000">
+<INPUT  type="hidden" name="errorCollector"   value="" SIZE="20" MAXLENGTH="20">
+<INPUT  type="hidden" name="dot1qPortVlanTableVT"   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  type="hidden" name=dot1qPortVlanTable$VT size="128"   value="OK">
+<INPUT  type="hidden" Name=dot1dBasePort$VT size="128"   value="Type=0;Access=1;NumOfEnumerations=0;Range0=[1,65535]">
+<INPUT  type="hidden" Name=dot1qPvid$VT size="128"   value="Type=7;Access=2;NumOfEnumerations=0;Range0=[-2147483648,2147483647];Default value=1">
+<INPUT  type="hidden" Name=dot1qPortAcceptableFrameTypes$VT size="128"   value="Type=0;Access=2;NumOfEnumerations=2;Range0=[1,2];Default value=1">
+<INPUT  type="hidden" Name=dot1qPortIngressFiltering$VT size="128"   value="Type=0;Access=2;NumOfEnumerations=2;Range0=[1,2];Default value=1">
+<INPUT  type="hidden" name=dot1qPortVlanTableVT$endVT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  type="hidden" name=dot1qPortVlanTableVT$query   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  type="hidden" name=dot1dBasePort$query   value="1000" SIZE="20" MAXLENGTH="20">
+<INPUT  type="hidden" name=dot1qPvid$query   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type="hidden" name=dot1qPortAcceptableFrameTypes$query   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type="hidden" name=dot1qPortIngressFiltering$query   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type="hidden" name=dot1qPortVlanTableVT$endQuery   value="OK" SIZE="20" MAXLENGTH="20"> </FORM>
+<script language="JavaScript">
+top.Draw_Header(document.title);
+</script>
+<div align="right">
+<table cellspacing="0" cellpadding="0" border="0" ID="Table1">
+<tr>
+<td width="14" height="25"><img style="WIDTH: 14px; HEIGHT: 25px" src="../images/lbutton.gif" width="14" height="25"></td>
+<td valign="middle" align="center" class="data-area-button">
+<a href="javascript:void(0)" onclick="openShowAllPage();" onMouseover="showtip(this,event,'Show Static MAC Address Table')"
+onMouseout="hidetip()">Show All </a>
+</td>
+<td width="14" height="25"><img style="WIDTH: 14px; HEIGHT: 25px" src="../images/rbutton.gif" width="14" height="25"></td>
+<td width="14" height="25"></td>
+</tr>
+</table>
+</div>
+<br>
+<div align="right">
+<table border="0" cellspacing="0" cellpadding="0" width="100%" ID="Table2">
+<script language="JavaScript">
+top.Draw_TableTop(2);
+top.Draw_TableHeader();
+</script>
+<tr>
+<td class="data-area-canvas" width="10">&nbsp;</td>
+<td class="data-area-canvas-odd" width="40%">LAG</td>
+<td class="data-area-canvas-odd">
+<select id="portSelect" onChange="selectInterface();" class="monitorEnabled" NAME="portSelect">
+</select>&nbsp;&nbsp;
+<script language="JavaScript">
+var portSelect = document.getElementById("portSelect");
+addTrunksListToSelectBox(portSelect, 1);
+</script>
+<script language="JavaScript">
+selectChosenInterface();
+</script>
+</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td width="15">&nbsp;</td>
+</tr>
+<tr>
+<td class="data-area-canvas" width="10">&nbsp;</td>
+<td class="data-area-canvas">PVID&nbsp;(1-4095)</td>
+<td class="data-area-canvas">
+<input size="16" maxlength="4" id="pvidText" NAME="pvidText">
+<script language="JavaScript">
+showPVID();
+</script>
+(4095 is the Discard VLAN)
+</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td width="15">&nbsp;</td>
+</tr>
+<tr>
+<td class="data-area-canvas" width="10">&nbsp;</td>
+<td class="data-area-canvas-odd">Frame Type</td>
+<td class="data-area-canvas-odd">
+<select id="frameTypeSelect" onChange="changeFrameType();" NAME="frameTypeSelect">
+<option value="2" selected>Admit Tag Only</option>
+<option value="1">Admit All</option>
+</select>
+<script language="JavaScript">
+displayFrameType();
+</script>
+</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td width="15">&nbsp;</td>
+</tr>
+<tr>
+<td class="data-area-canvas" width="10">&nbsp;</td>
+<td class="data-area-canvas">Ingress Filtering</td>
+<td class="data-area-canvas">
+<select id="filteringSelect" onChange="changeFiltering();" NAME="filteringSelect">
+<option value="1" selected>Enable</option>
+<option value="2">Disable</option>
+</select>
+<script language="JavaScript">
+displayFiltering();
+</script>
+</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td width="15">&nbsp;</td>
+</tr>
+<script language="JavaScript">
+top.Draw_TableBottom(2)
+</script>
+</table>
+<br>
+<div class="management-only">
+<script language="JavaScript">
+top.Draw_ButtonApply("formSubmit")
+</script>
+</div>
+</div>
+</body>
+</html>

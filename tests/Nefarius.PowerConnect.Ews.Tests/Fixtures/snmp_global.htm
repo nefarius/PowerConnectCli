@@ -1,0 +1,166 @@
+
+
+
+<html>
+<head>
+<script>
+document.write("<title>Global Parameters</title>");
+</script>
+
+
+<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
+<!--
+if(top.location==self.location )
+{
+var refStr=self.location + " ";
+var ind=0;
+refStr.toLowerCase();
+ind=refStr.indexOf("config");
+var locationStr=refStr.substring(0,ind);
+if (opener)
+{
+if (opener.opener)
+{
+if(opener.opener.top.location==opener.opener.location)
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+else
+{
+if(opener.top.location==opener.location)
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+}
+else
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+//-->
+</SCRIPT>
+
+
+<link rel="stylesheet" href="../device/style.css" type="text/css">
+<script src="../js/globalFunctions.js"></script>
+<script language="JavaScript">
+<!-- Beginng of JavaScript Applet
+if(top.MonitorMode) {
+document.write("<link rel='stylesheet' href='../device/monitorMode.css' type='text/css'>")
+}
+var engineIdWasOn = false;
+var defaultEngineWasOn = false;
+var engineNotConfiguredString = "EngineID not Configured";
+function elementByName(name) {
+return document.getElementsByName(name)[0];
+}
+function setControlValue(control, value) {
+control.disabled = false;
+control.value = value;
+}
+function enableControl(ctrl){
+ctrl.disabled = false;
+ctrl.style.backgroundColor="#ffffff";
+}
+function disableControl(ctrl){
+ctrl.disabled = true;
+ctrl.style.backgroundColor="#cccccc";
+}
+function initForm(){
+var snmpModeSelect = document.getElementById("snmpModeSelect");
+var authenModeSelect = document.getElementById("authenModeSelect");
+snmpModeSelect.value = elementByName("rndAlarmEnabling$scalar").value;
+if(snmpModeSelect.value == "2") {
+authenModeSelect.value = "2";
+authenModeSelect.disabled = true;
+} else {
+authenModeSelect.value = elementByName("snmpEnableAuthenTraps$scalar").value;
+}
+}
+function changeSnmpModeSelect(value) {
+var authenModeSelect = document.getElementById("authenModeSelect");
+if(value == "2") {
+authenModeSelect.disabled = true;
+authenModeSelect.value = "2";
+} else {
+authenModeSelect.disabled = false;
+authenModeSelect.value = "1";
+}
+}
+function formSubmit() {
+var snmpMode = document.getElementById("snmpModeSelect").value;
+var authenMode = document.getElementById("authenModeSelect").value;
+var snmpModeCtrl = elementByName("rndAlarmEnabling$scalar");
+var authenModeCtrl = elementByName("snmpEnableAuthenTraps$scalar");
+if(snmpMode != snmpModeCtrl.value) {
+setControlValue(snmpModeCtrl, snmpMode);
+}
+if(authenMode != authenModeCtrl.value) {
+setControlValue(authenModeCtrl, authenMode);
+}
+document.snmpGlobalForm.submit();
+}
+// --End of Java code -->
+</script>
+</head>
+<body bgcolor="#FFFFFF" leftmargin="15" onload="setScreenMonitorState();">
+<FORM METHOD='POST' name="snmpGlobalForm"  ACTION="/config/snmp_global.htm"   >
+<INPUT  type="hidden" name="restoreUrl" SIZE=256   value="">
+<INPUT  type="hidden" name="errorCollector"   value="" SIZE="20" MAXLENGTH="20">
+<INPUT  type="hidden" name=rndAlarmEnabling$scalar disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type="hidden" name=snmpEnableAuthenTraps$scalar disabled   value="1" SIZE="20" MAXLENGTH="20">
+</form>
+<script language="JavaScript">
+top.Draw_Header(document.title);
+</script>
+<table border="0" cellspacing="0" cellpadding="0" width="100%">
+<script language="JavaScript">
+top.Draw_TableTop(2);
+top.Draw_TableHeader();
+</script>
+<tr>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas-odd" width="45%">SNMP Notifications</td>
+<td class="data-area-canvas-odd">
+<select id="snmpModeSelect" size="1" onchange="changeSnmpModeSelect(this.value);">
+<option value="1">Enable</option>
+<option value="2">Disable</option>
+</select>
+</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas">Authentication Notifications</td>
+<td class="data-area-canvas">
+<select id="authenModeSelect">
+<option value="1">Enable</option>
+<option value="2">Disable</option>
+</select>
+</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<script language="JavaScript">
+initForm();
+top.Draw_TableBottom(2);
+</script>
+</table>
+<br>
+<div align="center" class="management-only">
+<table id="apply_tbl" cellspacing="0" cellpadding="0" border="0">
+<tr>
+<td nowrap nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/lbutton.gif"></td>
+<td nowrap nowrap valign="middle" align="center" class="data-area-button"><a href="javascript:preSubmit();">Apply Changes</a></td>
+<td nowrap nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/rbutton.gif"></td>
+</tr>
+</table>
+</div>
+</body>
+</html>

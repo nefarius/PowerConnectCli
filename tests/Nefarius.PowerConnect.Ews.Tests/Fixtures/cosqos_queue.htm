@@ -1,0 +1,347 @@
+
+
+
+<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
+<!--
+if(top.location==self.location )
+{
+var refStr=self.location + " ";
+var ind=0;
+refStr.toLowerCase();
+ind=refStr.indexOf("config");
+var locationStr=refStr.substring(0,ind);
+if (opener)
+{
+if (opener.opener)
+{
+if(opener.opener.top.location==opener.opener.location)
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+else
+{
+if(opener.top.location==opener.location)
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+}
+else
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+//-->
+</SCRIPT>
+
+<html>
+<head>
+<title>
+QoS Queue Settings
+</title>
+<link rel="stylesheet" href="../device/style.css" type="text/css">
+<script src="../js/globalFunctions.js"></script>
+<script language="JavaScript">
+<!-- Beginng of JavaScript Applet
+if(top.MonitorMode) {
+document.write("<link rel='stylesheet' href='../device/monitorMode.css' type='text/css'>")
+}
+top.FirstTd=0;
+var NumOfEntries=0;
+var numOfQueues=top.numOfQueues;
+var defaultWeights = [NaN, "1", "2", "8", "16", "32", "64", "128", "255"];
+function formSubmit() {
+var index;
+for (index=1; index<=numOfQueues; index++) {
+formele["rlQosEfQueueId$repeat?"+index].disabled=false;
+formele["rlQosEfState$repeat?"+index].disabled=false;
+formele["EfManageTable$endrepeat?"+index].disabled=false;
+}
+var weightField;
+for (i=1; i<=numOfQueues; i++) {
+weightField = document.getElementById("weight" + i);
+if (weightField.disabled) continue;
+if ( !checkWeight(weightField, i, i == 8 ? 1 : 0, 255, false) )
+return false;
+formele["rlQosValueQueue" + i + "$query"].disabled = weightField.disabled;
+formele["rlQosValueQueue" + i + "$query"].value = weightField.value;
+}
+for (i = 5; i <= 8; i++)
+formele["rlQosValueQueue"+i+"$query"].disabled = formele["rlQosValueQueue1$query"].disabled;
+document.cosqosQueueForm.submit();
+}
+function drawQueueTable() {
+var index = 1;
+var radioName;
+var sspRadioId;
+var wrrRadioId;
+var percentId
+var qid;
+var sspDisabled;
+var wrrDisabled;
+var sspChecked;
+var wrrChecked;
+var minRange;
+var weightField;
+while (formele["rlQosEfQueueId$repeat?" + index]) {
+NumOfEntries = index;
+radioName = "queueModeRadio" + index;
+sspRadioId = "sspRadio" + index;
+wrrRadioId = "wrrRadio" + index;
+percentId = "percentTd" + index;
+qid = formele["rlQosEfQueueId$repeat?" + index].value;
+sspDisabled = (index == 2) ? " disabled " : "";
+wrrDisabled = (index == 1) ? " disabled " : "";
+if (formele["rlQosEfState$repeat?" + index].value == "1") {
+wrrChecked = " checked ";
+sspChecked = "";
+} else {
+wrrChecked = "";
+sspChecked = " checked ";
+}
+minRange = (index == 8) ? 1 : 0;
+document.write("<tr>");
+document.write(" <td nowrap style='width: 10px' class='data-area-canvas'>&nbsp;</td>");
+document.write(" <td nowrap class='" + colorClass() + "' align='left'>"+ qid +"</td>");
+document.write(" <td nowrap class='" + colorClass() + "' align='left'>");
+document.write(" <input type='radio' name='" + radioName +"' id='"+ sspRadioId + "'" + sspDisabled + sspChecked);
+document.write(" onClick='changeQueueStatus(" + index + ");displayPrecent();'>");
+document.write(" </td>");
+document.write(" <td nowrap class='" + colorClass() + "' align='left'>");
+document.write(" <input type='radio' name='" + radioName + "' id='" + wrrRadioId + "'" + wrrDisabled + wrrChecked);
+document.write(" onClick='changeQueueStatus(" + index + ");displayPrecent();'>");
+document.write(" </td>");
+document.write(" <td align='center' nowrap valign='middle' class=" + colorClass() + ">");
+document.write(" <input type='text' size=20 id='weight" + index + "' onBlur=\"checkWeight(this," + index + "," + minRange + ",255, true);displayPrecent();\" size=3 id='weight" + index + "'>");
+document.write(" </td>");
+document.write(" <td align='center' id='" + percentId + "' nowrap valign='middle' class=" + colorClass() + ">&nbsp;</td>");
+document.write(" <td nowrap class='data-area-canvas'>&nbsp;</td>");
+document.write(" <td nowrap style='width: 15px'>&nbsp;</td>");
+document.write("</tr>");
+ChangeRowColor();
+index ++;
+}
+}
+function setValues() {
+var weightField;
+for (var i=1; i<=numOfQueues; i++) {
+weightField = document.getElementById("weight" + i);
+if (formele["rlQosEfState$repeat?"+i].value == "1") {
+weightField.value = formele["rlQosValueQueue" + i + "$query"].value;
+} else {
+weightField.value = "";
+weightField.disabled = true;
+}
+}
+}
+function displayPrecent() {
+var weight;
+var sum = calcSum();
+var td;
+for (var i=1; i<=numOfQueues; i++) {
+td = document.getElementById("percentTd" + i);
+if (!document.getElementById("weight" + i).disabled) {
+weight = parseInt(document.getElementById("weight" + i).value);
+if (sum == 0)
+td.innerHTML = "";
+else
+td.innerHTML = Math.round((weight/sum) * 10000)/100;
+} else {
+td.innerHTML="";
+}
+}
+}
+function calcSum() {
+var sum = 0;
+var weightCtrl;
+for (i=1; i<=numOfQueues; i++) {
+weightCtrl = document.getElementById("weight" + i);
+if (!weightCtrl.disabled) {
+sum += parseInt(weightCtrl.value);
+}
+}
+return sum;
+}
+function changeQueueStatus(index) {
+var i;
+var weightField;
+for (var i=1; i<=NumOfEntries; i++) {
+weightField = document.getElementById("weight" + i);
+if(weightField.value != "") {
+defaultWeights[i] = weightField.value;
+}
+}
+var sspRadio = document.getElementById("sspRadio" + index);
+if(sspRadio.checked) {
+for (i=index; i<=NumOfEntries; i++) {
+formele["rlQosEfState$repeat?"+i].value = "2";
+document.getElementById("sspRadio" + i).checked = true;
+weightField = document.getElementById("weight" + i);
+weightField.value = "";
+weightField.disabled = true;
+}
+} else {
+for (i=1; i<=index; i++) {
+document.getElementById("wrrRadio" + i).checked = true
+formele["rlQosEfState$repeat?"+i].value = "1";
+weightField = document.getElementById("weight" + i);
+weightField.value = defaultWeights[i];
+weightField.disabled = false;
+}
+}
+}
+function checkWeight(ctrl, index, min, max, show_alert) {
+if(ctrl.value == "" || ctrl.value == " ") {
+if ( show_alert )
+alert("Blank value for weight is not allowed!");
+ctrl.value = defaultWeights[index];
+ctrl.select();
+return false;
+}
+if (!checkInteger(ctrl.value)) {
+if ( show_alert )
+alert("Weight is not valid integer value");
+ctrl.value = defaultWeights[index];
+ctrl.select();
+return false;
+}
+var intVal = parseInt(ctrl.value);
+if (intVal == NaN || intVal < min || intVal > max) {
+if ( show_alert )
+alert("Weight must lay inside range [" + min + "," + max + "]");
+ctrl.value = defaultWeights[index];
+ctrl.select();
+return false;
+}
+else
+ctrl.value = intVal;
+return true;
+}
+// --End of Java code -->
+</script>
+</head>
+<body bgcolor="#FFFFFF" leftmargin="15" onload="setScreenMonitorState();">
+<script language="JavaScript">
+top.Draw_Header(document.title);
+</script>
+<FORM METHOD='POST' name="cosqosQueueForm"  ACTION="/config/cosqos_queue.htm"   >
+<INPUT  type="hidden" name="errorCollector"   value="" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=EfManageTable   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rlQosEfManageTable   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rlQosEfQueueId$VT   value="Type=0;Access=1;NumOfEnumerations=0;Range0=[1,8]" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rlQosEfState$VT   value="Type=0;Access=2;NumOfEnumerations=2;Range0=[1,2]" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=EfManageTable$endVT   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosEfQueueId$repeat?1  disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosEfState$repeat?1  disabled   value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=EfManageTable$endrepeat?1  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosEfQueueId$repeat?2  disabled   value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosEfState$repeat?2  disabled   value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=EfManageTable$endrepeat?2  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosEfQueueId$repeat?3  disabled   value="3" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosEfState$repeat?3  disabled   value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=EfManageTable$endrepeat?3  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosEfQueueId$repeat?4  disabled   value="4" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosEfState$repeat?4  disabled   value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=EfManageTable$endrepeat?4  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  Type="hidden" Name=ProfileTable   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rlQosQueueProfileTable$VT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rlQueueProfileName$VT   value="Type=100;Access=1;NumOfEnumerations=0;Range0=[0,32]" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rlQosValueQueue1$VT   value="Type=0;Access=2;NumOfEnumerations=0;Range0=[-2147483648,2147483647]" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rlQosValueQueue2$VT   value="Type=0;Access=2;NumOfEnumerations=0;Range0=[-2147483648,2147483647]" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rlQosValueQueue3$VT   value="Type=0;Access=2;NumOfEnumerations=0;Range0=[-2147483648,2147483647]" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rlQosValueQueue4$VT   value="Type=0;Access=2;NumOfEnumerations=0;Range0=[-2147483648,2147483647]" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rlQosValueQueue5$VT   value="Type=0;Access=2;NumOfEnumerations=0;Range0=[-2147483648,2147483647]" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rlQosValueQueue6$VT   value="Type=0;Access=2;NumOfEnumerations=0;Range0=[-2147483648,2147483647]" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rlQosValueQueue7$VT   value="Type=0;Access=2;NumOfEnumerations=0;Range0=[-2147483648,2147483647]" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rlQosValueQueue8$VT   value="Type=0;Access=2;NumOfEnumerations=0;Range0=[-2147483648,2147483647]" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rlQosQueueProfileStatus$VT   value="Type=0;Access=2;NumOfEnumerations=6;Range0=[1,6]" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=ProfileTable$endVT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=ProfileTable$query   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=rlQueueProfileName$query   value="default" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=rlQosValueQueue1$query   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=rlQosValueQueue2$query   value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=rlQosValueQueue3$query   value="3" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=rlQosValueQueue4$query   value="4" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=rlQosValueQueue5$query   value="5" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=rlQosValueQueue6$query   value="6" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=rlQosValueQueue7$query   value="7" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=rlQosValueQueue8$query   value="8" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=rlQosQueueProfileStatus$query   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=ProfileTable$endQuery   value="OK" SIZE="20" MAXLENGTH="20">
+</form>
+<script type="text/javascript">
+var formele = document.forms[0].elements;
+</script>
+<table border="0" cellspacing="0" cellpadding="0" width="100%">
+<script language="JavaScript">
+top.Draw_TableTop(5)
+</script>
+<tr>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-tab-header"><b>Queue</b></td>
+<td class="data-area-tab-header" colspan="3" align="center" width="40%"><b>Scheduling</b></td>
+<td class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td style="width: 10px" class="data-area-canvas" >&nbsp;</td>
+<td class="data-area-tab-header">&nbsp;</td>
+<td class="data-area-tab-header"><b>Strict Priority</b></td>
+<td class="data-area-tab-header"><b>WRR</b></td>
+<td class="data-area-tab-header" align="center"><b>WRR Weights</b></td>
+<td class="data-area-tab-header" align="center"><b>WRR percentage</b></td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td style="height: 1px; width: 10px" class="data-area-canvas"><img style="width: 1px; height: 1px" src=""></td>
+<td colspan="5" style="height: 1px" class="data-area-separator"><img style="width: 1px; height: 1px" src=""></td>
+<td style="height: 1px" class="data-area-canvas"><img style="width: 1px; height: 1px" src=""></td>
+<td style="height: 1px; width: 15px"></td>
+</tr>
+<script language="JavaScript">
+drawQueueTable();
+</script>
+<script language="JavaScript">
+setValues();
+displayPrecent();
+</script>
+<script language="JavaScript">
+top.Draw_TableBottom(5);
+</script>
+</table>
+<br>
+<div class="management-only">
+
+<div align="center"><table id="apply_tbl" cellspacing="0" cellpadding="0" border="0"><tr>
+<td nowrap nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/lbutton.gif"></td>
+<td nowrap nowrap valign="middle" align="center" class="data-area-button"><a href="javascript:preSubmit();">Apply Changes</a></td>
+<td nowrap nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/rbutton.gif"></td>
+</tr></table></div><br>
+<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
+<!--
+if(document.forms[0] && document.forms[0].elements.length<=1000)
+{
+for(i=0;(document.forms[0] && i<document.forms[0].elements.length);i++)
+{
+if(document.forms[0] && document.forms[0].elements[i].type=="select-one")
+if(document.forms[0] && document.forms[0].elements[i].length==0)
+document.forms[0].elements[i].style.width="70px";
+}
+}
+//-->
+</SCRIPT>
+
+</div>
+</body>
+</html>

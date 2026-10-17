@@ -1,0 +1,705 @@
+
+
+<html>
+<head>
+<title>STP Port Settings</title>
+
+
+<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
+<!--
+if(top.location==self.location )
+{
+var refStr=self.location + " ";
+var ind=0;
+refStr.toLowerCase();
+ind=refStr.indexOf("config");
+var locationStr=refStr.substring(0,ind);
+if (opener)
+{
+if (opener.opener)
+{
+if(opener.opener.top.location==opener.opener.location)
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+else
+{
+if(opener.top.location==opener.location)
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+}
+else
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+//-->
+</SCRIPT>
+
+
+<link rel="stylesheet" href="../device/style.css" type="text/css">
+<script src="../js/globalFunctions.js"></script>
+<script language="JavaScript">
+<!-- Beginng of JavaScript Applet
+if(top.MonitorMode)
+{
+document.write("<link rel='stylesheet' href='../device/monitorMode.css' type='text/css'>")
+}
+top.FirstTd=0;
+top.fldToCheck="";
+function displayState() {
+formele=document.staPortConfigForm.elements;
+var value = formele["dot1dStpPortState$query"].value;
+var textValue = "";
+var case2="Blocking";
+var case3="Listening";
+var stpOpMode=formele["dot1dStpVersion"].value;
+if(parseInt(stpOpMode)==2){
+case2="Discarding";
+case3="Discarding";
+}
+switch(value)
+{
+case "1":
+textValue = "Disabled";
+break;
+case "2":
+textValue = case2;
+break;
+case "3":
+textValue = case3;
+break;
+case "4":
+textValue = "Learning";
+break;
+case "5":
+textValue = "Forwarding";
+break;
+default:
+break;
+}
+var trunkStr = relatedTrunk(document.staPortConfigForm.elements["rlPhdPortsIfIndex$query"].value);
+if (parseInt(trunkStr)!=0)
+{
+textValue='N/A';
+}
+document.write(textValue);
+}
+function displayFastMode()
+{
+formele=document.staPortConfigForm.elements;
+var fastMode = formele["dot1dStpPortAdminEdgePort$query"].value;
+if(fastMode==1)
+formele["portFastMode$select"].selectedIndex=0;
+else
+{
+var autoMode = formele["rldot1dStpPortAutoEdgePort$query"].value;
+if(autoMode == 1)
+formele["portFastMode$select"].selectedIndex=1;
+else
+formele["portFastMode$select"].selectedIndex=2;
+}
+}
+function displayEdge() {
+formele=document.staPortConfigForm.elements;
+if (formele["dot1dStpPortAdminEdgePort$query"].value==1)
+formele["fastLink$cb"].checked=true;
+}
+function displaySpeed() {
+formele=document.staPortConfigForm.elements;
+var speedValue = formele["ifSpeed$query"].value;
+if (parseInt(speedValue) == 10)
+{
+textValue = speedValue + "G";
+}
+else
+{
+speedValue = parseInt(speedValue) / 1000000 ;
+textValue = speedValue + "M";
+}
+document.write(textValue);
+}
+function displayDesignatedBridge()
+{
+formele=document.staPortConfigForm.elements;
+var designatedBridgeVal=formele["dot1dStpPortDesignatedBridge$query"].value;
+var strLength = designatedBridgeVal.length ;
+var periorLen = strLength - 12 ;
+var leftStr = designatedBridgeVal.substring(0,periorLen) ;
+var rightStr = designatedBridgeVal.substring(periorLen,designatedBridgeVal.length) ;
+leftStr = hexToDec(leftStr);
+var displayStr = leftStr + '-' + fromStringToMacAddress(rightStr) ;
+var portStateValue = formele["dot1dStpPortState$query"].value;
+var portEnableValue = formele["dot1dStpPortEnable$query"].value;
+if ((parseInt(portStateValue) == 1) || (parseInt(portEnableValue)== 2) )
+{
+displayStr = 'N/A';
+}
+document.write( displayStr);
+}
+function displayDesignatedPort()
+{
+formele=document.staPortConfigForm.elements;
+var designatedPortVal=formele["dot1dStpPortDesignatedPort$query"].value;
+var strLength = designatedPortVal.length ;
+var portLen = strLength - 3 ;
+var leftStr = designatedPortVal.substring(0,portLen);
+var rightStr = hexToDec(designatedPortVal.substring(portLen,strLength));
+leftStr = hexToDec(leftStr+'0');
+var displayStr = leftStr + '-' + rightStr ;
+var portStateValue = formele["dot1dStpPortState$query"].value;
+var portEnableValue = formele["dot1dStpPortEnable$query"].value;
+if ((parseInt(portStateValue) == 1) || (parseInt(portEnableValue)== 2) )
+{
+displayStr = 'N/A';
+}
+document.write( displayStr);
+}
+function displayDesignatedTransitions()
+{
+formele=document.staPortConfigForm.elements;
+var designatedTransitionsVal=formele["dot1dStpPortForwardTransitions$query"].value;
+var portStateValue = formele["dot1dStpPortState$query"].value;
+var portEnableValue = formele["dot1dStpPortEnable$query"].value;
+if ((parseInt(portStateValue) == 1) || (parseInt(portEnableValue)== 2) )
+{
+designatedTransitionsVal = 'N/A';
+}
+document.write( designatedTransitionsVal);
+}
+function displayRootGuard()
+{
+formele=document.staPortConfigForm.elements;
+if(formele["rldot1dStpPortRestrictedRole$query"].value == 1)
+{
+formele["rootGuard$cb"].checked = true;
+}
+else
+{
+formele["rootGuard$cb"].checked = false;
+}
+}
+function displayDesignatedCost()
+{
+formele=document.staPortConfigForm.elements;
+var designatedCostVal=formele["dot1dStpPortDesignatedCost$query"].value;
+var portStateValue = formele["dot1dStpPortState$query"].value;
+var portEnableValue = formele["dot1dStpPortEnable$query"].value;
+if ( (parseInt(portStateValue) == 1) || (parseInt(portEnableValue)== 2) )
+{
+designatedCostVal = 'N/A';
+}
+document.write( designatedCostVal);
+}
+function findPortinTrunkArray()
+{
+formele = document.staPortConfigForm.elements;
+var trunk = formele["dot3adAggPortActorAdminKey$query"].value;
+if (trunk == '0' || trunk == "")
+trunk = "";
+else
+trunk = parseInt(trunk) - top.trunkFirstIndex + 1;
+return trunk;
+}
+function disableHtml()
+{
+formele=document.staPortConfigForm.elements;
+formele["defaultPathCost$cb"].disabled=true;
+formele["rootGuard$cb"].disabled=true;
+formele["fastLink$cb"].disabled=true;
+formele["port$select"].disabled=true;
+formele["dot1dStpPortPriority$select"].disabled=true;
+}
+function selectIndex() {
+var interfaceValue;
+var selectList;
+var formele=document.staPortConfigForm.elements;
+selectList=formele["port$select"];
+interfaceValue = selectList[selectList.selectedIndex].value;
+var newFilter="sta_port.htm?Query:rlPhdPortsIfIndex=";
+newFilter+=interfaceValue;
+filterString=newFilter;
+disableHtml();
+document.location.href=filterString;
+}
+function indexSign() {
+var i=0;
+var formele=document.staPortConfigForm.elements;
+var selectList;
+selectList=formele["port$select"];
+while (selectList.options[i]!=null)
+{
+if (selectList.options[i].value == formele["rlPhdPortsIfIndex$query"].value)
+{
+selectList.selectedIndex=i;
+break;
+}
+i++;
+}
+}
+function formSubmit()
+{
+formele=document.staPortConfigForm.elements;
+selectList=formele["port$select"];
+formele["rlPhdPortsIfIndex$query"].value = selectList[selectList.selectedIndex].value;
+if (formele["fastLink$cb"].checked==true){
+formele["dot1dStpPortAdminEdgePort$query"].value=1;
+}
+else {
+formele["dot1dStpPortAdminEdgePort$query"].value=2;
+}
+if (formele["defaultPathCost$cb"].checked==true)
+{
+formele["dot1dStpPortPathCost$query"].disabled=true;
+formele["dot1dStpPortAdminPathCost$query"].value=0;
+}
+else
+{
+formele["dot1dStpPortAdminPathCost$query"].disabled=true;
+}
+if(formele["rootGuard$cb"].checked)
+{
+formele["rldot1dStpPortRestrictedRole$query"].value = 1;
+}
+else
+{
+formele["rldot1dStpPortRestrictedRole$query"].value = 2;
+}
+if(formele["dot1dStpPortPriority$select"].value!=formele["dot1dStpPortPriority$query"].value)
+formele["dot1dStpPortPriority$query"].value=formele["dot1dStpPortPriority$select"].value;
+else
+formele["dot1dStpPortPriority$query"].disabled=true;
+disableHtml();
+document.staPortConfigForm.submit();
+}
+function checkPriority(fldName) {
+formele=document.staPortConfigForm.elements;
+if (top.fldToCheck=="")
+{
+top.fldToCheck=fldName;
+}
+else if(top.fldToCheck!=fldName){
+return
+}
+var errMsg=checkType(fldName,"int");
+if (errMsg)
+{
+if(formele[fldName].value=="" || formele[fldName].value==" ")
+{
+alert("Blank is not a legal value");
+formele[fldName].value= formele[fldName].defaultValue;
+top.fldToCheck="";
+}
+else{
+alert(errMsg);
+formele[fldName].focus();
+setTimeout('checkFocus()',5);
+}
+}
+else{
+var priority = (formele[fldName].value)*1 ;
+if ( (priority < 0) ||(priority > 240) || ((priority%16)!=0) )
+{
+alert ("Priority should be between 0 and 240 in steps of 16.");
+formele[fldName].focus();
+setTimeout('checkFocus()',5);
+}
+else{
+top.fldToCheck="";
+}
+}
+}
+function changeEnablePathCost(){
+formele=document.staPortConfigForm.elements;
+if (formele["defaultPathCost$cb"].checked==true) {
+formele["dot1dStpPortPathCost$query"].disabled=true;
+}
+else {
+formele["dot1dStpPortPathCost$query"].disabled=false;
+}
+}
+function openShowAllWindow(){
+if(top.Units==true){
+window.open('stp_port_table.htm?Filter:((rlPhdPortsModuleNumber='+formele["rlPhdPortsModuleNumber$q"].value+')&&(ifOperStatus!=6))','', 'width=850, height=600, left=50, top=50, scrollbars=yes, resizable=yes');
+}
+else{
+window.open('stp_port_table.htm?Filter:(ifOperStatus!=6)','', 'width=850, height=600, left=50, top=50, scrollbars=yes, resizable=yes');
+}
+}
+function checkDisable(){
+formele=document.staPortConfigForm.elements;
+var trunkStr = relatedTrunk(formele["rlPhdPortsIfIndex$query"].value);
+if (parseInt(trunkStr)!=0)
+{
+formele["dot1dStpPortEnable$select"].disabled=true;
+formele["dot1dStpPortEnable$query"].disabled=true;
+}
+}
+function displayRole(){
+formele=document.staPortConfigForm.elements;
+var value = formele["rldot1dStpPortRole$query"].value;
+var textValue = "";
+switch(value) {
+case "0":
+textValue = "Unknown";
+break;
+case "1":
+textValue = "Disabled";
+break;
+case "2":
+textValue = "Alternate";
+break;
+case "3":
+textValue = "Backup";
+break;
+case "4":
+textValue = "Root";
+break;
+case "5":
+textValue = "Designated";
+break;
+default:
+break;
+}
+document.write(textValue);
+}
+// --End of Java code -->
+</script>
+</head>
+<body bgcolor="#FFFFFF" leftmargin="15" onload="setScreenMonitorState();">
+<script language="JavaScript">top.Draw_Header(document.title);</script>
+
+<FORM METHOD='POST' name="staPortConfigForm"  ACTION="/config/sta_port.htm"  >
+<INPUT  Type="HIDDEN" Name="restoreUrl" SIZE=256   value="unit=1">
+
+<div align="right"><table id="sta_port_buttons_tbl" cellspacing="0" cellpadding="0" border="0"><tr>
+<td nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/lbutton.gif"></td>
+<td nowrap valign="middle" align="center" class="data-area-button"><a href="javascript:void(0)"
+onclick="javascript:openShowAllWindow()"
+onMouseover="showtip(this,event,'Show Spanning Port Table')"
+onMouseout="hidetip()">Show All</a></td>
+<td nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/rbutton.gif"></td>
+<td nowrap style="width: 14px; height: 25px"></td>
+</tr></table></div><br>
+<table id="sta_port_tbl" border="0" cellspacing="0" cellpadding="0" width="100%">
+<script language="JavaScript">
+top.Draw_TableTop(2);top.Draw_TableHeader();
+</script>
+<tr>
+<td nowrap style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas" width="40%">Select a Port</td>
+<td nowrap class="data-area-canvas">
+<select id=port$selectId name=port$select onChange="selectIndex()" class="monitorEnabled">
+<option>1<option>2</select></td>
+<script language="JavaScript">
+addPresentPortsSelectionList(document.staPortConfigForm,'port$select','','n');
+</script>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+
+<INPUT  TYPE="HIDDEN" NAME="errorCollector"   value="" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=STPPortTable   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rlPhdPortsTable$VT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rlPhdPortsIfIndex$VT SIZE=128   value="Type=0;Access=1;NumOfEnumerations=0;Range0=[-2147483648,2147483647]">
+<INPUT  Type=HIDDEN Name=rlPhdPortsIfIndexName$VT SIZE=128   value="Type=100;Access=1;NumOfEnumerations=0;Range0=[1,20]">
+<INPUT  Type=HIDDEN Name=dot1dStpPortEnable$VT SIZE=128   value="Type=0;Access=2;NumOfEnumerations=2;Range0=[1,2];Default value=1">
+<INPUT  Type=HIDDEN Name=dot1dStpPortAdminEdgePort$VT SIZE=128   value="Type=0;Access=2;NumOfEnumerations=2;Range0=[1,2];Default value=2">
+<INPUT  Type=HIDDEN Name=dot1dStpPortState$VT SIZE=128   value="Type=0;Access=1;NumOfEnumerations=6;Range0=[1,6]">
+<INPUT  Type=HIDDEN Name=ifSpeed$VT SIZE=128   value="Type=7;Access=1;NumOfEnumerations=0;Range0=[-2147483648,2147483647]">
+<INPUT  Type=HIDDEN Name=dot1dStpPortPathCost$VT SIZE=128   value="Type=0;Access=2;NumOfEnumerations=0;Range0=[1,200000000];Default value=19">
+<INPUT  Type=HIDDEN Name=dot1dStpPortAdminPathCost$VT SIZE=128   value="Type=0;Access=2;NumOfEnumerations=0;Range0=[0,200000000];Default value=0">
+<INPUT  Type=HIDDEN Name=dot1dStpPortPriority$VT SIZE=128   value="Type=0;Access=2;NumOfEnumerations=0;Range0=[0,255];Default value=128">
+<INPUT  Type=HIDDEN Name=dot1dStpPortDesignatedBridge$VT SIZE=128   value="Type=2;Access=1;NumOfEnumerations=0;Range0=[8,8]">
+<INPUT  Type=HIDDEN Name=dot1dStpPortDesignatedPort$VT SIZE=128   value="Type=2;Access=1;NumOfEnumerations=0;Range0=[2,2]">
+<INPUT  Type=HIDDEN Name=dot1dStpPortDesignatedCost$VT SIZE=128   value="Type=0;Access=1;NumOfEnumerations=0;Range0=[-2147483648,2147483647]">
+<INPUT  Type=HIDDEN Name=dot1dStpPortForwardTransitions$VT SIZE=128   value="Type=6;Access=1;NumOfEnumerations=0;Range0=[-2147483648,2147483647]">
+<INPUT  Type=HIDDEN Name=ifOperStatus$VT SIZE=128   value="Type=0;Access=1;NumOfEnumerations=7;Range0=[1,7]">
+<INPUT  Type=HIDDEN Name=rldot1dStpPortAutoEdgePort$VT SIZE=128   value="Type=0;Access=2;NumOfEnumerations=2;Range0=[1,2]">
+<INPUT  Type=HIDDEN Name=rldot1dStpPortRestrictedRole$VT SIZE=128   value="Type=0;Access=2;NumOfEnumerations=2;Range0=[1,2];Default value=2">
+<INPUT  Type=HIDDEN Name=rldot1dStpPortRole$VT SIZE=128   value="Type=0;Access=1;NumOfEnumerations=6;Range0=[0,5]">
+<INPUT  Type=HIDDEN Name=dot3adAggPortActorAdminKey$VT   value="Type=0;Access=2;NumOfEnumerations=0;Range0=[0,65535];Default value=0" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=STPPortTable$endVT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=hidden Name=dot1dStpVersion   value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=STPPortTable$query   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=rlPhdPortsIfIndex$query   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=rlPhdPortsIfIndexName$query   value="g1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=dot1dStpPortEnable$query   value="1" SIZE="20" MAXLENGTH="20">
+
+<tr>
+<td nowrap style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd">STP</td>
+<td nowrap class="data-area-canvas-odd">
+
+<SELECT  Name=dot1dStpPortEnable$select size="1"
+ >
+
+<OPTION value=1 selected> Enable
+
+<OPTION value=2> Disable
+
+</select>
+</select>
+
+
+<script language="JavaScript">
+checkDisable();
+</script>
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="width: 10px;height:24px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas">Fast Link</td>
+<td nowrap class="data-area-canvas">
+<INPUT  TYPE=hidden NAME=dot1dStpPortAdminEdgePort$query   value="2" SIZE="20" MAXLENGTH="20">
+
+<input type="checkbox" name="fastLink$cb">
+<script language="JavaScript">
+displayEdge()
+</script>
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd">Root Guard</td>
+<td nowrap class="data-area-canvas-odd">
+
+<INPUT  TYPE=hidden NAME="rldot1dStpPortRestrictedRole$query"   value="2" SIZE="20" MAXLENGTH="20">
+
+<input type="checkbox" name="rootGuard$cb">
+<script language="JavaScript">
+displayRootGuard();
+</script>
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="width: 10px;height:24px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas" width="40%">Port State</td>
+<td nowrap class="data-area-canvas">
+
+<INPUT  TYPE=hidden NAME=dot1dStpPortState$query   value="1" SIZE="20" MAXLENGTH="20">
+
+<script language="JavaScript">
+displayState()
+</script>
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="width: 10px;height:24px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd" width="40%">Role</td>
+<td nowrap class="data-area-canvas-odd">
+
+<INPUT  TYPE=hidden NAME=rldot1dStpPortRole$query   value="1" SIZE="20" MAXLENGTH="20">
+
+<script language="JavaScript">
+displayRole()
+</script>
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="width: 10px;height:24px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas">Speed</td>
+<td nowrap class="data-area-canvas">
+
+<INPUT  TYPE=hidden NAME=ifSpeed$query   value="1000000000" SIZE="20" MAXLENGTH="20">
+
+<script language="JavaScript">
+displaySpeed()
+</script>
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd" width="40%">Path Cost
+<script language="JavaScript">
+displayIntRange("dot1dStpPortPathCost")
+</script>
+</td>
+<td nowrap class="data-area-canvas-odd">
+
+<INPUT  id=PathCostCtrl TYPE=text NAME=dot1dStpPortPathCost$query size=10 MAXLENGTH=9 onBlur=checkValidation()   value="4">
+<script>
+PathCostCtrlOriginalValue = document.getElementById("PathCostCtrl").value;
+</script>
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas">Default Path Cost</td>
+<td nowrap class="data-area-canvas">
+
+<INPUT  TYPE=hidden NAME=dot1dStpPortAdminPathCost$query   value="0" SIZE="20" MAXLENGTH="20">
+
+<input type="checkbox" name="defaultPathCost$cb" onClick="changeEnablePathCost()">
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd" width="40%">Priority
+</td>
+<td nowrap class="data-area-canvas-odd">
+
+<INPUT  TYPE=hidden NAME=dot1dStpPortPriority$query size=4 MAXLENGTH=3 onBlur="checkPriority(name)"   value="128">
+
+<select id=dot1dStpPortPriority$select name=dot1dStpPortPriority$select>
+<option value=0>0
+<option value=16>16
+<option value=32>32
+<option value=48>48
+<option value=64>64
+<option value=80>80
+<option value=96>96
+<option value=112>112
+<option value=128>128
+<option value=144>144
+<option value=160>160
+<option value=176>176
+<option value=192>192
+<option value=208>208
+<option value=224>224
+<option value=240>240
+</select>
+<script>
+formele=document.staPortConfigForm.elements;
+formele["dot1dStpPortPriority$select"].value=formele["dot1dStpPortPriority$query"].value;
+</script>
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="width: 10px;height:24px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas">Designated Bridge ID</td>
+<td nowrap class="data-area-canvas">
+
+<INPUT  TYPE=hidden NAME=dot1dStpPortDesignatedBridge$query   value="8000000000000000" SIZE="20" MAXLENGTH="20">
+
+<script language="JavaScript">
+displayDesignatedBridge()
+</script>
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="width: 10px;height:24px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd" width="40%">Designated Port ID</td>
+<td nowrap class="data-area-canvas-odd">
+
+<INPUT  TYPE=hidden NAME=dot1dStpPortDesignatedPort$query   value="8001" SIZE="20" MAXLENGTH="20">
+
+<script language="JavaScript">
+displayDesignatedPort()
+</script>
+&nbsp;
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="width: 10px;height:24px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas">Designated Cost</td>
+<td nowrap class="data-area-canvas">
+
+<INPUT  TYPE=hidden NAME=dot1dStpPortDesignatedCost$query   value="0" SIZE="20" MAXLENGTH="20">
+
+<script language="JavaScript">
+displayDesignatedCost()
+</script>
+&nbsp;
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="width: 10px;height:24px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd" width="40%">Forward Transitions</td>
+<td nowrap class="data-area-canvas-odd">
+
+<INPUT  TYPE=hidden NAME=dot1dStpPortForwardTransitions$query   value="0" SIZE="20" MAXLENGTH="20">
+
+<script language="JavaScript">
+displayDesignatedTransitions()
+</script>
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="width: 10px;height:24px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas">LAG</td>
+<td nowrap class="data-area-canvas">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminKey$query   value="0" SIZE="20" MAXLENGTH="20">
+<script language="JavaScript">
+document.write(findPortinTrunkArray());
+</script>
+&nbsp;
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+
+<INPUT  type=hidden Name=STPPortTable$endQuery   value="OK" SIZE="20" MAXLENGTH="20">
+
+</tr>
+<script language="JavaScript">
+top.Draw_TableBottom(2);
+indexSign();
+</script>
+</table><br>
+<INPUT  Type=HIDDEN Name=rlPhdPorts   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rlPhdPortsTable$VT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rlPhdPortsIfIndex$VT SIZE=128   value="Type=0;Access=1;NumOfEnumerations=0;Range0=[-2147483648,2147483647]">
+<INPUT  TYPE=HIDDEN NAME=rlPhdPortsModuleNumber$VT SIZE=128   value="Type=0;Access=1;NumOfEnumerations=0;Range0=[-2147483648,2147483647]">
+<INPUT  Type=HIDDEN Name=rlPhdPorts$endVT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=rlPhdPorts$q   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN NAME=rlPhdPortsIfIndex$q disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN NAME=rlPhdPortsModuleNumber$q disabled   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=rlPhdPorts$eq   value="OK" SIZE="20" MAXLENGTH="20">
+
+<div class="management-only">
+
+<div align="center"><table id="apply_tbl" cellspacing="0" cellpadding="0" border="0"><tr>
+<td nowrap nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/lbutton.gif"></td>
+<td nowrap nowrap valign="middle" align="center" class="data-area-button"><a href="javascript:preSubmit();">Apply Changes</a></td>
+<td nowrap nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/rbutton.gif"></td>
+</tr></table></div><br>
+<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
+<!--
+if(document.forms[0] && document.forms[0].elements.length<=1000)
+{
+for(i=0;(document.forms[0] && i<document.forms[0].elements.length);i++)
+{
+if(document.forms[0] && document.forms[0].elements[i].type=="select-one")
+if(document.forms[0] && document.forms[0].elements[i].length==0)
+document.forms[0].elements[i].style.width="70px";
+}
+}
+//-->
+</SCRIPT>
+
+</div>
+</form>
+</body>
+</html>

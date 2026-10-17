@@ -1,0 +1,711 @@
+
+
+
+<html>
+<head>
+<title>Static Hosts</title>
+<link rel="stylesheet" href="../device/style.css" type="text/css">
+<script src="../js/globalFunctions.js"></script>
+<script language="JavaScript">
+if(top.MonitorMode) {
+document.write("<link rel='stylesheet' href='../device/monitorMode.css' type='text/css'>")
+}
+var flagParamsExist = false;
+var flagSubmitParams = false;
+var submitFields = new Array();
+function initPage()
+{
+fillIPSelect();
+if(formele["rlDhcpSrvIpAddrIpAddr$cmb"].options.length > 0)
+{
+if(!setIPSelectByQuery())
+{
+queryData();
+return;
+}
+var host = formele["rlDhcpSrvIpAddrIpAddr$cmb"].options[formele["rlDhcpSrvIpAddrIpAddr$cmb"].selectedIndex].text;
+var param = formele["rlDhcpSrvIpAddrIpAddr$cmb"].options[formele["rlDhcpSrvIpAddrIpAddr$cmb"].selectedIndex].value;
+if(!testHostAndConfParamsMatch(host,param))
+queryData();
+else
+displayValues();
+}
+else
+{
+formele["rlDhcpSrvIpAddrIpAddr$cmb"].disabled = true;
+networkRadioClick();
+idTypeRadioClick();
+}
+if(!flagParamsExist)
+formele["rlDhcpSrvConfParamsNetbiosNodeType$cmb"].selectedIndex = 0;
+}
+function displayValues()
+{
+document.getElementById("rlDhcpSrvIpAddrPoolName$lbl").innerHTML = formele["rlDhcpSrvIpAddrPoolName$query"].value;
+formele["ipAdEntNetMask$txt"].value = formele["rlDhcpSrvIpAddrIpNetMask$query"].value;
+formele["ipAdEntNetPrefix$txt"].value = maskIpToInt("ipAdEntNetMask$txt");
+setDisabled(formele["ipAdEntNetPrefix$txt"], true);
+if(formele["rlDhcpSrvIpAddrIdentifierType$query"].value == "1")
+{
+formele["rlDhcpSrvIpAddrIdentifierMAC$txt"].value = fromStringToMacAddress(formele["rlDhcpSrvIpAddrIdentifier$query"].value);
+setDisabled(formele["rlDhcpSrvIpAddrIdentifier$txt"], true);
+formele["identifierType"][1].checked = true;
+}
+else if(formele["rlDhcpSrvIpAddrIdentifierType$query"].value == "2")
+{
+formele["rlDhcpSrvIpAddrIdentifier$txt"].value = formele["rlDhcpSrvIpAddrIdentifier$query"].value;
+setDisabled(formele["rlDhcpSrvIpAddrIdentifierMAC$txt"], true);
+formele["identifierType"][0].checked = true;
+}
+else
+{
+alert("Unknown client identifier type recieved.");
+}
+formele["rlDhcpSrvIpAddrClnHostName$txt"].value = formele["rlDhcpSrvIpAddrClnHostName$query"].value;
+if(flagParamsExist)
+{
+formele["rlDhcpSrvConfParamsNextServerIp$txt"].value = formele["rlDhcpSrvConfParamsNextServerIp$query"].value;
+if(formele["rlDhcpSrvConfParamsNextServerIp$txt"].value == "0.0.0.0")
+{
+formele["rlDhcpSrvConfParamsNextServerIp$txt"].value = "";
+}
+formele["rlDhcpSrvConfParamsNextServerName$txt"].value = formele["rlDhcpSrvConfParamsNextServerName$query"].value;
+formele["rlDhcpSrvConfParamsBootfileName$txt"].value = formele["rlDhcpSrvConfParamsBootfileName$query"].value;
+formele["rlDhcpSrvConfParamsRoutersList$txt"].value = formele["rlDhcpSrvConfParamsRoutersList$query"].value;
+formele["rlDhcpSrvConfParamsTimeSrvList$txt"].value = formele["rlDhcpSrvConfParamsTimeSrvList$query"].value;
+formele["rlDhcpSrvConfParamsDnsList$txt"].value = formele["rlDhcpSrvConfParamsDnsList$query"].value;
+formele["rlDhcpSrvConfParamsDomainName$txt"].value = formele["rlDhcpSrvConfParamsDomainName$query"].value;
+formele["rlDhcpSrvConfParamsNetbiosNameList$txt"].value = formele["rlDhcpSrvConfParamsNetbiosNameList$query"].value;
+formele["rlDhcpSrvConfParamsNetbiosNodeType$cmb"].value = formele["rlDhcpSrvConfParamsNetbiosNodeType$query"].value;
+formele["rlDhcpSrvConfParamsNetbiosNodeType$cmb"].options[0] = null;
+}
+}
+function maskChanged(inSubmit)
+{
+var prefix = getPrefixFromMask(formele["ipAdEntNetMask$txt"].value);
+if(prefix == -1)return false;
+if(inSubmit && removeSpacesFromHeadAndTail(formele["ipAdEntNetMask$txt"].value) == "")
+{
+alert("Please enter a Network Mask.");
+return false;
+}
+if(prefix == 0)
+{
+if(inSubmit)
+alert("Illegal mask value: Mask must be between 255.0.0.0 and 255.255.255.252.");
+return false;
+}
+if(!checkValidationRange(prefix,8,30,false,true))
+{
+alert("Illegal mask value: Mask must be between 255.0.0.0 and 255.255.255.252.");
+return false;
+}
+else
+{
+formele["ipAdEntNetPrefix$txt"].value = prefix;
+return true;
+}
+}
+function prefixChanged(inSubmit)
+{
+if(inSubmit && removeSpacesFromHeadAndTail(formele["ipAdEntNetPrefix$txt"].value) == "")
+{
+alert("Please enter a prefix length.");
+return false;
+}
+if(!checkValidationRange(formele["ipAdEntNetPrefix$txt"].value,8,30,false,true))
+{
+alert("Illegal prefix length: Prefix length must be between 8 and 30.");
+return false;
+}
+else
+{
+formele["ipAdEntNetMask$txt"].value = maskIntToIp("ipAdEntNetPrefix$txt");
+return true;
+}
+}
+function networkRadioClick()
+{
+setDisabled(formele["ipAdEntNetPrefix$txt"], formele["network"][0].checked);
+setDisabled(formele["ipAdEntNetMask$txt"], !formele["network"][0].checked);
+}
+function idTypeRadioClick()
+{
+setDisabled(formele["rlDhcpSrvIpAddrIdentifierMAC$txt"], formele["identifierType"][0].checked);
+setDisabled(formele["rlDhcpSrvIpAddrIdentifier$txt"], !formele["identifierType"][0].checked);
+}
+function fillIPSelect()
+{
+var opt, txt, val;
+var i = 1;
+while(formele["rlDhcpSrvIpAddrIpAddr$repeat?"+i])
+{
+txt = formele["rlDhcpSrvIpAddrIpAddr$repeat?"+i].value;
+val = formele["rlDhcpSrvIpAddrConfParamsName$repeat?"+i].value;
+opt = new Option(txt,val);
+formele["rlDhcpSrvIpAddrIpAddr$cmb"].options[formele["rlDhcpSrvIpAddrIpAddr$cmb"].options.length] = opt;
+i++;
+}
+}
+function setIPSelectByQuery()
+{
+var ipSlct = formele["rlDhcpSrvIpAddrIpAddr$cmb"];
+var ipAddr = formele["rlDhcpSrvIpAddrIpAddr$query"].value;
+if(removeSpacesFromHeadAndTail(ipAddr)=="")
+return false;
+selectOptionByText(ipSlct, ipAddr);
+return true;
+}
+function testHostAndConfParamsMatch(ipAddr, linkedParam)
+{
+var selectedParam = formele["rlDhcpSrvConfParamsName$query"].value;
+if(linkedParam == "")
+{
+flagParamsExist = false;
+return true;
+}
+else if(linkedParam != selectedParam)
+{
+return false;
+}
+else
+{
+flagParamsExist = true;
+return true;
+}
+}
+function getParamsEntryByIP(ipAddr)
+{
+var i = 1;
+while(formele["rlDhcpSrvIpAddrIpAddr$repeat?"+i])
+{
+if(formele["rlDhcpSrvIpAddrIpAddr$repeat?"+i].value == ipAddr)
+return formele["rlDhcpSrvIpAddrConfParamsName$repeat?"+i].value;
+i++;
+}
+return "";
+}
+function queryData()
+{
+var ipAddr = formele["rlDhcpSrvIpAddrIpAddr$cmb"].options[formele["rlDhcpSrvIpAddrIpAddr$cmb"].selectedIndex].text;
+var param = formele["rlDhcpSrvIpAddrIpAddr$cmb"].options[formele["rlDhcpSrvIpAddrIpAddr$cmb"].selectedIndex].value;
+var filter = "DHCPSrv_Static_Host.htm?[DHCPIPVT]Filter:rlDhcpSrvIpAddrMechanism=1^Query:rlDhcpSrvIpAddrIpAddr="+ipAddr;
+filter = filter + "[DHCPconfVT]Query:rlDhcpSrvConfParamsName="+param;
+document.location.href = filter;
+}
+function validateFieldsAndPrepareSubmit()
+{
+var valToTest = "";
+if(formele["network"][0].checked)
+{
+if(!maskChanged(true))
+return false;
+}
+else
+{
+if(!prefixChanged(true))
+return false;
+}
+if(formele["rlDhcpSrvIpAddrIpNetMask$query"].value != formele["ipAdEntNetMask$txt"].value)
+{
+formele["rlDhcpSrvIpAddrIpNetMask$query"].value = formele["ipAdEntNetMask$txt"].value;
+submitFields.push("rlDhcpSrvIpAddrIpNetMask$query");
+}
+if(formele["identifierType"][0].checked)
+{
+valToTest = formele["rlDhcpSrvIpAddrIdentifier$txt"].value;
+if(!checkOctetString(valToTest) || !validateOctetLength(valToTest,2,32) || removeSpacesFromHeadAndTail(valToTest)=="")
+{
+alert("Illegal Client Identifier value: Client Identifier must be a string of 2 to 32 octets");
+return false;
+}
+else
+{
+if(valToTest.indexOf(":") != -1)valToTest = valToTest.split(":").join("");
+if(valToTest.indexOf("-") != -1)valToTest = valToTest.split("-").join("");
+if(valToTest.indexOf(".") != -1)valToTest = valToTest.split(".").join("");
+if(formele["rlDhcpSrvIpAddrIdentifier$query"].value != valToTest)
+{
+formele["rlDhcpSrvIpAddrIdentifier$query"].value = valToTest;
+submitFields.push("rlDhcpSrvIpAddrIdentifier$query");
+}
+if(formele["rlDhcpSrvIpAddrIdentifierType$query"].value != "2")
+{
+formele["rlDhcpSrvIpAddrIdentifierType$query"].value = "2";
+submitFields.push("rlDhcpSrvIpAddrIdentifierType$query");
+}
+}
+}
+else
+{
+valToTest = formele["rlDhcpSrvIpAddrIdentifierMAC$txt"].value;
+if(!checkOctetString(valToTest) || !validateOctetLength(valToTest,6,6))
+{
+alert("Illegal MAC Address value.");
+return false;
+}
+else
+{
+if(valToTest.indexOf(":") != -1)valToTest = valToTest.split(":").join("");
+if(valToTest.indexOf("-") != -1)valToTest = valToTest.split("-").join("");
+if(formele["rlDhcpSrvIpAddrIdentifier$query"].value != valToTest)
+{
+formele["rlDhcpSrvIpAddrIdentifier$query"].value = valToTest;
+submitFields.push("rlDhcpSrvIpAddrIdentifier$query");
+}
+if(formele["rlDhcpSrvIpAddrIdentifierType$query"].value != "1")
+{
+formele["rlDhcpSrvIpAddrIdentifierType$query"].value = "1";
+submitFields.push("rlDhcpSrvIpAddrIdentifierType$query");
+}
+}
+}
+if(formele["rlDhcpSrvIpAddrClnHostName$txt"].value != "")
+{
+if(formele["rlDhcpSrvIpAddrClnHostName$query"].value != formele["rlDhcpSrvIpAddrClnHostName$txt"].value)
+{
+formele["rlDhcpSrvIpAddrClnHostName$query"].value = formele["rlDhcpSrvIpAddrClnHostName$txt"].value;
+submitFields.push("rlDhcpSrvIpAddrClnHostName$query");
+}
+}
+if(!checkValidationIP(formele["rlDhcpSrvConfParamsRoutersList$txt"],true, true, false))
+return false;
+else
+handleParamTxtField("rlDhcpSrvConfParamsRoutersList");
+if(!checkValidationIP(formele["rlDhcpSrvConfParamsDnsList$txt"],true, true, false))
+return false;
+else
+handleParamTxtField("rlDhcpSrvConfParamsDnsList");
+if(!checkValidationIP(formele["rlDhcpSrvConfParamsNetbiosNameList$txt"],true, true, false))
+return false;
+else
+handleParamTxtField("rlDhcpSrvConfParamsNetbiosNameList");
+if(!checkValidationIP(formele["rlDhcpSrvConfParamsTimeSrvList$txt"],true, true, false))
+return false;
+else
+handleParamTxtField("rlDhcpSrvConfParamsTimeSrvList");
+if(!checkValidationIP(formele["rlDhcpSrvConfParamsNextServerIp$txt"],false, true, false))
+return false;
+else
+handleParamTxtField("rlDhcpSrvConfParamsNextServerIp");
+handleParamTxtField("rlDhcpSrvConfParamsNextServerName");
+handleParamTxtField("rlDhcpSrvConfParamsBootfileName");
+handleParamTxtField("rlDhcpSrvConfParamsDomainName");
+if(!isEmptyNetbiosOptionSelected())
+{
+if(flagParamsExist)
+{
+if(formele["rlDhcpSrvConfParamsNetbiosNodeType$query"].value != formele["rlDhcpSrvConfParamsNetbiosNodeType$cmb"].value)
+{
+formele["rlDhcpSrvConfParamsNetbiosNodeType$query"].value = formele["rlDhcpSrvConfParamsNetbiosNodeType$cmb"].value;
+submitFields.push("rlDhcpSrvConfParamsNetbiosNodeType$query");
+flagSubmitParams = true;
+}
+}
+else
+{
+formele["rlDhcpSrvConfParamsNetbiosNodeType$add"].value = formele["rlDhcpSrvConfParamsNetbiosNodeType$cmb"].value;
+submitFields.push("rlDhcpSrvConfParamsNetbiosNodeType$add");
+flagSubmitParams = true;
+}
+}
+return true;
+}
+function isEmptyNetbiosOptionSelected()
+{
+var slct = formele["rlDhcpSrvConfParamsNetbiosNodeType$cmb"];
+if(slct.options.length == 5 && slct.selectedIndex == 0)
+return true;
+else if(slct.options.length == 4 && slct.selectedIndex == -1)
+return true;
+else
+return false;
+}
+function handleParamTxtField(fldName)
+{
+if(flagParamsExist)
+{
+if(formele[fldName+"$query"].value != formele[fldName+"$txt"].value)
+{
+formele[fldName+"$query"].value = formele[fldName+"$txt"].value;
+submitFields.push(fldName+"$query");
+flagSubmitParams = true;
+}
+}
+else
+{
+if(formele[fldName+"$txt"].value != "")
+{
+formele[fldName+"$add"].value = formele[fldName+"$txt"].value;
+submitFields.push(fldName+"$add");
+flagSubmitParams = true;
+}
+}
+}
+function finalizeSubmit()
+{
+formele["rlDhcpSrvIpAddrRowStatus$query"].value = 1;
+if(flagSubmitParams && !flagParamsExist)
+{
+submitFields.push("rlDhcpSrvIpAddrConfParamsName$query");
+submitFields.push("rlDhcpSrvConfParamsRowStatus$add");
+submitFields.push("rlDhcpSrvConfParamsName$add");
+submitFields.push("DHCPconfVT$endAdd");
+var hostName = formele["rlDhcpSrvIpAddrPoolName$query"].value;
+formele["rlDhcpSrvIpAddrConfParamsName$query"].value = hostName;
+formele["rlDhcpSrvConfParamsName$add"].value = hostName;
+formele["rlDhcpSrvConfParamsRowStatus$add"].value = 4;
+}
+else if(flagSubmitParams)
+{
+submitFields.push("rlDhcpSrvConfParamsName$query");
+submitFields.push("rlDhcpSrvConfParamsRowStatus$query");
+submitFields.push("DHCPconfVT$endQuery");
+formele["rlDhcpSrvConfParamsRowStatus$query"].value = 1;
+}
+for(var i = 0; i < submitFields.length; i++)
+formele[submitFields[i]].disabled = false;
+}
+function disableHtml()
+{
+formele["rlDhcpSrvIpAddrIpAddr$cmb"].disabled=true;
+formele["network"][0].disabled=true;
+formele["network"][1].disabled=true;
+formele["ipAdEntNetMask$txt"].disabled=true;
+formele["ipAdEntNetPrefix$txt"].disabled=true;
+formele["identifierType"][0].disabled=true;
+formele["identifierType"][1].disabled=true;
+formele["rlDhcpSrvIpAddrIdentifierMAC$txt"].disabled=true;
+formele["rlDhcpSrvIpAddrIdentifier$txt"].disabled=true;
+formele["rlDhcpSrvIpAddrClnHostName$txt"].disabled=true;
+formele["rlDhcpSrvConfParamsRoutersList$txt"].disabled=true;
+formele["rlDhcpSrvConfParamsDnsList$txt"].disabled=true;
+formele["rlDhcpSrvConfParamsDomainName$txt"].disabled=true;
+formele["rlDhcpSrvConfParamsNetbiosNameList$txt"].disabled=true;
+formele["rlDhcpSrvConfParamsNetbiosNodeType$cmb"].disabled=true;
+formele["rlDhcpSrvConfParamsTimeSrvList$txt"].disabled=true;
+formele["rlDhcpSrvConfParamsNextServerIp$txt"].disabled=true;
+formele["rlDhcpSrvConfParamsNextServerName$txt"].disabled=true;
+formele["rlDhcpSrvConfParamsBootfileName$txt"].disabled=true;
+}
+function formSubmit()
+{
+if(formele["rlDhcpSrvIpAddrIpAddr$cmb"].options.length == 0)
+{
+alert("No static hosts exist.");
+return false;
+}
+if(!validateFieldsAndPrepareSubmit())
+{
+flagSubmitParams = false;
+submitFields.length = 0;
+return false;
+}
+finalizeSubmit();
+disableHtml();
+document.staticHostForm.submit();
+}
+// --End of Java code -->
+</script>
+</head>
+<body bgcolor="#ffffff" leftmargin="15" onload="setScreenMonitorState();" style="display:none" id="main_body">
+<script language="JavaScript">
+top.Draw_Header(document.title);
+</script>
+
+<FORM METHOD='POST' name="staticHostForm"  ACTION="/config/DHCPSrv_Static_Host.htm" onsubmit="return(formSubmit());"  >
+<script>
+var formele = document.staticHostForm.elements;
+</script>
+<div align="right">
+<table cellspacing="0" cellpadding="0" border="0" ID="Table1">
+<tr>
+<div class="management-only" id="addButtonDiv">
+<td style="width: 14px; height: 25px" class="management-only"><img style="width: 14px; height: 25px" src="../Images/lbutton.gif"></td>
+<td valign="middle" align="center" class="data-area-button-management-only"><a href="javascript:void(0)" onclick="javascript:window.open('DHCPSrv_Static_Add.htm','', 'width=850, height=600, left=50, top=50, scrollbars=yes, resizable=yes');" title='Add Notification Recipient'>&nbsp;&nbsp;Add&nbsp;&nbsp;</a></td>
+<td style="width: 14px; height: 25px" class="management-only"><img style="width: 14px; height: 25px" src="../Images/rbutton.gif"></td>
+</div>
+<td style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/lbutton.gif"></td>
+<td valign="middle" align="center" class="data-area-button"><a href="javascript:void(0)" onclick="javascript:window.open('DHCPSrv_Static_Table.htm?[DHCPIPVT]Filter:rlDhcpSrvIpAddrMechanism=1','', 'width=850, height=600, left=50, top=50, scrollbars=yes, resizable=yes');" title='Show Notification Recipient Table'>Show All</a></td>
+<td style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/rbutton.gif"></td>
+<td style="width: 14px; height: 25px"></td>
+</tr>
+</table>
+</div>
+<br>
+<INPUT  Type="HIDDEN" Name="restoreUrl" SIZE=256   value="[DHCPIPVT]Filter:rlDhcpSrvIpAddrMechanism=1">
+<INPUT  TYPE="HIDDEN" NAME="errorCollector"   value="" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=DHCPconfVT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rlDhcpSrvConfParamsTable$VT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rlDhcpSrvConfParamsName$VT SIZE=128   value="Type=100;Access=2;NumOfEnumerations=0;Range0=[1,32]">
+<INPUT  Type=HIDDEN Name=rlDhcpSrvConfParamsNextServerIp$VT SIZE=128   value="Type=5;Access=2;NumOfEnumerations=0;Default value=0.0.0.0">
+<INPUT  Type=HIDDEN Name=rlDhcpSrvConfParamsNextServerName$VT SIZE=128   value="Type=100;Access=2;NumOfEnumerations=0;Range0=[0,64];Default value=">
+<INPUT  Type=HIDDEN Name=rlDhcpSrvConfParamsBootfileName$VT SIZE=128   value="Type=100;Access=2;NumOfEnumerations=0;Range0=[0,128];Default value=">
+<INPUT  Type=HIDDEN Name=rlDhcpSrvConfParamsRoutersList$VT SIZE=128   value="Type=100;Access=2;NumOfEnumerations=0;Range0=[0,160];Default value=">
+<INPUT  Type=HIDDEN Name=rlDhcpSrvConfParamsTimeSrvList$VT SIZE=128   value="Type=100;Access=2;NumOfEnumerations=0;Range0=[0,160];Default value=">
+<INPUT  Type=HIDDEN Name=rlDhcpSrvConfParamsDnsList$VT SIZE=128   value="Type=100;Access=2;NumOfEnumerations=0;Range0=[0,160];Default value=">
+<INPUT  Type=HIDDEN Name=rlDhcpSrvConfParamsDomainName$VT SIZE=128   value="Type=2;Access=2;NumOfEnumerations=0;Range0=[0,32];Default value=">
+<INPUT  Type=HIDDEN Name=rlDhcpSrvConfParamsNetbiosNameList$VT SIZE=128   value="Type=100;Access=2;NumOfEnumerations=0;Range0=[0,160];Default value=">
+<INPUT  Type=HIDDEN Name=rlDhcpSrvConfParamsNetbiosNodeType$VT SIZE=128   value="Type=0;Access=2;NumOfEnumerations=4;Range0=[1,2];Range1=[4,4];Range2=[8,8];Default value=8">
+<INPUT  Type=HIDDEN Name=rlDhcpSrvConfParamsRowStatus$VT SIZE=128   value="Type=0;Access=2;NumOfEnumerations=6;Range0=[1,6]">
+<INPUT  Type=HIDDEN Name=DHCPconfVT$endVT   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  type=hidden Name=DHCPconf$query disabled   value=" " SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlDhcpSrvConfParamsName$query disabled   value=" " SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=rlDhcpSrvConfParamsNextServerIp$query disabled   value=" " SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=rlDhcpSrvConfParamsNextServerName$query disabled   value=" " SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlDhcpSrvConfParamsBootfileName$query disabled   value=" " SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlDhcpSrvConfParamsRoutersList$query disabled   value=" " SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=rlDhcpSrvConfParamsTimeSrvList$query disabled   value=" " SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=rlDhcpSrvConfParamsDnsList$query disabled   value=" " SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=String$query   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlDhcpSrvConfParamsDomainName$query disabled   value=" " SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=Default$query   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlDhcpSrvConfParamsNetbiosNameList$query disabled   value=" " SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=rlDhcpSrvConfParamsNetbiosNodeType$query disabled   value=" " SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=rlDhcpSrvConfParamsRowStatus$query disabled   value=" " SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DHCPconfVT$endQuery   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlDhcpSrvConfParamsName$add disabled   value="" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=rlDhcpSrvConfParamsNextServerIp$add disabled   value="0.0.0.0" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=rlDhcpSrvConfParamsNextServerName$add disabled   value="" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlDhcpSrvConfParamsBootfileName$add disabled   value="" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlDhcpSrvConfParamsRoutersList$add disabled   value="" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=rlDhcpSrvConfParamsTimeSrvList$add disabled   value="" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=rlDhcpSrvConfParamsDnsList$add disabled   value="" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=String$add   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlDhcpSrvConfParamsDomainName$add disabled   value="" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=Default$add   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlDhcpSrvConfParamsNetbiosNameList$add disabled   value="" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=rlDhcpSrvConfParamsNetbiosNodeType$add disabled   value="0" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=rlDhcpSrvConfParamsRowStatus$add disabled   value="0" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DHCPconfVT$endAdd disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=DHCPIPVT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rlDhcpSrvIpAddrTable$VT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rlDhcpSrvIpAddrIpAddr$VT SIZE=128   value="Type=5;Access=2;NumOfEnumerations=0">
+<INPUT  Type=HIDDEN Name=rlDhcpSrvIpAddrIpNetMask$VT SIZE=128   value="Type=5;Access=2;NumOfEnumerations=0">
+<INPUT  Type=HIDDEN Name=rlDhcpSrvIpAddrIdentifier$VT SIZE=128   value="Type=2;Access=2;NumOfEnumerations=0;Range0=[2,32]">
+<INPUT  Type=HIDDEN Name=rlDhcpSrvIpAddrIdentifierType$VT SIZE=128   value="Type=0;Access=2;NumOfEnumerations=2;Range0=[1,2];Default value=2">
+<INPUT  Type=HIDDEN Name=rlDhcpSrvIpAddrClnHostName$VT SIZE=128   value="Type=2;Access=2;NumOfEnumerations=0;Range0=[0,32];Default value=">
+<INPUT  Type=HIDDEN Name=rlDhcpSrvIpAddrMechanism$VT SIZE=128   value="Type=0;Access=2;NumOfEnumerations=3;Range0=[1,3];Default value=1">
+<INPUT  Type=HIDDEN Name=rlDhcpSrvIpAddrPoolName$VT SIZE=128   value="Type=100;Access=2;NumOfEnumerations=0;Range0=[1,32]">
+<INPUT  Type=HIDDEN Name=rlDhcpSrvIpAddrConfParamsName$VT SIZE=128   value="Type=100;Access=2;NumOfEnumerations=0;Range0=[0,32];Default value=">
+<INPUT  Type=HIDDEN Name=rlDhcpSrvIpAddrRowStatus$VT SIZE=128   value="Type=0;Access=2;NumOfEnumerations=6;Range0=[1,6]">
+<INPUT  Type=HIDDEN Name=DHCPIPVT$endVT   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  type=hidden Name=DHCPIPVT$query   value=" " SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlDhcpSrvIpAddrIpAddr$query   value=" " SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=rlDhcpSrvIpAddrIpNetMask$query disabled   value=" " SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=rlDhcpSrvIpAddrIdentifier$query disabled   value=" " SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlDhcpSrvIpAddrIdentifierType$query disabled   value=" " SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=String$add   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlDhcpSrvIpAddrClnHostName$query disabled   value=" " SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=Default$add   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=rlDhcpSrvIpAddrMechanism$query disabled   value=" " SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlDhcpSrvIpAddrPoolName$query disabled   value=" " SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlDhcpSrvIpAddrConfParamsName$query disabled   value=" " SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlDhcpSrvIpAddrRowStatus$query   value=" " SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DHCPIPVT$endQuery   value="OK" SIZE="20" MAXLENGTH="20">
+<table border="0" cellspacing="0" cellpadding="0" width="100%" ID="Table2">
+<script language="JavaScript">
+top.Draw_TableTop(3);
+</script>
+<tr>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas" valign="top">&nbsp;</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px" class="data-area-canvas">&nbsp;</td>
+</tr>
+<tr>
+<td style="height: 1px; width: 10px" class="data-area-canvas"><img style="width: 1px; height: 1px" src=""></td>
+<td colspan="3" style="height: 1px" class="data-area-separator"><img style="width: 1px; height: 1px" src=""></td>
+<td style="height: 1px" class="data-area-canvas"><img style="width: 1px; height: 1px" src=""></td>
+<td style="height: 1px; width: 5px"><img style="width: 1px; height: 1px" src=""></td>
+</tr>
+<tr>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas-odd" width="45%">Host Name</td>
+<td class="data-area-canvas-odd" style="padding-bottom:2px;padding-top:2px;"><span id="rlDhcpSrvIpAddrPoolName$lbl"></span></td>
+<td class="data-area-canvas-odd">&nbsp;</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas">&nbsp;IP Address</td>
+<td class="data-area-canvas">
+<select name="rlDhcpSrvIpAddrIpAddr$cmb" onchange="queryData();" class="monitorEnabled"></select>
+</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas-odd"><input type="radio" name="network" OnClick="networkRadioClick()" checked ID="Radio1" VALUE="Radio1">&nbsp;Network Mask</td>
+<td class="data-area-canvas-odd"><input type="text" id=ipAdEntNetMask$txt NAME="ipAdEntNetMask$txt" onchange="maskChanged();"></td>
+<td class="data-area-canvas-odd">&nbsp;</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas-odd"><input type="radio" name="network" OnClick="networkRadioClick()" ID="Radio2" VALUE="Radio2">&nbsp;Prefix Length</td>
+<td class="data-area-canvas-odd"><input type="text" id=ipAdEntNetPrefix$txt NAME="ipAdEntNetPrefix$txt" onchange="prefixChanged();" #onblur="checkValidation('','','',false,'INT',8,30);"></td>
+<td class="data-area-canvas-odd">&nbsp;</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas"><input type="radio" name="identifierType" OnClick="idTypeRadioClick()" checked VALUE="Radio1">&nbsp;Client Identifier</td>
+<td class="data-area-canvas"><input type="text" NAME="rlDhcpSrvIpAddrIdentifier$txt"></td>
+<td class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas"><input type="radio" name="identifierType" OnClick="idTypeRadioClick()" VALUE="Radio2">&nbsp;MAC Address</td>
+<td class="data-area-canvas"><input type="text" NAME="rlDhcpSrvIpAddrIdentifierMAC$txt"></td>
+<td class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas-odd" width="45%">Client Name</td>
+<td class="data-area-canvas-odd"><input NAME="rlDhcpSrvIpAddrClnHostName$txt" maxlength="32"></td>
+<td class="data-area-canvas-odd">&nbsp;</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<script language="JavaScript">top.Draw_TableBottom(3)</script>
+</table>
+<br>
+<table border="0" cellspacing="0" cellpadding="0" width="100%" ID="Table3">
+<script language="JavaScript">
+top.Draw_TableTop(3);
+</script>
+<tr>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas" valign="top">&nbsp;</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px" class="data-area-canvas">&nbsp;</td>
+</tr>
+<tr>
+<td style="height: 1px; width: 10px" class="data-area-canvas"><img style="width: 1px; height: 1px" src=""></td>
+<td colspan="3" style="height: 1px" class="data-area-separator"><img style="width: 1px; height: 1px" src=""></td>
+<td style="height: 1px" class="data-area-canvas"><img style="width: 1px; height: 1px" src=""></td>
+<td style="height: 1px; width: 5px"><img style="width: 1px; height: 1px" src=""></td>
+</tr>
+<tr>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas-odd" width="45%">Default Router</td>
+<td class="data-area-canvas-odd"><input name="rlDhcpSrvConfParamsRoutersList$txt"></td>
+<td class="data-area-canvas-odd">&nbsp;</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px"></td>
+</tr>
+<tr>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas">Domain Name Server</td>
+<td class="data-area-canvas"><input name="rlDhcpSrvConfParamsDnsList$txt"></td>
+<td class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px"></td>
+</tr>
+<tr>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas-odd" width="45%">Domain Name</td>
+<td class="data-area-canvas-odd"><input type="text" NAME="rlDhcpSrvConfParamsDomainName$txt" maxlength="32"></td>
+<td class="data-area-canvas-odd">&nbsp;</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas">NetBIOS WINS Server</td>
+<td class="data-area-canvas"><input name="rlDhcpSrvConfParamsNetbiosNameList$txt"></td>
+<td class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px"></td>
+</tr>
+<tr>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas-odd" width="45%">NetBIOS Node Type</td>
+<td class="data-area-canvas-odd"><select ID="NetBIOSselect" NAME="rlDhcpSrvConfParamsNetbiosNodeType$cmb">
+<option value=""></option>
+<option value="1">Broadcast</option>
+<option value="2">Peer-to-Peer</option>
+<option value="4">Mixes</option>
+<option value="8">Hybrid</option>
+</select></td>
+<td class="data-area-canvas-odd">&nbsp;</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas">SNTP Server</td>
+<td class="data-area-canvas"><input name="rlDhcpSrvConfParamsTimeSrvList$txt"></td>
+<td class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px"></td>
+</tr>
+<tr>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas-odd" width="45%">Next Server</td>
+<td class="data-area-canvas-odd"><input type="text" ID="nextServerIPTxt" NAME="rlDhcpSrvConfParamsNextServerIp$txt"></td>
+<td class="data-area-canvas-odd">&nbsp;</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas" width="45%">Next Server Name</td>
+<td class="data-area-canvas"><input type="text" ID="nextServerTxt" NAME="rlDhcpSrvConfParamsNextServerName$txt" maxlength="64"></td>
+<td class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas-odd" width="45%">Config File Name</td>
+<td class="data-area-canvas-odd"><input type="text" ID="imageTxt" NAME="rlDhcpSrvConfParamsBootfileName$txt" maxlength="128"></td>
+<td class="data-area-canvas-odd">&nbsp;</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<script language="JavaScript">top.Draw_TableBottom(3)</script>
+</table>
+<script language="JavaScript">initPage();</script>
+<br>
+
+<div class="management-only">
+
+<div align="center"><table id="apply_tbl" cellspacing="0" cellpadding="0" border="0"><tr>
+<td nowrap nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/lbutton.gif"></td>
+<td nowrap nowrap valign="middle" align="center" class="data-area-button"><a href="javascript:preSubmit();">Apply Changes</a></td>
+<td nowrap nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/rbutton.gif"></td>
+</tr></table></div><br>
+<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
+<!--
+if(document.forms[0] && document.forms[0].elements.length<=1000)
+{
+for(i=0;(document.forms[0] && i<document.forms[0].elements.length);i++)
+{
+if(document.forms[0] && document.forms[0].elements[i].type=="select-one")
+if(document.forms[0] && document.forms[0].elements[i].length==0)
+document.forms[0].elements[i].style.width="70px";
+}
+}
+//-->
+</SCRIPT>
+
+</div>
+</form>
+</body>
+<script>document.getElementById("main_body").style.display="";</script>
+</html>

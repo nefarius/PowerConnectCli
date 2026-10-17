@@ -1,0 +1,902 @@
+
+
+
+<style type="text/css">
+font.small{color:black;font-size:9;}
+font.big{color:black;font-size:18;font-weight:bold;}
+</style>
+<html>
+
+
+<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
+<!--
+if(top.location==self.location )
+{
+var refStr=self.location + " ";
+var ind=0;
+refStr.toLowerCase();
+ind=refStr.indexOf("config");
+var locationStr=refStr.substring(0,ind);
+if (opener)
+{
+if (opener.opener)
+{
+if(opener.opener.top.location==opener.opener.location)
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+else
+{
+if(opener.top.location==opener.location)
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+}
+else
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+//-->
+</SCRIPT>
+
+
+<script>
+if (top.DeviceType && top.DeviceType == 1)
+{
+document.write("<title>Bridge Multicast Group</title>");
+}
+else
+{
+document.write("<title>Bridge Multicast Group</title>");
+}
+</script>
+<link rel="stylesheet" href="../device/style.css" type="text/css">
+<script src="../js/globalFunctions.js"></script>
+<head>
+<script language="javascript">
+<!--
+if(top.MonitorMode) {
+document.write("<link rel='stylesheet' href='../device/monitorMode.css' type='text/css'>")
+}
+if (document.images) {
+cellImages = new Array(4)
+cellImages[0] = new Array(4)
+cellImages[0][0] = new Image(22,22)
+cellImages[0][0].src = '../Images/blankup.gif'
+cellImages[0][1] = new Image(22,22)
+cellImages[0][1].src = '../Images/dup.gif'
+cellImages[0][2] = new Image(22,22)
+cellImages[0][2].src = '../Images/sup.gif'
+cellImages[0][3] = new Image(22,22)
+cellImages[0][3].src = '../Images/fup.gif'
+cellImages[1] = new Array(4)
+cellImages[1][0] = new Image(22,22)
+cellImages[1][0].src = '../Images/blankup.gif'
+cellImages[1][1] = new Image(22,22)
+cellImages[1][1].src = '../Images/dup.gif'
+cellImages[1][2] = new Image(22,22)
+cellImages[1][2].src = '../Images/sup.gif'
+cellImages[1][3] = new Image(22,22)
+cellImages[1][3].src = '../Images/fup.gif'
+cellImages[2] = new Array(4)
+cellImages[2][0] = new Image(22,22)
+cellImages[2][0].src = '../Images/blankdown.gif'
+cellImages[2][1] = new Image(22,22)
+cellImages[2][1].src = '../Images/ddown.gif'
+cellImages[2][2] = new Image(22,22)
+cellImages[2][2].src = '../Images/sdown.gif'
+cellImages[2][3] = new Image(22,22)
+cellImages[2][3].src = '../Images/fdown.gif'
+}
+var isStaticAddress=false;
+var addMode=false;
+var igmpMemberCurrent;
+var igmpMemberCurrentLearnt;
+var igmpMemberStatic;
+var igmpMemberForbidden;
+var amMaxVlanCount;
+var currentVlan;
+var queryMatch=false;
+var pageAfterClear=false;
+vlanMembers = new Array(top.trunkFirstIndex-1)
+vlanMembersCurrent = new Array(top.trunkFirstIndex-1)
+vlanMembersTrunk = new Array(top.NumberOfTrunks)
+vlanMembersTrunkCurrent = new Array(top.NumberOfTrunks)
+function putDataToVriables()
+{
+formele=document.IgmpMemberForm.elements;
+igmpMemberCurrent =octetToBitsAsChars(formele["dot1qTpGroupEgressPorts$query"].value);
+if ((!igmpMemberCurrent)||(igmpMemberCurrent==top.queryNA))
+{
+igmpMemberCurrent="";
+for (i=0;i<(top.trunkFirstIndex-1+top.NumberOfTrunks);i++)
+igmpMemberCurrent+="0";
+}
+else
+if (igmpMemberCurrent.length<(top.trunkFirstIndex-1+top.NumberOfTrunks))
+for (i=igmpMemberCurrent.length;i<(top.trunkFirstIndex-1+top.NumberOfTrunks);i++)
+igmpMemberCurrent+="0";
+igmpMemberStatic =octetToBitsAsChars(formele["dot1qStaticMulticastStaticEgressPorts$query"].value);
+if ((!igmpMemberStatic)||(igmpMemberStatic==top.queryNA))
+{
+igmpMemberStatic="";
+for (i=0;i<(top.trunkFirstIndex-1+top.NumberOfTrunks);i++)
+igmpMemberStatic+="0";
+}
+else
+if (igmpMemberStatic.length<(top.trunkFirstIndex-1+top.NumberOfTrunks))
+for (i=igmpMemberStatic.length;i<(top.trunkFirstIndex-1+top.NumberOfTrunks);i++)
+igmpMemberStatic+="0";
+igmpMemberCurrentLearnt=octetToBitsAsChars(formele["dot1qTpGroupLearnt$query"].value);
+if ((!igmpMemberCurrentLearnt)||(igmpMemberCurrentLearnt==top.queryNA))
+{
+igmpMemberCurrentLearnt="";
+for (i=0;i<(top.trunkFirstIndex-1+top.NumberOfTrunks);i++)
+igmpMemberCurrentLearnt+="0";
+}
+else
+if (igmpMemberCurrentLearnt.length<(top.trunkFirstIndex-1+top.NumberOfTrunks))
+for (i=igmpMemberCurrentLearnt.length;i<(top.trunkFirstIndex-1+top.NumberOfTrunks);i++)
+igmpMemberCurrentLearnt+="0";
+igmpMemberForbidden=octetToBitsAsChars(formele["dot1qStaticMulticastForbiddenEgressPorts$query"].value);
+if ((!igmpMemberForbidden)||(igmpMemberForbidden==top.queryNA))
+{
+igmpMemberForbidden="";
+for (i=0;i<(top.trunkFirstIndex-1+top.NumberOfTrunks);i++)
+igmpMemberForbidden+="0";
+}
+else
+if (igmpMemberForbidden.length<(top.trunkFirstIndex-1+top.NumberOfTrunks))
+for (i=igmpMemberForbidden.length;i<(top.trunkFirstIndex-1+top.NumberOfTrunks);i++)
+igmpMemberForbidden+="0";
+amMaxVlanCount=1094;
+currentVlan=formele["dot1qVlanIndex$query"].value;
+vlanIndex=currentVlan;
+}
+var columnsPerRow;
+var portPerRow;
+function setRow(moduleIndex)
+{
+if(top.NumberOfPortPerModuleArr[moduleIndex-1] == top.NumberOfPorts)
+{
+columnsPerRow = parseInt(top.NumberOfPorts)+10;
+portPerRow = top.NumberOfPorts;
+}
+else
+{
+portPerRow = top.NumberOfPortPerModuleArr[moduleIndex-1];
+columnsPerRow = portPerRow +10;
+}
+}
+function memberFromString(vlanIndex)
+{
+var memberString
+var portId
+memberString = igmpMemberStatic;
+memberString2= igmpMemberForbidden;
+for (portId = 0; portId < (top.trunkFirstIndex-1); portId++)
+{
+vlanMembers[portId] = (parseInt(memberString.charAt(portId))==1 ? 2 : 0)
+if (parseInt(memberString2.charAt(portId))==1)
+{
+vlanMembers[portId] = 3
+}
+}
+}
+function writeSpaceLine() {
+}
+function writeOneVlan(moduleIndex)
+{
+var portBase;
+var portId=0;
+var portEntry;
+var portName;
+memberFromString(vlanIndex)
+memberFromStringCurrent(vlanIndex)
+for (portBase = 0; ((portBase+portId) < top.NumberOfPortPerModuleArr[moduleIndex-1]); portBase += portPerRow)
+{
+document.writeln('<tr>')
+if ((top.NumberOfModules!=1))
+{
+document.write("<td nowrap height='24' width='10%' valign='center'>");
+DrawModuleNumber(moduleIndex,top.NumberOfModules)
+document.write("</td>");
+}
+for (portId = 0; ((portId < portPerRow) && (portBase+portId < top.NumberOfPortPerModuleArr[moduleIndex-1])); portId++)
+{
+if (top.NumberOfModules==1 || (top.NumberOfModules>1 && (portBase+portId)<top.NumberOfPortPerModuleArr[moduleIndex-1]))
+{
+if (portId==0)
+{
+document.write("<tr><td rowspan=2 valign=bottom><font size=1>Static</font><br/><div style='width:37px;height:12px;margin-top:8px;'><font size=1>Current</font></div></td><td nowrap bgcolor='#eeeeee' colspan=24>&nbsp;&nbsp;Ports</td></tr>");
+document.write("<tr>");
+}
+portEntry=portBase+portId+top.StartingPortPerModuleArr[moduleIndex-1]-1;
+portName=(portBase+portId+1);
+if (relatedTrunk(portEntry+1)==0)
+{
+document.writeln('<td nowrap align="center" width="20" bgcolor="#eeeeee"><font size="1"\
+face="Helvetica">',portName,'<br>\
+</font><a href="javascript:void(0)"\
+onMouseOver="window.status=\'\'; raise(\'', vlanIndex, '\', \'', portEntry, '\'); return true"\
+onMouseOut="flat(\'', vlanIndex, '\', \'', portEntry, '\')"\
+onMouseDown="lower(\'', vlanIndex, '\', \'', portEntry, '\')"\
+onMouseUp="window.status=\'\'; return true"\
+onClick="toggle(\'', vlanIndex, '\', \'', portEntry, '\'); return false">\
+<img src="', cellImages[0][vlanMembers[portEntry]].src, '" border="0"\
+align="center" width="20" height="20" name="cell', vlanIndex, '_', portEntry, '"></a>\
+<img src="', cellImages[0][vlanMembersCurrent[portEntry]].src, '" border="0"\
+align="center" width="20" height="20" name="cell', vlanIndex, '_Current', portEntry, '"></td>')
+}
+else
+{
+document.writeln('<td nowrap align="center" width="20" bgcolor="#eeeeee"><font \
+size="1" face="Helvetica">', portName, '<br>\
+</font><img src="../Images/null.gif" width="20" height="20">\
+<img src="../Images/null.gif" width="20" height="20"></td>')
+}
+}
+}
+portId=0;
+document.writeln('</tr>')
+writeSpaceLine()
+}
+}
+function DrawModuleNumber(moduleIndex,numberOfModules)
+{
+document.write("<table id='igmp_member_table_modules_tbl' align='center' valign='center' border='0'><tr>");
+if ((numberOfModules==1)||(!isShowModuleNumber))
+{
+moduleIndex=" ";
+}
+else moduleIndex=top.RealModuleNameArr[moduleIndex-1];
+isShowModuleNumber=false;
+document.write("<td nowrap><font class='big'>"+moduleIndex+"</td>");
+document.write("</tr></table>");
+}
+var isShowModuleNumber;
+function writeVlan()
+{
+for (var moduleIndex=1; moduleIndex<=top.NumberOfModules; moduleIndex++)
+{
+isShowModuleNumber=true;
+setRow(moduleIndex);
+writeSpaceLine();
+writeOneVlan(moduleIndex)
+}
+}
+function flat(vlanIndex, portId) {
+if (document.images) {
+document.images['cell'+vlanIndex+'_'+portId].src =
+cellImages[0][vlanMembers[portId]].src
+}
+}
+function clearImages()
+{
+pageAfterClear=true;
+if (document.images)
+{
+i=0;
+while(document.images[i])
+{
+if ((document.images[i].src.indexOf("nkup")==-1)&&((document.images[i].src.indexOf("up")!=-1)||(document.images[i].src.indexOf("down")!=-1)))
+document.images[i].src=cellImages[1][0].src;
+i++;
+}
+for (portId = 0; portId < (top.trunkFirstIndex-1); portId++)
+{
+vlanMembers[portId]=0;
+}
+for (trunkId = 0; trunkId < top.NumberOfTrunks; trunkId++)
+{
+vlanMembersTrunk[trunkId] =0;
+}
+}
+}
+function raise(vlanIndex, portId) {
+if (document.images) {
+document.images['cell'+vlanIndex+'_'+portId].src =
+cellImages[1][vlanMembers[portId]].src
+}
+}
+function lower(vlanIndex, portId) {
+if (document.images) {
+document.images['cell'+vlanIndex+'_'+portId].src =
+cellImages[2][vlanMembers[portId]].src
+}
+}
+function toggle(vlanIndex,portId)
+{
+if (isStaticAddress && !top.MonitorMode)
+{
+if (vlanMembers[portId]==0)
+{
+vlanMembers[portId]=2
+}
+else if (vlanMembers[portId]==2)
+{
+vlanMembers[portId]=3
+}
+else
+{
+vlanMembers[portId]=0
+}
+raise(vlanIndex, portId)
+}
+}
+function writeVlanTrunk()
+{
+document.writeln('<tr>')
+if ((top.NumberOfModules!=1))
+{
+document.write("<td nowrap height='24' width='10%' valign='center' >");
+document.write("<table id='igmp_member_table_vlanTrunk_tbl' align='center' valign='center' border='0'><tr>");
+document.write("<td nowrap><font class='big'>&nbsp;</td>");
+document.write("</tr></table>");
+document.write("</td>");
+document.write("<td nowrap height='24' width='10%' valign='center' >");
+document.write("<table id='igmp_member_table_vlanTrunk_inner_tbl' align='center' valign='center' border='0'><tr>");
+document.write("<td nowrap><font class='big'>&nbsp;</td>");
+document.write("</tr></table>");
+document.write("</td>");
+}
+document.writeln('<td nowrap>&nbsp;</td><td nowrap bgcolor="#eeeeee" colspan="'+top.NumberOfTrunks+'">&nbsp;&nbsp;LAGs</td></tr>')
+writeOneVlanTrunk(currentVlan)
+writeOneVlanTrunkCurrent(currentVlan)
+}
+function flatTrunk(vlanIndex, trunkId) {
+if (document.images) {
+document.images['cell'+vlanIndex+'_trunk'+trunkId].src =
+cellImages[0][vlanMembersTrunk[trunkId]].src
+}
+}
+function raiseTrunk(vlanIndex, trunkId) {
+if (document.images) {
+document.images['cell'+vlanIndex+'_trunk'+trunkId].src =
+cellImages[1][vlanMembersTrunk[trunkId]].src
+}
+}
+function lowerTrunk(vlanIndex, trunkId) {
+if (document.images) {
+document.images['cell'+vlanIndex+'_trunk'+trunkId].src =
+cellImages[2][vlanMembersTrunk[trunkId]].src
+}
+}
+function toggleTrunk(vlanIndex, trunkId)
+{
+if (isStaticAddress && !top.MonitorMode)
+{
+if (vlanMembersTrunk[trunkId]==0)
+{
+vlanMembersTrunk[trunkId] = 2
+}
+else if (vlanMembersTrunk[trunkId]==2)
+{
+vlanMembersTrunk[trunkId] = 3
+}
+else
+{
+vlanMembersTrunk[trunkId] = 0
+}
+raiseTrunk(vlanIndex, trunkId)
+}
+}
+function memberFromStringTrunk(vlanIndex)
+{
+var memberString
+var trunkId
+memberString = igmpMemberStatic;
+memberString2= igmpMemberForbidden;
+for (trunkId = 0; trunkId < top.NumberOfTrunks; trunkId++)
+{
+vlanMembersTrunk[trunkId] = (parseInt(memberString.charAt(top.trunkFirstIndex-1+trunkId))==1 ? 2 : 0)
+if (parseInt(memberString2.charAt(top.trunkFirstIndex-1+trunkId))==1)
+{
+vlanMembersTrunk[trunkId] = 3
+}
+}
+}
+function writeOneVlanTrunk(vlanIndex){
+var trunkBase
+var trunkId
+memberFromStringTrunk(vlanIndex)
+document.writeln('<tr>')
+if ((top.NumberOfModules!=1))
+{
+document.write("<td nowrap height='24' width='10%' valign='center' >");
+document.write("<table id='igmp_member_table_oneVT_tbl' align='center' valign='center' border='0'><tr>");
+document.write("<td nowrap><font class='big'>&nbsp;</td>");
+document.write("</tr></table>");
+document.write("</td>");
+document.write("<td nowrap height='24' width='10%' valign='center' >");
+document.write("<table id='igmp_member_table_oneVT_inner_tbl' align='center' valign='center' border='0'><tr>");
+document.write("<td nowrap><font class='big'>&nbsp;</td>");
+document.write("</tr></table>");
+document.write("</td>");
+}
+document.writeln('<td nowrap valign="bottom"><font size="1">Static&nbsp;</font></td>')
+for (trunkId = 0; trunkId < top.NumberOfTrunks; trunkId++)
+{
+if (true)
+{
+document.writeln('<td nowrap align="center" width="20" bgcolor="#eeeeee"><font size="1" face="Helvetica">',trunkId+1,'<br>\
+</font><a href="javascript:void(0)"\
+onMouseOver="window.status=\'\'; raiseTrunk(\'', vlanIndex, '\', \'', trunkId, '\'); return true"\
+onMouseOut="flatTrunk(\'', vlanIndex, '\', \'', trunkId, '\')"\
+onMouseDown="lowerTrunk(\'', vlanIndex, '\', \'', trunkId, '\')"\
+onMouseUp="window.status=\'\'; return true"\
+onClick="toggleTrunk(\'', vlanIndex, '\', \'', trunkId, '\'); return false">\
+<img src="', cellImages[0][vlanMembersTrunk[trunkId]].src, '" border="0"\
+align="center" width="20" height="20" name="cell', vlanIndex, '_trunk', trunkId, '"></a></td>')
+}
+else
+{
+document.writeln('<td nowrap align="center" width="20" bgcolor="#eeeeee"><font \
+size="1" face="Helvetica">',trunkId+1,'<br>\
+</font><img src="../Images/null.gif" width="20"height="20"></td>')
+}
+}
+document.writeln('</tr>')
+}
+function memberFromStringCurrent(vlanIndex){
+var memberString
+var portId
+memberString = igmpMemberCurrent;
+memberString2 = igmpMemberCurrentLearnt;
+for (portId = 0; portId < top.trunkFirstIndex-1; portId++)
+{
+vlanMembersCurrent[portId]=0;
+if (vlanMembers[portId] == 3)
+vlanMembersCurrent[portId]=3;
+else if (vlanMembers[portId] == 2)
+{
+vlanMembersCurrent[portId] = 2;
+}
+else if (parseInt(memberString2.charAt(portId))==1)
+vlanMembersCurrent[portId] =1;
+}
+}
+function writeOneVlanTrunkCurrent(vlanIndex){
+var trunkBase
+var trunkId
+memberFromStringTrunkCurrent(vlanIndex)
+document.writeln('<tr>')
+if ((top.NumberOfModules!=1))
+{
+document.write("<td nowrap height='24' width='10%' valign='center' >");
+document.write("<table id='igmp_router_table_currentVT_tbl' align='center' valign='center' border='0'><tr>");
+document.write("<td nowrap><font class='big'>&nbsp;</td>");
+document.write("</tr></table>");
+document.write("</td>");
+document.write("<td nowrap height='24' width='10%' valign='center' >");
+document.write("<table id='igmp_router_table_currentVT_inner_tbl' align='center' valign='center' border='0'><tr>");
+document.write("<td nowrap><font class='big'>&nbsp;</td>");
+document.write("</tr></table>");
+document.write("</td>");
+}
+document.writeln('<td nowrap valign="bottom"><font size="1">Current&nbsp;</font></td>')
+for (trunkId = 0; trunkId < top.NumberOfTrunks; trunkId++){
+if (true){
+document.writeln('<td nowrap align="center" width="20" bgcolor="#eeeeee">\
+<img src="', cellImages[0][vlanMembersTrunkCurrent[trunkId]].src, '" border="0"\
+align="center" width="20" height="20" name="cell', vlanIndex, '_trunkCurrent', trunkId, '"></td>')
+}else{
+document.writeln('<td nowrap align="center" width="20" bgcolor="#eeeeee"><img src="../Images/null.gif" width="20"\
+height="20"></td>')
+}
+}
+document.writeln('</tr>')
+}
+function memberFromStringTrunkCurrent(vlanIndex){
+var memberString
+var trunkId
+memberString = igmpMemberCurrent;
+memberString2 = igmpMemberCurrentLearnt;
+for (trunkId = 0; trunkId < top.NumberOfTrunks; trunkId++)
+{
+vlanMembersTrunkCurrent[trunkId] =0;
+if (vlanMembersTrunk[trunkId] == 3)
+vlanMembersTrunkCurrent[trunkId] = 3;
+else if (vlanMembersTrunk[trunkId]==2)
+{
+vlanMembersTrunkCurrent[trunkId] = 2;
+}
+else if (parseInt(memberString2.charAt(top.trunkFirstIndex-1+trunkId))==1)
+{
+vlanMembersTrunkCurrent[trunkId] =1;
+}
+}
+}
+function writeVlanModify(){
+document.writeln('<td nowrap class="data-area-sub-header">VLAN ID:<br>(1-'+amMaxVlanCount+')</td>')
+document.writeln('<td nowrap>&nbsp;</td>')
+if (currentVlan==0){
+document.writeln('<td nowrap class="data-area-sub-header"><input id=OneVlanId type="text" size="4" maxlength="4" name="OneVlanId" value=""></td>')
+document.writeln('<td nowrap width="30">&nbsp;</td>')
+document.writeln('<td nowrap class="data-area-sub-header"><input id=OneVlanRemove type="checkbox" name="OneVlanRemove" disabled>Remove VLAN</td>')
+}else{
+document.writeln('<td nowrap class="data-area-sub-header"><input id=OneVlanId type="text" size="4" maxlength="4" name="OneVlanId" value="'+currentVlan+'" disabled></td>')
+document.writeln('<td nowrap width="30">&nbsp;</td>')
+document.writeln('<td nowrap class="data-area-sub-header"><input id=OneVlanRemove type="checkbox" name="OneVlanRemove">Remove VLAN</td>')
+}
+}
+function memberToStaticStrings()
+{
+formele=document.IgmpMemberForm.elements;
+var igmpMemberStaticTemp = '' ;
+var igmpMemberForbiddenTemp = '' ;
+var igmpMemberStaticChanged = false ;
+var igmpMemberForbiddenChanged = false ;
+var portId ;
+for (portId = 0; portId < (top.trunkFirstIndex-1); portId++)
+{
+igmpMemberStaticTemp+=(vlanMembers[portId]==2 ? 1 : 0)
+igmpMemberForbiddenTemp+=(vlanMembers[portId]==3 ? 1 : 0)
+if (igmpMemberStaticTemp.charAt(igmpMemberStaticTemp.length-1)!='0')
+igmpMemberStaticChanged=true;
+if (igmpMemberForbiddenTemp.charAt(igmpMemberForbiddenTemp.length-1)!='0')
+igmpMemberForbiddenChanged=true;
+}
+var trunkId ;
+for (trunkId = 0; trunkId < top.NumberOfTrunks; trunkId++)
+{
+igmpMemberStaticTemp+=(vlanMembersTrunk[trunkId]==2 ? 1 : 0)
+igmpMemberForbiddenTemp+=(vlanMembersTrunk[trunkId]==3 ? 1 : 0)
+if (igmpMemberStaticTemp.charAt(igmpMemberStaticTemp.length-1)!='0')
+igmpMemberStaticChanged=true;
+if (igmpMemberForbiddenTemp.charAt(igmpMemberForbiddenTemp.length-1)!='0')
+igmpMemberForbiddenChanged=true;
+}
+if (igmpMemberStaticChanged)
+formele["dot1qStaticMulticastStaticEgressPorts$query"].value=bitsAsCharsToOctet(igmpMemberStaticTemp);
+else formele["dot1qStaticMulticastStaticEgressPorts$query"].value="";
+if (igmpMemberForbiddenChanged)
+formele["dot1qStaticMulticastForbiddenEgressPorts$query"].value=bitsAsCharsToOctet(igmpMemberForbiddenTemp);
+else formele["dot1qStaticMulticastForbiddenEgressPorts$query"].value="";
+}
+function formSubmit()
+{
+formele=document.IgmpMemberForm.elements;
+if (removeSpacesFromHeadAndTail(formele["dot1qStaticMulticastStatus$query"].value) == "")
+formele["dot1qStaticMulticastStatus$query"].disabled = true;
+if (formele["dot1qTpGroupAddress$select"][0])
+{
+memberToStaticStrings();
+disableHtml();
+document.IgmpMemberForm.submit();
+}
+}
+function disableHtml()
+{
+var formele=document.IgmpMemberForm.elements;
+formele["dot1qVlanIndex$select"].disabled=true;
+formele["dot1qTpGroupAddress$select"].disabled=true;
+formele["RemoveCBox"].disabled=true;
+}
+function disableQuery(){
+formele=document.IgmpMemberForm.elements;
+formele["dot1qVlanIndex$query"].disabled=true;
+formele["dot1qTpGroupAddress$query"].disabled=true;
+formele["dot1qStaticMulticastReceivePort$query"].disabled=true;
+formele["dot1qStaticMulticastStaticEgressPorts$query"].disabled=true;
+formele["dot1qStaticMulticastForbiddenEgressPorts$query"].disabled=true;
+formele["dot1qStaticMulticastStatus$query"].disabled=true;
+formele["IgmpMulticastVT$endQuery"].disabled=true;
+}
+function ChangeStatus(){
+formele=document.IgmpMemberForm.elements;
+if (formele["RemoveCBox"].checked==true)
+{
+formele["IgmpMulticastVT$query"].disabled=true;
+formele["dot1qVlanIndex$query"].disabled=true;
+formele["dot1qTpGroupAddress$query"].disabled=true;
+formele["dot1qStaticMulticastReceivePort$query"].disabled=true;
+formele["dot1qStaticMulticastStaticEgressPorts$query"].disabled=true;
+formele["dot1qStaticMulticastForbiddenEgressPorts$query"].disabled=true;
+formele["dot1qTpGroupEgressPorts$query"].disabled=true;
+formele["dot1qTpGroupLearnt$query"].disabled=true;
+formele["dot1qStaticMulticastStatus$query"].disabled=true;
+formele["IgmpMulticastVT$endQuery"].disabled=true;
+formele["dot1qStaticMulticastVT$queryRemove"].disabled=false;
+formele["dot1qVlanIndex$queryRemove"].disabled=false;
+formele["dot1qStaticMulticastAddress$queryRemove"].disabled=false;
+formele["dot1qStaticMulticastReceivePort$queryRemove"].disabled=false;
+formele["dot1qStaticMulticastStatus$queryRemove"].disabled=false;
+formele["dot1qStaticMulticastVT$endqueryRemove"].disabled=false;
+formele["dot1qStaticMulticastStatus$queryRemove"].value=2;
+}
+else
+{
+formele["IgmpMulticastVT$query"].disabled=false;
+formele["dot1qVlanIndex$query"].disabled=false;
+formele["dot1qTpGroupAddress$query"].disabled=false;
+formele["dot1qStaticMulticastStaticEgressPorts$query"].disabled=false;
+formele["dot1qStaticMulticastForbiddenEgressPorts$query"].disabled=false;
+formele["dot1qTpGroupEgressPorts$query"].disabled=false;
+formele["dot1qTpGroupLearnt$query"].disabled=false;
+formele["dot1qStaticMulticastStatus$query"].disabled=false;
+formele["IgmpMulticastVT$endQuery"].disabled=false;
+formele["dot1qStaticMulticastVT$queryRemove"].disabled=true;
+formele["dot1qVlanIndex$queryRemove"].disabled=true;
+formele["dot1qStaticMulticastAddress$queryRemove"].disabled=true;
+formele["dot1qStaticMulticastReceivePort$queryRemove"].disabled=true;
+formele["dot1qStaticMulticastStatus$queryRemove"].disabled=true;
+formele["dot1qStaticMulticastVT$endqueryRemove"].disabled=true;
+}
+}
+function selectQuery(){
+selectNameVlan=document.IgmpMemberForm.elements["dot1qVlanIndex$select"];
+selectNameMulti=document.IgmpMemberForm.elements["dot1qTpGroupAddress$select"];
+var newHref="igmp_member_table.htm?[IgmpMulticastVT]Query:dot1qVlanIndex="
+newHref+=(selectNameVlan.options[selectNameVlan.selectedIndex].text);
+newHref+="@dot1qTpGroupAddress="
+if ((selectNameMulti.options[selectNameMulti.selectedIndex].text).indexOf(":")!=-1)
+{
+newHref+=fromMacAddressToString(selectNameMulti.options[selectNameMulti.selectedIndex].text);
+}
+else
+{
+newHref+=(fromIPToMulticastMac(selectNameMulti.options[selectNameMulti.selectedIndex].text,true));
+}
+newHref+="^FixedKey:dot1qStaticMulticastReceivePort=0[dot1qStaticMulticastVT]Query:dot1qVlanIndex=";
+newHref+=(selectNameVlan.options[selectNameVlan.selectedIndex].text);
+newHref+="@dot1qStaticMulticastAddress="
+if ((selectNameMulti.options[selectNameMulti.selectedIndex].text).indexOf(":")!=-1)
+{
+newHref+=fromMacAddressToString(selectNameMulti.options[selectNameMulti.selectedIndex].text);
+}
+else
+{
+newHref+=(fromIPToMulticastMac(selectNameMulti.options[selectNameMulti.selectedIndex].text,true));
+}
+newHref+="@dot1qStaticMulticastReceivePort=0"
+document.location.href=newHref;
+}
+function addMySelectionList()
+{
+var formele=document.IgmpMemberForm.elements;
+var optionNo=1;
+var optionIndex=0;
+queryMatch=false;
+selectName=formele["dot1qTpGroupAddress$select"];
+selName=formele["dot1qVlanIndex$select"];
+formele["dot1qTpGroupAddress$select"].remove(0);
+formele["dot1qTpGroupAddress$select"][0]=null;
+while (formele["dot1qVlanIndex$repeat?"+optionNo])
+{
+if ((formele["dot1qVlanIndex$repeat?"+optionNo].value)==(selName.options[selName.selectedIndex].text))
+{
+if ((formele["dot1qTpGroupAddress$repeat?"+optionNo].value).indexOf("01005e")==0)
+{
+text=fromMulticastMacToIP(formele["dot1qTpGroupAddress$repeat?"+optionNo].value,true);
+}
+else
+{
+text=fromStringToMacAddress(formele["dot1qTpGroupAddress$repeat?"+optionNo].value);
+}
+newOption = new Option(text);
+selectName.options[optionIndex]=newOption;
+if ((formele["dot1qTpGroupAddress$query"].value==formele["dot1qTpGroupAddress$repeat?"+optionNo].value)&&(formele["dot1qVlanIndex$query"].value)==(selName.options[selName.selectedIndex].text))
+queryMatch=true;
+optionIndex++;
+}
+optionNo++;
+}
+if ((formele["dot1qTpGroupAddress$select"][0])&&(!queryMatch || pageAfterClear))
+{
+selectName.selectedIndex=0;
+selectQuery();
+}
+if (!(formele["dot1qTpGroupAddress$select"][0]))
+{
+selectName.disabled=true;
+formele["RemoveCBox"].disabled=true;
+clearImages();
+}
+else
+{
+selectName.disabled=false;
+formele["RemoveCBox"].disabled=false;
+}
+}
+function checkStaticOrDynamicAddress()
+{
+var formele=document.IgmpMemberForm.elements;
+var entryNo=1;
+selectName=formele["dot1qTpGroupAddress$select"];
+selName=formele["dot1qVlanIndex$select"];
+var addVal="";
+while (formele["dot1qVlanIndex$repeatOnStatic?"+entryNo])
+{
+if ((formele["dot1qStaticMulticastAddress$repeatOnStatic?"+entryNo].value).indexOf("01005e")==0)
+{
+addVal=fromMulticastMacToIP(formele["dot1qStaticMulticastAddress$repeatOnStatic?"+entryNo].value,true);
+}
+else
+{
+addVal=fromStringToMacAddress(formele["dot1qStaticMulticastAddress$repeatOnStatic?"+entryNo].value);
+}
+if ((formele["dot1qVlanIndex$repeatOnStatic?"+entryNo].value==selName.options[selName.selectedIndex].text)&&
+(addVal==selectName.options[selectName.selectedIndex].text))
+{
+isStaticAddress=true;
+break;
+}
+entryNo++;
+}
+if (isStaticAddress==false)
+formele["RemoveCBox"].disabled=true;
+}
+function indexSignAddress(selectObject)
+{
+var i=0;
+formele=document.forms[0].elements;
+selectName=formele[selectObject];
+queryObject=getBaseName(selectObject)+"$query"
+var val=fromMulticastMacToIP(formele[queryObject].value,true);
+while (selectName.options[i]!=null)
+{
+if (selectName.options[i].text == val || selectName.options[i].text==fromStringToMacAddress(formele[queryObject].value))
+{
+selectName.selectedIndex=i;
+break;
+}
+i++;
+}
+if(formele[queryObject].value==top.queryNA)
+selectName.selectedIndex=-1;
+}
+//-->
+</script>
+</head>
+<body bgcolor="#FFFFFF" leftmargin="15" onload="setScreenMonitorState();">
+<script language="JavaScript">top.Draw_Header(document.title);</script>
+<div align="right" class="management-only" id="addButtonDiv">
+<table id="igmp_member_table_buttons_tbl" cellspacing="0" cellpadding="0" border="0">
+<tr>
+<td nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/lbutton.gif"></td>
+<td nowrap valign="middle" align="center" class="data-area-button"><a href="javascript:void(0)" onclick="javascript:window.open('add_bridge_mc_address.htm','', 'width=850, height=600, left=50, top=50, scrollbars=yes, resizable=yes');" title='Add Bridge Multicast Group'>&nbsp;&nbsp;Add&nbsp;&nbsp;</a></td>
+<td nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/rbutton.gif"></td>
+<td nowrap style="width: 14px; height: 25px"></td>
+</tr>
+</table>
+</div>
+<br>
+
+<FORM METHOD='POST' name="IgmpMemberForm"  ACTION="/config/igmp_member_table.htm"   >
+<INPUT  Type="HIDDEN" Name="restoreUrl" SIZE=256   value="">
+<INPUT  TYPE="HIDDEN" NAME="errorCollector"   value="" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=IgmpStaticMulticastVT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=dot1qStaticMulticastTable$VT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=dot1qVlanIndex$VT size=128   value="Type=7;Access=1;NumOfEnumerations=0;Range0=[-2147483648,2147483647]">
+<INPUT  Type=HIDDEN Name=dot1qStaticMulticastAddress$VT size=128   value="Type=2;Access=1;NumOfEnumerations=0;Range0=[6,6]">
+<INPUT  Type=HIDDEN Name=dot1qStaticMulticastReceivePort$VT size=128   value="Type=0;Access=1;NumOfEnumerations=0;Range0=[0,65535]">
+<INPUT  Type=HIDDEN Name=IgmpStaticMulticastVT$endVT   value="OK" SIZE="20" MAXLENGTH="20">
+
+
+<INPUT  Type=HIDDEN Name=IgmpMulticastVT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=dot1qTpGroupTable$VT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=dot1qVlanIndex$VT size=128   value="Type=7;Access=1;NumOfEnumerations=0;Range0=[-2147483648,2147483647]">
+<INPUT  Type=HIDDEN Name=dot1qTpGroupAddress$VT size=128   value="Type=2;Access=1;NumOfEnumerations=0;Range0=[6,6]">
+<INPUT  Type=HIDDEN Name=dot1qStaticMulticastReceivePort$VT size=128   value="Type=0;Access=1;NumOfEnumerations=0;Range0=[0,65535]">
+<INPUT  Type=HIDDEN Name=dot1qStaticMulticastStaticEgressPorts$VT size=256 maxlength=256   value="Type=101;Access=2;NumOfEnumerations=0;Range0=[0,160];Default value=000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000">
+<INPUT  Type=HIDDEN Name=dot1qStaticMulticastForbiddenEgressPorts$VT size=256 maxlength=256   value="Type=101;Access=2;NumOfEnumerations=0;Range0=[0,160];Default value=000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000">
+<INPUT  Type=HIDDEN Name=dot1qStaticMulticastStatus$VT size=128   value="Type=0;Access=2;NumOfEnumerations=5;Range0=[1,5];Default value=3">
+<INPUT  Type=HIDDEN Name=dot1qTpGroupEgressPorts$VT size=128   value="Type=101;Access=1;NumOfEnumerations=0;Range0=[0,160]">
+<INPUT  Type=HIDDEN Name=dot1qTpGroupLearnt$VT size=128   value="Type=101;Access=1;NumOfEnumerations=0;Range0=[0,160]">
+<INPUT  Type=HIDDEN Name=IgmpMulticastVT$endVT   value="OK" SIZE="20" MAXLENGTH="20">
+
+<table id="igmp_member_table_display1_tbl" border="0" cellspacing="0" cellpadding="0" width="100%">
+<script language="JavaScript">
+top.Draw_TableTop(2);top.Draw_TableHeader();
+</script>
+<tr>
+<td nowrap style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd" width="50%">VLAN ID</td>
+<td nowrap class="data-area-canvas-odd">
+
+<SELECT  Name=dot1qVlanIndex$select size="1" onChange="addMySelectionList()" class="monitorEnabled"
+ RpGetType=complex >
+<OPTION  value=0>1
+<OPTION  value=1>20
+<OPTION  value=2>30
+</select>
+
+
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+
+
+
+<td nowrap style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas">Bridge Multicast Address</td>
+<td nowrap class="data-area-canvas">
+<select name="dot1qTpGroupAddress$select" size="1" onChange="selectQuery()">
+<option value=" ">&nbsp;</option>
+</select>
+</td>
+
+<INPUT  type=hidden Name=IgmpMulticastVT$query   value=" " SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qVlanIndex$query   value=" " SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qTpGroupAddress$query   value=" " SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qStaticMulticastReceivePort$query disabled   value=" " SIZE="20" MAXLENGTH="20">
+
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd">Remove</td>
+<td nowrap class="data-area-canvas-odd">
+<input type="checkbox" name="RemoveCBox" OnClick="ChangeStatus()">
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<script language="JavaScript">top.Draw_TableBottom(2)</script>
+</table>
+<script language=javascript>
+indexSign("dot1qVlanIndex$select");
+var selName=document.IgmpMemberForm.dot1qVlanIndex$select;
+if (selName.selectedIndex==-1)
+selName.selectedIndex=0;
+addMySelectionList();
+if (queryMatch)
+{
+indexSignAddress("dot1qTpGroupAddress$select");
+checkStaticOrDynamicAddress();
+}
+</script>
+
+<INPUT  TYPE=HIDDEN NAME=dot1qStaticMulticastStaticEgressPorts$query size=256 maxlength=256   value=" ">
+<INPUT  TYPE=HIDDEN NAME=dot1qStaticMulticastForbiddenEgressPorts$query size=256 maxlength=256   value=" ">
+<INPUT  TYPE=HIDDEN NAME=dot1qTpGroupEgressPorts$query size=160 disabled   value=" ">
+<INPUT  TYPE=HIDDEN NAME=dot1qTpGroupLearnt$query size=160 disabled   value=" ">
+<INPUT  TYPE=HIDDEN NAME=dot1qStaticMulticastStatus$query   value=" " SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=IgmpMulticastVT$endQuery   value="OK" SIZE="20" MAXLENGTH="20">
+
+<br>
+<table id="igmp_member_table_display2_tbl" border="0" cellpadding="0" cellspacing="0">
+<script language="javascript">
+putDataToVriables();
+writeVlan();
+</script>
+</table>
+<br>
+<table id="igmp_member_table_display3_tbl" border="0" cellpadding="0" cellspacing="0">
+<script language="javascript">writeVlanTrunk()</script>
+</table>
+<br>
+
+<INPUT  Type=HIDDEN Name=dot1qStaticMulticastVT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=dot1qStaticMulticastTable$VT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=dot1qVlanIndex$VT size=128   value="Type=7;Access=1;NumOfEnumerations=0;Range0=[-2147483648,2147483647]">
+<INPUT  Type=HIDDEN Name=dot1qStaticMulticastAddress$VT size=128   value="Type=2;Access=1;NumOfEnumerations=0;Range0=[6,6]">
+<INPUT  Type=HIDDEN Name=dot1qStaticMulticastReceivePort$VT size=128   value="Type=0;Access=1;NumOfEnumerations=0;Range0=[0,65535]">
+<INPUT  Type=HIDDEN Name=dot1qStaticMulticastStatus$VT size=128   value="Type=0;Access=2;NumOfEnumerations=5;Range0=[1,5];Default value=3">
+<INPUT  Type=HIDDEN Name=dot1qStaticMulticastVT$endVT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=dot1qStaticMulticastVT$queryRemove disabled   value=" " SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qVlanIndex$queryRemove disabled   value=" " SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qStaticMulticastAddress$queryRemove disabled   value=" " SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qStaticMulticastReceivePort$queryRemove disabled   value=" " SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qStaticMulticastStatus$queryRemove disabled   value=" " SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=dot1qStaticMulticastVT$endqueryRemove disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<div class="management-only">
+<script language="JavaScript">
+top.Draw_ButtonApply("formSubmit")
+</script>
+</div>
+
+</form>
+</body>
+</html>

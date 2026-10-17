@@ -1,0 +1,1888 @@
+
+
+
+<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
+<!--
+if(top.location==self.location )
+{
+var refStr=self.location + " ";
+var ind=0;
+refStr.toLowerCase();
+ind=refStr.indexOf("config");
+var locationStr=refStr.substring(0,ind);
+if (opener)
+{
+if (opener.opener)
+{
+if(opener.opener.top.location==opener.opener.location)
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+else
+{
+if(opener.top.location==opener.location)
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+}
+else
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+//-->
+</SCRIPT>
+
+<html>
+
+<head>
+<title>Dynamic Address Table</title>
+<link rel="stylesheet" href="../device/style.css" type="text/css">
+<script src="../js/globalFunctions.js"></script>
+<script language="JavaScript">
+<!-- Beginng of JavaScript Applet
+if(top.MonitorMode) {
+document.write("<link rel='stylesheet' href='../device/monitorMode.css' type='text/css'>")
+}
+var lastUrlArrayValue = top.lastUrlArray;
+var lastUrlIndexValue = top.lastUrlIndex;
+top.FirstTd=0;
+var OperationCompleted=false;
+var Aging_proper=true;
+var MaxSize=6000;
+var dataArray=new Array(currIndex);
+var smallDataArray=new Array();
+var ArrIndex=0;
+var currIndex=0;
+var minAgingTime=0;
+var maxAgingTime=0;
+var enabledColor="#ffffff";
+var disabledColor="#cccccc";
+var pageIndex = 0;
+function enableSort()
+{
+formele=document.AddressDynamicForm.elements;
+formele["SortList"].disabled=false;
+}
+function updateSortFlag()
+{
+formele=document.AddressDynamicForm.elements;
+if (formele["SortList"].selectedIndex==0)
+top.sortFlag="dot1qFdbId$repeat";
+else if (formele["SortList"].selectedIndex==1)
+top.sortFlag="dot1qTpFdbAddress$repeat";
+else top.sortFlag="dot1qTpFdbPort$repeat";
+activateSort();
+}
+function selectSortIndex()
+{
+formele=document.AddressDynamicForm.elements;
+if (top.sortFlag=="dot1qFdbId$repeat")
+formele["SortList"].selectedIndex=0;
+else if (top.sortFlag=="dot1qTpFdbAddress$repeat")
+formele["SortList"].selectedIndex=1;
+else
+formele["SortList"].selectedIndex=2;
+}
+function DataIntoArray(index)
+{
+formele=document.AddressDynamicForm.elements;
+dataArray[ArrIndex]=formele[top.sortFlag+"?"+index].value+"$"+index;
+ArrIndex++;
+}
+function sortDataArray()
+{
+formele=document.AddressDynamicForm.elements;
+dataArray.sort(myCompare);
+}
+function myCompare(value1,value2)
+{
+var1Arr=sliceString(value1,"$");
+var2Arr=sliceString(value2,"$");
+value1=var1Arr[0];
+value2=var2Arr[0];
+if (top.sortFlag == "dot1qTpFdbAddress$repeat")
+{
+for(m=0; m<value1.length; m++)
+{
+if(value1.charCodeAt(m)>value2.charCodeAt(m))
+return 1;
+if(value1.charCodeAt(m)<value2.charCodeAt(m))
+return -1;
+}
+return 0;
+}
+else if (top.sortFlag == "dot1qFdbId$repeat")
+{
+return value1 - value2;
+}
+else
+{
+var p1 = getPortNumber(value1);
+var p2 = getPortNumber(value2);
+return p1 - p2;
+}
+}
+function getPortNumber(InterName)
+{
+formele=document.AddressDynamicForm.elements;
+if ((InterName.charAt(0)=="g")||(InterName.charAt(0)=="e"))
+return (parseInt(InterName.substring(1,InterName.length)));
+else if (InterName.charAt(0)=="L")
+return (parseInt(InterName.substring(4,InterName.length))+top.trunkFirstIndex-1);
+else
+return (parseInt(InterName.substring(0,1))*52+parseInt(InterName.substring(3,InterName.length)))
+}
+function displayDataArray()
+{
+formele=document.AddressDynamicForm.elements;
+sortDataArray();
+for(i=0;i<ArrIndex;i++)
+{
+myTable=document.getElementsByTagName('TABLE')[7];
+var rawArr=sliceString(dataArray[i],"$");
+newValueMac=formele["dot1qTpFdbAddress$repeat?"+rawArr[1]].value;
+myTable.tBodies[0].rows[i].cells[3].innerHTML=newValueMac;
+newValueVlan=formele["dot1qFdbId$repeat?"+rawArr[1]].value;
+if (newValueVlan<4096)
+myTable.tBodies[0].rows[i].cells[2].innerHTML="VLAN "+newValueVlan;
+else
+myTable.tBodies[0].rows[i].cells[2].innerHTML="Internal Use";
+newValuePort=formele["dot1qTpFdbPort$repeat?"+rawArr[1]].value;
+myTable.tBodies[0].rows[i].cells[4].innerHTML=newValuePort;
+}
+ArrIndex=0;
+}
+function formSubmit()
+{
+if (Aging_proper == true)
+{
+formele=document.AddressDynamicForm.elements;
+if((formele["dot1dTpAgingTime"].defaultValue != formele["dot1dTpAgingTime"].value)||formele["rndActionChbx"].checked)
+{
+if (!putValueInrndAction())
+return;
+disableHtml();
+document.AddressDynamicForm.submit();
+}
+}
+}
+function disableHtml(){
+formele=document.AddressDynamicForm.elements;
+formele["rndActionChbx"].disabled=true;
+formele["dot1qTpFdbAddress$text"].disabled=true;
+formele["PortCheck"].disabled=true;
+formele["MacCheck"].disabled=true;
+formele["VlanCheck"].disabled=true;
+formele["SortList"].disabled=true;
+formele["port"].disabled=true;
+formele["trunk"].disabled=true;
+formele["PortTrunkVlanAdd"][0].disabled=true;
+formele["PortTrunkVlanAdd"][1].disabled=true;
+formele["dot1qFdbId$text"].disabled=true;
+}
+function selectFilter()
+{
+var notIE = (navigator.appName.indexOf("Microsoft") == -1);
+if (!((notIE)&&(top.fldToCheck!="")))
+{
+formele=document.AddressDynamicForm.elements;
+var newFilter="address_dynamic.htm?Filter:";
+var isCon=true;
+newFilter+="((dot1qTpFdbStatus!=1)&&(dot1qTpFdbStatus!=5))&&((ifOperStatus!=6)||(dot1qTpFdbPort>"+parseInt(top.NumberOfPorts)+"))&&";
+if (formele["PortCheck"].checked==true)
+{
+myInterface=getInterface();
+newFilter+="(dot1qTpFdbPort="+(myInterface)+")&&";
+}
+if (formele["MacCheck"].checked==true)
+{
+var macStr=formele["dot1qTpFdbAddress$text"].value;
+if (macStr!="" && macStr!='\t' && macStr!='\n' && macStr!=" ")
+{
+if(macStr.indexOf(":")!=-1){
+macStr=fromMacAddressToString(macStr);
+newFilter+='(dot1qTpFdbAddress=0x"'+macStr+'")&&';
+}
+else
+{
+isCon=false;
+alert("Mac Address Type should be XX:XX:XX:XX:XX:XX !");
+}
+}
+else
+{
+isCon=false;
+alert("You must enter Mac Address or uncheck the Mac Address!");
+}
+}
+if (formele["VlanCheck"].checked==true)
+{
+if (!checkValidation('VLAN ID', true, 'dot1qFdbId$text', '', 'INT', 1, 4094))
+return;
+newFilter+="(dot1qFdbId="+formele["dot1qFdbId$text"].value+")";
+}
+var i=newFilter.length;
+if (newFilter.charAt(i-2)=="&")
+newFilter=newFilter.substr(0,i-2);
+if (isCon==true){
+disableApplyChanges();
+document.location.href=newFilter;
+}
+}
+}
+function getInterface()
+{
+formele=document.AddressDynamicForm.elements;
+if (formele["PortTrunkVlanAdd"][0].checked==true)
+return (formele["port"].options[formele["port"].selectedIndex].value);
+else
+return (parseInt(formele["trunk"].options[formele["trunk"].selectedIndex].text)+top.trunkFirstIndex-1);
+}
+function activateSort()
+{
+for (i=1;i<=currIndex;i++)
+DataIntoArray(i);
+displayDataArray();
+}
+function loopIndex(index){
+currIndex=index;
+}
+function DisplayFields(field){
+var fieldName=field+"$repeat";
+formField=document.AddressDynamicForm.elements[fieldName+"?"+currIndex];
+document.write(formField.value);
+}
+function displayInterface(index)
+{
+var theIndex=parseInt(index);
+if (theIndex.toString()=="NaN")
+return (index);
+else if (theIndex<=top.NumberOfPorts)
+return (top.portsNamesArr[theIndex-1]);
+else
+return ("Ch "+(theIndex-top.NumberOfPorts));
+}
+function drawApplyChanges(){
+formele=document.AddressDynamicForm.elements;
+myTable=document.getElementsByTagName('TABLE')[3];
+htmlStr="<a href='javascript:preSubmit();'>Apply Changes</a>";
+myTable.tBodies[0].rows[0].cells[1].innerHTML=htmlStr;
+document.body.style.cursor="default";
+}
+function disableApplyChanges(){
+formele=document.AddressDynamicForm.elements;
+myTable=document.getElementsByTagName('TABLE')[3];
+htmlStr="Apply Changes";
+myTable.tBodies[0].rows[0].cells[1].innerHTML=htmlStr;
+document.body.style.cursor="wait";
+}
+function checkFilter()
+{
+formele=document.AddressDynamicForm.elements;
+if (formele["restoreUrl"].value=="Filter:" || formele["restoreUrl"].value=="")
+{
+top.lastUrlArray= new Array();
+top.lastUrlArray[0]="address_dynamic.htm?Filter:";
+top.lastUrlIndex=0;
+lastUrlIndexValue = top.lastUrlIndex;
+lastUrlArrayValue = top.lastUrlArray
+top.sortFlag="dot1qFdbId$repeat";
+document.location.href='address_dynamic.htm?Filter:((dot1qTpFdbStatus!=1)&&(dot1qTpFdbStatus!=5))&&((ifOperStatus!=6)||(dot1qTpFdbPort>'+parseInt(top.NumberOfPorts)+'))';
+}
+}
+function checkAging()
+{
+formele=document.AddressDynamicForm.elements;
+if ((formele["dot1dTpAgingTime"].value!='')&&(formele["dot1dTpAgingTime"].value!='\t')&&(formele["dot1dTpAgingTime"].value!=' ')&&(formele["dot1dTpAgingTime"].value!='\n'))
+{
+if (!((parseInt(formele["dot1dTpAgingTime"].value)>=parseInt(formele["rldot1dTpAgingTimeMin$hidden"].value))&&
+(parseInt(formele["dot1dTpAgingTime"].value)<=parseInt(formele["rldot1dTpAgingTimeMax$hidden"].value))))
+{
+alert ("Agging time must be an integer between "+formele["rldot1dTpAgingTimeMin$hidden"].value+" and "+formele["rldot1dTpAgingTimeMax$hidden"].value+".");
+formele["dot1dTpAgingTime"].focus();
+return false;
+}
+return true;
+}
+else
+formele["dot1dTpAgingTime"].value=300;
+return true;
+}
+function getAgingTimeRange(){
+formele=document.AddressDynamicForm.elements;
+minAgingTime=parseInt(formele["rldot1dTpAgingTimeMin$hidden"].value);
+maxAgingTime=parseInt(formele["rldot1dTpAgingTimeMax$hidden"].value);
+}
+function onInterfaceClicked()
+{
+var formele=document.AddressDynamicForm.elements;
+var query_by_port = formele["PortCheck"].checked;
+formele["PortTrunkVlanAdd"][0].disabled = (!query_by_port);
+formele["PortTrunkVlanAdd"][1].disabled = (!query_by_port);
+formele["port"].disabled = !(query_by_port && formele["PortTrunkVlanAdd"][0].checked);
+formele["trunk"].disabled = !(query_by_port && formele["PortTrunkVlanAdd"][1].checked);
+}
+function changeSensitiveness(textElement, enabled)
+{
+formele=document.AddressDynamicForm.elements;
+if (enabled)
+{
+formele[textElement].disabled = false;
+formele[textElement].style.backgroundColor = enabledColor;
+}
+else
+{
+formele[textElement].disabled = true;
+formele[textElement].style.backgroundColor = disabledColor;
+}
+}
+function putValueInrndAction()
+{
+formele=document.AddressDynamicForm.elements;
+if (formele["rndActionChbx"].checked==true)
+{
+if(confirm("The dynamic addresses table will be cleared. Would you like to continue?"))
+formele["rndAction$hidden"].value = 23;
+else
+{
+formele["rndAction$hidden"].disabled=true;
+return false;
+}
+}
+else
+formele["rndAction$hidden"].disabled=true;
+return true;
+}
+function manageClearTable()
+{
+formele=document.AddressDynamicForm.elements;
+if (formele["rndActionChbx"].checked==true)
+{
+changeSensitiveness('dot1dTpAgingTime',false);
+}
+else
+{
+changeSensitiveness('dot1dTpAgingTime',true);
+}
+}
+function GetNextEntries()
+{
+var firstIndex, secondIndex, thirdIndex;
+if(currIndex!=0)
+{
+firstIndex = formele["dot1qTpFdbAddress$repeat?"+currIndex].value;
+secondIndex = formele["dot1qFdbId$repeat?"+currIndex].value;
+var currentUrlVal = 'address_dynamic.htm?'+formele["restoreUrl"].value;
+lastUrlIndexValue = lastUrlIndexValue+1;
+top.lastUrlIndex=lastUrlIndexValue;
+lastUrlArrayValue[lastUrlIndexValue]=currentUrlVal;
+top.lastUrlArray = lastUrlArrayValue;
+var pageCounter = pageIndex + 1;
+var navigateNext = "[AddressDynamicVT]partialKey:From-dot1qTpFdbAddress=" + firstIndex + "@dot1qFdbId=" + secondIndex + "^";
+var currentUrl = formele["restoreUrl"].value;
+var nextUrl;
+if (currentUrl.indexOf("partialKey") == -1)
+nextUrl = navigateNext + currentUrl;
+else
+{
+nextUrl = navigateNext + currentUrl.substr(currentUrl.indexOf("Filter:"));
+nextUrl = nextUrl.substring(0, nextUrl.indexOf("^pagenum="));
+}
+document.location.href = "address_dynamic.htm?" + nextUrl + "^pagenum="+pageCounter;
+}
+}
+function GetPreviousEntries()
+{
+if(lastUrlIndexValue!=0)
+{
+lastUrlIndexValue=lastUrlIndexValue-1;
+top.lastUrlIndex=lastUrlIndexValue;
+document.location.href=lastUrlArrayValue[lastUrlIndexValue+1];
+}
+}
+function getPageIndex()
+{
+var urlVal = formele["restoreUrl"].value;
+var pagerIndex = urlVal.indexOf("pagenum");
+if(pagerIndex==-1)
+pageIndex = 0;
+else
+{
+var pagerStr = urlVal.substring(pagerIndex+8);
+pageIndex = parseInt(pagerStr,10);
+}
+}
+function displayQueryParams()
+{
+var currentUrl = formele["restoreUrl"].value;
+var stripIndex = currentUrl.indexOf("^Filter:");
+if (stripIndex != -1)
+currentUrl = currentUrl.substr(stripIndex);
+var iTpFdbPort = currentUrl.indexOf("dot1qTpFdbPort=");
+var iTpFdbAddress = currentUrl.indexOf("dot1qTpFdbAddress=");
+var iFdbId = currentUrl.indexOf("dot1qFdbId=");
+if (iTpFdbPort != -1)
+{
+var TpFdbPortVal = parseInt(currentUrl.substr(iTpFdbPort + 15), 10);
+if (!isNaN(TpFdbPortVal))
+{
+formele["PortCheck"].checked = true;
+var strTpFdbPortVal = TpFdbPortVal.toString();
+if (TpFdbPortVal < parseInt(formele["trunk"].options[0].value))
+{
+for (var i = 0; i < formele["port"].length; i++)
+if (formele["port"].options[i].value == strTpFdbPortVal)
+{
+formele["PortTrunkVlanAdd"][0].checked = true;
+formele["port"].selectedIndex = i;
+break;
+}
+}
+else
+{
+for (var i = 0; i < formele["trunk"].length; i++)
+if (formele["trunk"].options[i].value == strTpFdbPortVal)
+{
+formele["PortTrunkVlanAdd"][1].checked = true;
+formele["trunk"].selectedIndex = i;
+break;
+}
+}
+onInterfaceClicked();
+}
+}
+if (iTpFdbAddress != -1)
+{
+formele["MacCheck"].checked = true;
+var strTpFdbAddress = currentUrl.substr(iTpFdbAddress + 21, 12);
+changeSensitiveness("dot1qTpFdbAddress$text", true);
+formele["dot1qTpFdbAddress$text"].value = fromStringToMacAddress(strTpFdbAddress);
+}
+if (iFdbId != -1)
+{
+formele["VlanCheck"].checked = true;
+changeSensitiveness("dot1qFdbId$text", true);
+var FdbIdVal = parseInt(currentUrl.substr(iFdbId + 11), 10);
+if (!isNaN(FdbIdVal))
+formele["dot1qFdbId$text"].value = FdbIdVal.toString();
+}
+}
+function initPagerButtons()
+{
+if(currIndex < 50)
+disableLinkButton("nextLink");
+if(pageIndex == 0)
+disableLinkButton("backLink");
+}
+function disableLinkButton(id)
+{
+var link = document.getElementById(id);
+link.href = "javascript:function(){return};";
+link.style.cursor = "default";
+}
+// --End of Java code -->
+</script>
+</head>
+<body style="cursor:wait;" bgcolor="#FFFFFF" leftmargin="15" onLoad="drawApplyChanges();enableSort();displayQueryParams();setScreenMonitorState();">
+
+<FORM METHOD='POST' name="AddressDynamicForm"  ACTION="/config/address_dynamic.htm"   >
+<INPUT  TYPE="HIDDEN" Name="restoreUrl" size=256   value="Filter:((dot1qTpFdbStatus!=1)&&(dot1qTpFdbStatus!=5))&&((ifOperStatus!=6)||(dot1qTpFdbPort>24))">
+<INPUT  TYPE="HIDDEN" NAME="errorCollector"   value="" SIZE="20" MAXLENGTH="20">
+
+<script language="JavaScript">
+checkFilter();
+getPageIndex();
+top.Draw_Header(document.title);
+</script>
+
+<INPUT  Type=HIDDEN Name=AddressDynamicVT size=128   value="OK">
+<INPUT  Type=HIDDEN Name=dot1qTpFdbTable$VT size=128   value="OK">
+<INPUT  Type=HIDDEN Name=dot1qTpFdbAddress$VT size=128   value="Type=2;Access=1;NumOfEnumerations=0;Range0=[6,6]">
+<INPUT  Type=HIDDEN Name=dot1qFdbId$VT size=128   value="Type=7;Access=1;NumOfEnumerations=0;Range0=[-2147483648,2147483647]">
+<INPUT  Type=HIDDEN Name=dot1qTpFdbPort$VT size=128   value="Type=0;Access=1;NumOfEnumerations=0;Range0=[0,65535]">
+<INPUT  Type=HIDDEN Name=dot1qTpFdbStatus$VT size=128   value="Type=0;Access=1;NumOfEnumerations=5;Range0=[1,5]">
+<INPUT  Type=HIDDEN Name="ifIndex=dot1qTpFdbPort$VT" size=128   value="Type=0;Access=1;NumOfEnumerations=0;Range0=[1,2147483647]">
+<INPUT  Type=HIDDEN Name=ifOperStatus$VT size=128   value="Type=0;Access=1;NumOfEnumerations=7;Range0=[1,7]">
+<INPUT  Type=HIDDEN Name=AddressDynamicVT$endVT   value="OK" SIZE="20" MAXLENGTH="20">
+
+<table id="address_dynamic_aging_tbl" border="0" cellspacing="0" cellpadding="0" width="100%">
+<script language="JavaScript">top.Draw_TableTop(2);top.Draw_TableHeader();</script>
+<tr>
+<td nowrap width="10" class="data-area-canvas">&nbsp;</td>
+
+<INPUT  TYPE=hidden NAME=rldot1dTpAgingTimeMin$hidden disabled   value="10" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=rldot1dTpAgingTimeMax$hidden disabled   value="630" SIZE="20" MAXLENGTH="20">
+
+<td nowrap class="data-area-canvas-odd">Address Aging (<script>
+getAgingTimeRange();
+document.write(minAgingTime + "-" + maxAgingTime);
+</script>)</td>
+<td nowrap class="data-area-canvas-odd">
+
+<INPUT  TYPE=text NAME=dot1dTpAgingTime onBlur="checkValidation('','','','','INT',minAgingTime,maxAgingTime)"   value="300" SIZE="20" MAXLENGTH="20">
+
+(Sec)
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px"></td>
+</tr>
+<tr>
+<td nowrap width="10" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas">Clear Table</td>
+<td nowrap class="data-area-canvas">
+<INPUT  TYPE=hidden NAME=rndAction$hidden   value="26" SIZE="20" MAXLENGTH="20">
+
+<input type=checkbox name="rndActionChbx" onClick="manageClearTable()">
+
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px"></td>
+</tr>
+<script language="JavaScript">top.Draw_TableBottom(2)</script>
+</table>
+<br>
+<div align="center" class="management-only">
+<table cellspacing="0" cellpadding="0" border="0">
+<tr>
+<td style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/lbutton.gif"></td>
+<td valign="middle" align="center" class="data-area-button">Apply Changes</td>
+<td style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/rbutton.gif"></td>
+</tr>
+</table>
+</div>
+<br>
+<div>
+<table id="address_dynamic_queryBy_tbl" border="0" cellspacing="0" cellpadding="0" width="100%">
+<script language="JavaScript">top.Draw_TableTop(3);</script>
+<tr>
+<td nowrap width="10" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-tab-header" colspan="3">Query by:</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap width="5">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="height: 1px; width: 10px" class="data-area-canvas"></td>
+<td nowrap colspan="3" height="1px" class="data-area-separator"></td>
+<td nowrap height="1" class="data-area-canvas"></td>
+<td nowrap height="1" width="5"></td>
+</tr>
+<tr>
+<td nowrap width="10" height="24" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd" width="40%">
+<input type="checkbox" name="PortCheck" onClick="onInterfaceClicked()" class="monitorEnabled">
+Interface
+</td>
+<td nowrap class="data-area-canvas-odd" width="30%">
+<input class="monitorEnabled" type="radio" id=radioPort name="PortTrunkVlanAdd" value="1" Checked onClick="clickRadio();" disabled>
+Port
+<select class="monitorEnabled" name="port" size="1" disabled><option value="0">&nbsp;</option></select>
+<script language="javaScript">addPresentPortsSelectionList(document.AddressDynamicForm,"port",1,"n");</script>
+&nbsp;
+<input class="monitorEnabled" type="radio" id=radioTrunk name="PortTrunkVlanAdd" value="2" onClick="clickRadio();" disabled>
+LAG
+<select class="monitorEnabled" name="trunk" size="1" disabled><option value="0">&nbsp;</option></select>
+<script language="javaScript" >
+formObj=document.AddressDynamicForm;
+addRangeSelectionList(formObj,"trunk",1,top.NumberOfTrunks,"",1);
+</script>
+</td>
+<td nowrap class="data-area-canvas-odd" width="30%">&nbsp;</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas">
+<input class="monitorEnabled" type="checkbox" name="MacCheck" onClick="changeSensitiveness('dot1qTpFdbAddress$text', this.checked)">
+MAC Address
+</td>
+<td nowrap class="data-area-canvas" colspan="2" nowrap>
+<input class="monitorEnabled" type=text Name=dot1qTpFdbAddress$text maxlength=17 onBlur=checkValidation('','','',true) style="background-color: #cccccc;" disabled>
+<script language="JavaScript">document.write(top.dataTypeMAC);</script>
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd">
+<input class="monitorEnabled" type="checkbox" name="VlanCheck" onClick="changeSensitiveness('dot1qFdbId$text', this.checked)">
+VLAN ID
+</td>
+<td nowrap class="data-area-canvas-odd" colspan="2">
+<input class="monitorEnabled" type="text" name="dot1qFdbId$text" onBlur="checkValidation('VLAN ID', '', '', true, 'INT', 1, 4094)" style="background-color: #cccccc;" disabled>
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas">Address Table Sort Key</td>
+<td nowrap class="data-area-canvas" colspan="2">
+<select name="SortList" disabled size="1" onChange="updateSortFlag();" class="monitorEnabled">
+<option value="1">VLAN</option>
+<option value="2">Address</option>
+<option value="3">Interface</option>
+</select>
+<script>selectSortIndex();</script>
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<script language="JavaScript">top.Draw_TableBottom(3)</script>
+</table>
+</div>
+<br>
+<div align="center">
+<table id="address_dynamic_makeQuery_tbl" cellspacing="0" cellpadding="0" border="0">
+<tr>
+<td nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/lbutton.gif"></td>
+<td nowrap valign="middle" align="center" class="data-area-button"><a href="javascript:selectFilter()">Query</a></td>
+<td nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/rbutton.gif"></td>
+</tr>
+</table>
+</div>
+<br>
+<div align="left">
+<SPAN class=data-area-page-title id=pagetitle>Current Address Table</SPAN>
+</div>
+<br>
+<table id="address_dynamic_currentAddress_tbl" border="0" cellspacing="0" cellpadding="0" width="100%">
+<tr>
+<td valign="bottom" align="right" width="10"><img style="width: 10px; height: 10px" src="../Images/tl.gif"></td>
+<td colspan="4" class="data-area-canvas" height="10"></td>
+<td valign="bottom" width="10" align="left"><img style="width: 10px; height: 10px" src="../Images/tr.gif"></td>
+<td width="5"></td>
+</tr>
+<tr>
+<td nowrap class="data-area-canvas" width="1%">&nbsp;</td>
+<td nowrap class="data-area-canvas" width="2%">&nbsp;</td>
+<td nowrap class="data-area-canvas" align=center width=30%><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;VLAN ID</b></td>
+<td nowrap class="data-area-canvas" align=center width=35%><b>MAC</b></td>
+<td nowrap class="data-area-canvas" align=center width=30%><b>Interface</b></td>
+<td nowrap class="data-area-canvas" width="1%">&nbsp;</td>
+<td nowrap width="1%">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap height="1" width="10" class="data-area-canvas"></td>
+<td nowrap colspan="4" width=97% height="1px" class="data-area-separator"></td>
+<td nowrap height="1" width="5" class="data-area-canvas"></td>
+<td nowrap height="1" width="5"></td>
+</tr>
+</table>
+<table id="address_dynamic_currentAddress_loop_tbl" border="0" cellspacing="0" cellpadding="0" width=100%>
+
+<INPUT  Type=HIDDEN NAME=dot1qTpFdbAddress$51 SIZE=128   value="">
+<INPUT  Type=HIDDEN NAME=dot1qFdbId$51 SIZE=128   value="">
+
+<tr>
+<td nowrap width="10" class="data-area-canvas">&nbsp;</td>
+<td nowrap width="10" class="data-area-canvas">
+<b>
+<script>
+currIndex++;
+var entryNum = (pageIndex * 50) + currIndex;
+document.write(entryNum.toString());
+</script>
+</b>
+</td>
+<td align='center' class='data-area-canvas-odd'width=30%>
+<INPUT  TYPE=HIDDEN name="(dot1qFdbId<4096)?1" disabled    value="OK" SIZE="20" MAXLENGTH="20">
+
+
+
+VLAN
+
+1
+
+
+
+</td>
+<td align='center' class='data-area-canvas-odd'width=33%>
+0011321c387c
+</td>
+<td align='center' class='data-area-canvas-odd'width=30%>
+<INPUT  TYPE=hidden NAME=PortString$repeat?1  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+g1
+<INPUT  TYPE=hidden NAME=Default$repeat?1  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+</td>
+<td nowrap class="data-area-canvas" width="1%">&nbsp;</td>
+<td nowrap width="1%">&nbsp;</td>
+
+<INPUT  TYPE=HIDDEN NAME=dot1qTpFdbAddress$repeat?1 disabled    value="0011321c387c" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qFdbId$repeat?1 disabled    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=PortString$repeat?1  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qTpFdbPort$repeat?1 disabled    value="g1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=Default$repeat?1  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=AddressDynamicVT$endRepeat?1  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+</tr>
+
+<tr>
+<td nowrap width="10" class="data-area-canvas">&nbsp;</td>
+<td nowrap width="10" class="data-area-canvas">
+<b>
+<script>
+currIndex++;
+var entryNum = (pageIndex * 50) + currIndex;
+document.write(entryNum.toString());
+</script>
+</b>
+</td>
+<td align='center' class='data-area-canvas'width=30%>
+<INPUT  TYPE=HIDDEN name="(dot1qFdbId<4096)?2" disabled    value="OK" SIZE="20" MAXLENGTH="20">
+
+
+
+VLAN
+
+1
+
+
+
+</td>
+<td align='center' class='data-area-canvas'width=33%>
+00155d020c06
+</td>
+<td align='center' class='data-area-canvas'width=30%>
+<INPUT  TYPE=hidden NAME=PortString$repeat?2  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+g1
+<INPUT  TYPE=hidden NAME=Default$repeat?2  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+</td>
+<td nowrap class="data-area-canvas" width="1%">&nbsp;</td>
+<td nowrap width="1%">&nbsp;</td>
+
+<INPUT  TYPE=HIDDEN NAME=dot1qTpFdbAddress$repeat?2 disabled    value="00155d020c06" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qFdbId$repeat?2 disabled    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=PortString$repeat?2  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qTpFdbPort$repeat?2 disabled    value="g1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=Default$repeat?2  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=AddressDynamicVT$endRepeat?2  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+</tr>
+
+<tr>
+<td nowrap width="10" class="data-area-canvas">&nbsp;</td>
+<td nowrap width="10" class="data-area-canvas">
+<b>
+<script>
+currIndex++;
+var entryNum = (pageIndex * 50) + currIndex;
+document.write(entryNum.toString());
+</script>
+</b>
+</td>
+<td align='center' class='data-area-canvas-odd'width=30%>
+<INPUT  TYPE=HIDDEN name="(dot1qFdbId<4096)?3" disabled    value="OK" SIZE="20" MAXLENGTH="20">
+
+
+
+VLAN
+
+1
+
+
+
+</td>
+<td align='center' class='data-area-canvas-odd'width=33%>
+001d9403944d
+</td>
+<td align='center' class='data-area-canvas-odd'width=30%>
+<INPUT  TYPE=hidden NAME=PortString$repeat?3  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+g1
+<INPUT  TYPE=hidden NAME=Default$repeat?3  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+</td>
+<td nowrap class="data-area-canvas" width="1%">&nbsp;</td>
+<td nowrap width="1%">&nbsp;</td>
+
+<INPUT  TYPE=HIDDEN NAME=dot1qTpFdbAddress$repeat?3 disabled    value="001d9403944d" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qFdbId$repeat?3 disabled    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=PortString$repeat?3  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qTpFdbPort$repeat?3 disabled    value="g1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=Default$repeat?3  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=AddressDynamicVT$endRepeat?3  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+</tr>
+
+<tr>
+<td nowrap width="10" class="data-area-canvas">&nbsp;</td>
+<td nowrap width="10" class="data-area-canvas">
+<b>
+<script>
+currIndex++;
+var entryNum = (pageIndex * 50) + currIndex;
+document.write(entryNum.toString());
+</script>
+</b>
+</td>
+<td align='center' class='data-area-canvas'width=30%>
+<INPUT  TYPE=HIDDEN name="(dot1qFdbId<4096)?4" disabled    value="OK" SIZE="20" MAXLENGTH="20">
+
+
+
+VLAN
+
+1
+
+
+
+</td>
+<td align='center' class='data-area-canvas'width=33%>
+00ae13883f84
+</td>
+<td align='center' class='data-area-canvas'width=30%>
+<INPUT  TYPE=hidden NAME=PortString$repeat?4  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+g1
+<INPUT  TYPE=hidden NAME=Default$repeat?4  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+</td>
+<td nowrap class="data-area-canvas" width="1%">&nbsp;</td>
+<td nowrap width="1%">&nbsp;</td>
+
+<INPUT  TYPE=HIDDEN NAME=dot1qTpFdbAddress$repeat?4 disabled    value="00ae13883f84" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qFdbId$repeat?4 disabled    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=PortString$repeat?4  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qTpFdbPort$repeat?4 disabled    value="g1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=Default$repeat?4  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=AddressDynamicVT$endRepeat?4  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+</tr>
+
+<tr>
+<td nowrap width="10" class="data-area-canvas">&nbsp;</td>
+<td nowrap width="10" class="data-area-canvas">
+<b>
+<script>
+currIndex++;
+var entryNum = (pageIndex * 50) + currIndex;
+document.write(entryNum.toString());
+</script>
+</b>
+</td>
+<td align='center' class='data-area-canvas-odd'width=30%>
+<INPUT  TYPE=HIDDEN name="(dot1qFdbId<4096)?5" disabled    value="OK" SIZE="20" MAXLENGTH="20">
+
+
+
+VLAN
+
+1
+
+
+
+</td>
+<td align='center' class='data-area-canvas-odd'width=33%>
+00e04c680ca9
+</td>
+<td align='center' class='data-area-canvas-odd'width=30%>
+<INPUT  TYPE=hidden NAME=PortString$repeat?5  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+g1
+<INPUT  TYPE=hidden NAME=Default$repeat?5  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+</td>
+<td nowrap class="data-area-canvas" width="1%">&nbsp;</td>
+<td nowrap width="1%">&nbsp;</td>
+
+<INPUT  TYPE=HIDDEN NAME=dot1qTpFdbAddress$repeat?5 disabled    value="00e04c680ca9" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qFdbId$repeat?5 disabled    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=PortString$repeat?5  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qTpFdbPort$repeat?5 disabled    value="g1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=Default$repeat?5  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=AddressDynamicVT$endRepeat?5  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+</tr>
+
+<tr>
+<td nowrap width="10" class="data-area-canvas">&nbsp;</td>
+<td nowrap width="10" class="data-area-canvas">
+<b>
+<script>
+currIndex++;
+var entryNum = (pageIndex * 50) + currIndex;
+document.write(entryNum.toString());
+</script>
+</b>
+</td>
+<td align='center' class='data-area-canvas'width=30%>
+<INPUT  TYPE=HIDDEN name="(dot1qFdbId<4096)?6" disabled    value="OK" SIZE="20" MAXLENGTH="20">
+
+
+
+VLAN
+
+1
+
+
+
+</td>
+<td align='center' class='data-area-canvas'width=33%>
+14d424af761f
+</td>
+<td align='center' class='data-area-canvas'width=30%>
+<INPUT  TYPE=hidden NAME=PortString$repeat?6  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+g1
+<INPUT  TYPE=hidden NAME=Default$repeat?6  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+</td>
+<td nowrap class="data-area-canvas" width="1%">&nbsp;</td>
+<td nowrap width="1%">&nbsp;</td>
+
+<INPUT  TYPE=HIDDEN NAME=dot1qTpFdbAddress$repeat?6 disabled    value="14d424af761f" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qFdbId$repeat?6 disabled    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=PortString$repeat?6  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qTpFdbPort$repeat?6 disabled    value="g1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=Default$repeat?6  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=AddressDynamicVT$endRepeat?6  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+</tr>
+
+<tr>
+<td nowrap width="10" class="data-area-canvas">&nbsp;</td>
+<td nowrap width="10" class="data-area-canvas">
+<b>
+<script>
+currIndex++;
+var entryNum = (pageIndex * 50) + currIndex;
+document.write(entryNum.toString());
+</script>
+</b>
+</td>
+<td align='center' class='data-area-canvas-odd'width=30%>
+<INPUT  TYPE=HIDDEN name="(dot1qFdbId<4096)?7" disabled    value="OK" SIZE="20" MAXLENGTH="20">
+
+
+
+VLAN
+
+1
+
+
+
+</td>
+<td align='center' class='data-area-canvas-odd'width=33%>
+1c98ec0fad24
+</td>
+<td align='center' class='data-area-canvas-odd'width=30%>
+<INPUT  TYPE=hidden NAME=PortString$repeat?7  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+g1
+<INPUT  TYPE=hidden NAME=Default$repeat?7  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+</td>
+<td nowrap class="data-area-canvas" width="1%">&nbsp;</td>
+<td nowrap width="1%">&nbsp;</td>
+
+<INPUT  TYPE=HIDDEN NAME=dot1qTpFdbAddress$repeat?7 disabled    value="1c98ec0fad24" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qFdbId$repeat?7 disabled    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=PortString$repeat?7  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qTpFdbPort$repeat?7 disabled    value="g1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=Default$repeat?7  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=AddressDynamicVT$endRepeat?7  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+</tr>
+
+<tr>
+<td nowrap width="10" class="data-area-canvas">&nbsp;</td>
+<td nowrap width="10" class="data-area-canvas">
+<b>
+<script>
+currIndex++;
+var entryNum = (pageIndex * 50) + currIndex;
+document.write(entryNum.toString());
+</script>
+</b>
+</td>
+<td align='center' class='data-area-canvas'width=30%>
+<INPUT  TYPE=HIDDEN name="(dot1qFdbId<4096)?8" disabled    value="OK" SIZE="20" MAXLENGTH="20">
+
+
+
+VLAN
+
+1
+
+
+
+</td>
+<td align='center' class='data-area-canvas'width=33%>
+1c98ec0fad26
+</td>
+<td align='center' class='data-area-canvas'width=30%>
+<INPUT  TYPE=hidden NAME=PortString$repeat?8  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+g1
+<INPUT  TYPE=hidden NAME=Default$repeat?8  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+</td>
+<td nowrap class="data-area-canvas" width="1%">&nbsp;</td>
+<td nowrap width="1%">&nbsp;</td>
+
+<INPUT  TYPE=HIDDEN NAME=dot1qTpFdbAddress$repeat?8 disabled    value="1c98ec0fad26" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qFdbId$repeat?8 disabled    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=PortString$repeat?8  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qTpFdbPort$repeat?8 disabled    value="g1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=Default$repeat?8  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=AddressDynamicVT$endRepeat?8  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+</tr>
+
+<tr>
+<td nowrap width="10" class="data-area-canvas">&nbsp;</td>
+<td nowrap width="10" class="data-area-canvas">
+<b>
+<script>
+currIndex++;
+var entryNum = (pageIndex * 50) + currIndex;
+document.write(entryNum.toString());
+</script>
+</b>
+</td>
+<td align='center' class='data-area-canvas-odd'width=30%>
+<INPUT  TYPE=HIDDEN name="(dot1qFdbId<4096)?9" disabled    value="OK" SIZE="20" MAXLENGTH="20">
+
+
+
+VLAN
+
+1
+
+
+
+</td>
+<td align='center' class='data-area-canvas-odd'width=33%>
+1c98ec3522f2
+</td>
+<td align='center' class='data-area-canvas-odd'width=30%>
+<INPUT  TYPE=hidden NAME=PortString$repeat?9  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+g1
+<INPUT  TYPE=hidden NAME=Default$repeat?9  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+</td>
+<td nowrap class="data-area-canvas" width="1%">&nbsp;</td>
+<td nowrap width="1%">&nbsp;</td>
+
+<INPUT  TYPE=HIDDEN NAME=dot1qTpFdbAddress$repeat?9 disabled    value="1c98ec3522f2" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qFdbId$repeat?9 disabled    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=PortString$repeat?9  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qTpFdbPort$repeat?9 disabled    value="g1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=Default$repeat?9  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=AddressDynamicVT$endRepeat?9  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+</tr>
+
+<tr>
+<td nowrap width="10" class="data-area-canvas">&nbsp;</td>
+<td nowrap width="10" class="data-area-canvas">
+<b>
+<script>
+currIndex++;
+var entryNum = (pageIndex * 50) + currIndex;
+document.write(entryNum.toString());
+</script>
+</b>
+</td>
+<td align='center' class='data-area-canvas'width=30%>
+<INPUT  TYPE=HIDDEN name="(dot1qFdbId<4096)?10" disabled    value="OK" SIZE="20" MAXLENGTH="20">
+
+
+
+VLAN
+
+1
+
+
+
+</td>
+<td align='center' class='data-area-canvas'width=33%>
+1cb9c4198180
+</td>
+<td align='center' class='data-area-canvas'width=30%>
+<INPUT  TYPE=hidden NAME=PortString$repeat?10  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+g1
+<INPUT  TYPE=hidden NAME=Default$repeat?10  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+</td>
+<td nowrap class="data-area-canvas" width="1%">&nbsp;</td>
+<td nowrap width="1%">&nbsp;</td>
+
+<INPUT  TYPE=HIDDEN NAME=dot1qTpFdbAddress$repeat?10 disabled    value="1cb9c4198180" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qFdbId$repeat?10 disabled    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=PortString$repeat?10  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qTpFdbPort$repeat?10 disabled    value="g1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=Default$repeat?10  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=AddressDynamicVT$endRepeat?10  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+</tr>
+
+<tr>
+<td nowrap width="10" class="data-area-canvas">&nbsp;</td>
+<td nowrap width="10" class="data-area-canvas">
+<b>
+<script>
+currIndex++;
+var entryNum = (pageIndex * 50) + currIndex;
+document.write(entryNum.toString());
+</script>
+</b>
+</td>
+<td align='center' class='data-area-canvas-odd'width=30%>
+<INPUT  TYPE=HIDDEN name="(dot1qFdbId<4096)?11" disabled    value="OK" SIZE="20" MAXLENGTH="20">
+
+
+
+VLAN
+
+1
+
+
+
+</td>
+<td align='center' class='data-area-canvas-odd'width=33%>
+1cb9c41a32b0
+</td>
+<td align='center' class='data-area-canvas-odd'width=30%>
+<INPUT  TYPE=hidden NAME=PortString$repeat?11  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+g1
+<INPUT  TYPE=hidden NAME=Default$repeat?11  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+</td>
+<td nowrap class="data-area-canvas" width="1%">&nbsp;</td>
+<td nowrap width="1%">&nbsp;</td>
+
+<INPUT  TYPE=HIDDEN NAME=dot1qTpFdbAddress$repeat?11 disabled    value="1cb9c41a32b0" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qFdbId$repeat?11 disabled    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=PortString$repeat?11  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qTpFdbPort$repeat?11 disabled    value="g1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=Default$repeat?11  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=AddressDynamicVT$endRepeat?11  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+</tr>
+
+<tr>
+<td nowrap width="10" class="data-area-canvas">&nbsp;</td>
+<td nowrap width="10" class="data-area-canvas">
+<b>
+<script>
+currIndex++;
+var entryNum = (pageIndex * 50) + currIndex;
+document.write(entryNum.toString());
+</script>
+</b>
+</td>
+<td align='center' class='data-area-canvas'width=30%>
+<INPUT  TYPE=HIDDEN name="(dot1qFdbId<4096)?12" disabled    value="OK" SIZE="20" MAXLENGTH="20">
+
+
+
+VLAN
+
+1
+
+
+
+</td>
+<td align='center' class='data-area-canvas'width=33%>
+1cb9c41a7e00
+</td>
+<td align='center' class='data-area-canvas'width=30%>
+<INPUT  TYPE=hidden NAME=PortString$repeat?12  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+g1
+<INPUT  TYPE=hidden NAME=Default$repeat?12  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+</td>
+<td nowrap class="data-area-canvas" width="1%">&nbsp;</td>
+<td nowrap width="1%">&nbsp;</td>
+
+<INPUT  TYPE=HIDDEN NAME=dot1qTpFdbAddress$repeat?12 disabled    value="1cb9c41a7e00" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qFdbId$repeat?12 disabled    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=PortString$repeat?12  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qTpFdbPort$repeat?12 disabled    value="g1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=Default$repeat?12  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=AddressDynamicVT$endRepeat?12  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+</tr>
+
+<tr>
+<td nowrap width="10" class="data-area-canvas">&nbsp;</td>
+<td nowrap width="10" class="data-area-canvas">
+<b>
+<script>
+currIndex++;
+var entryNum = (pageIndex * 50) + currIndex;
+document.write(entryNum.toString());
+</script>
+</b>
+</td>
+<td align='center' class='data-area-canvas-odd'width=30%>
+<INPUT  TYPE=HIDDEN name="(dot1qFdbId<4096)?13" disabled    value="OK" SIZE="20" MAXLENGTH="20">
+
+
+
+VLAN
+
+1
+
+
+
+</td>
+<td align='center' class='data-area-canvas-odd'width=33%>
+1cb9c41a7f00
+</td>
+<td align='center' class='data-area-canvas-odd'width=30%>
+<INPUT  TYPE=hidden NAME=PortString$repeat?13  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+g1
+<INPUT  TYPE=hidden NAME=Default$repeat?13  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+</td>
+<td nowrap class="data-area-canvas" width="1%">&nbsp;</td>
+<td nowrap width="1%">&nbsp;</td>
+
+<INPUT  TYPE=HIDDEN NAME=dot1qTpFdbAddress$repeat?13 disabled    value="1cb9c41a7f00" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qFdbId$repeat?13 disabled    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=PortString$repeat?13  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qTpFdbPort$repeat?13 disabled    value="g1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=Default$repeat?13  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=AddressDynamicVT$endRepeat?13  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+</tr>
+
+<tr>
+<td nowrap width="10" class="data-area-canvas">&nbsp;</td>
+<td nowrap width="10" class="data-area-canvas">
+<b>
+<script>
+currIndex++;
+var entryNum = (pageIndex * 50) + currIndex;
+document.write(entryNum.toString());
+</script>
+</b>
+</td>
+<td align='center' class='data-area-canvas'width=30%>
+<INPUT  TYPE=HIDDEN name="(dot1qFdbId<4096)?14" disabled    value="OK" SIZE="20" MAXLENGTH="20">
+
+
+
+VLAN
+
+1
+
+
+
+</td>
+<td align='center' class='data-area-canvas'width=33%>
+30c5998601aa
+</td>
+<td align='center' class='data-area-canvas'width=30%>
+<INPUT  TYPE=hidden NAME=PortString$repeat?14  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+g1
+<INPUT  TYPE=hidden NAME=Default$repeat?14  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+</td>
+<td nowrap class="data-area-canvas" width="1%">&nbsp;</td>
+<td nowrap width="1%">&nbsp;</td>
+
+<INPUT  TYPE=HIDDEN NAME=dot1qTpFdbAddress$repeat?14 disabled    value="30c5998601aa" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qFdbId$repeat?14 disabled    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=PortString$repeat?14  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qTpFdbPort$repeat?14 disabled    value="g1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=Default$repeat?14  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=AddressDynamicVT$endRepeat?14  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+</tr>
+
+<tr>
+<td nowrap width="10" class="data-area-canvas">&nbsp;</td>
+<td nowrap width="10" class="data-area-canvas">
+<b>
+<script>
+currIndex++;
+var entryNum = (pageIndex * 50) + currIndex;
+document.write(entryNum.toString());
+</script>
+</b>
+</td>
+<td align='center' class='data-area-canvas-odd'width=30%>
+<INPUT  TYPE=HIDDEN name="(dot1qFdbId<4096)?15" disabled    value="OK" SIZE="20" MAXLENGTH="20">
+
+
+
+VLAN
+
+1
+
+
+
+</td>
+<td align='center' class='data-area-canvas-odd'width=33%>
+5254005c8c91
+</td>
+<td align='center' class='data-area-canvas-odd'width=30%>
+<INPUT  TYPE=hidden NAME=PortString$repeat?15  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+g1
+<INPUT  TYPE=hidden NAME=Default$repeat?15  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+</td>
+<td nowrap class="data-area-canvas" width="1%">&nbsp;</td>
+<td nowrap width="1%">&nbsp;</td>
+
+<INPUT  TYPE=HIDDEN NAME=dot1qTpFdbAddress$repeat?15 disabled    value="5254005c8c91" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qFdbId$repeat?15 disabled    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=PortString$repeat?15  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qTpFdbPort$repeat?15 disabled    value="g1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=Default$repeat?15  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=AddressDynamicVT$endRepeat?15  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+</tr>
+
+<tr>
+<td nowrap width="10" class="data-area-canvas">&nbsp;</td>
+<td nowrap width="10" class="data-area-canvas">
+<b>
+<script>
+currIndex++;
+var entryNum = (pageIndex * 50) + currIndex;
+document.write(entryNum.toString());
+</script>
+</b>
+</td>
+<td align='center' class='data-area-canvas'width=30%>
+<INPUT  TYPE=HIDDEN name="(dot1qFdbId<4096)?16" disabled    value="OK" SIZE="20" MAXLENGTH="20">
+
+
+
+VLAN
+
+1
+
+
+
+</td>
+<td align='center' class='data-area-canvas'width=33%>
+58bf25c02541
+</td>
+<td align='center' class='data-area-canvas'width=30%>
+<INPUT  TYPE=hidden NAME=PortString$repeat?16  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+g1
+<INPUT  TYPE=hidden NAME=Default$repeat?16  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+</td>
+<td nowrap class="data-area-canvas" width="1%">&nbsp;</td>
+<td nowrap width="1%">&nbsp;</td>
+
+<INPUT  TYPE=HIDDEN NAME=dot1qTpFdbAddress$repeat?16 disabled    value="58bf25c02541" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qFdbId$repeat?16 disabled    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=PortString$repeat?16  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qTpFdbPort$repeat?16 disabled    value="g1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=Default$repeat?16  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=AddressDynamicVT$endRepeat?16  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+</tr>
+
+<tr>
+<td nowrap width="10" class="data-area-canvas">&nbsp;</td>
+<td nowrap width="10" class="data-area-canvas">
+<b>
+<script>
+currIndex++;
+var entryNum = (pageIndex * 50) + currIndex;
+document.write(entryNum.toString());
+</script>
+</b>
+</td>
+<td align='center' class='data-area-canvas-odd'width=30%>
+<INPUT  TYPE=HIDDEN name="(dot1qFdbId<4096)?17" disabled    value="OK" SIZE="20" MAXLENGTH="20">
+
+
+
+VLAN
+
+1
+
+
+
+</td>
+<td align='center' class='data-area-canvas-odd'width=33%>
+743e2b1b9a40
+</td>
+<td align='center' class='data-area-canvas-odd'width=30%>
+<INPUT  TYPE=hidden NAME=PortString$repeat?17  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+g1
+<INPUT  TYPE=hidden NAME=Default$repeat?17  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+</td>
+<td nowrap class="data-area-canvas" width="1%">&nbsp;</td>
+<td nowrap width="1%">&nbsp;</td>
+
+<INPUT  TYPE=HIDDEN NAME=dot1qTpFdbAddress$repeat?17 disabled    value="743e2b1b9a40" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qFdbId$repeat?17 disabled    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=PortString$repeat?17  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qTpFdbPort$repeat?17 disabled    value="g1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=Default$repeat?17  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=AddressDynamicVT$endRepeat?17  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+</tr>
+
+<tr>
+<td nowrap width="10" class="data-area-canvas">&nbsp;</td>
+<td nowrap width="10" class="data-area-canvas">
+<b>
+<script>
+currIndex++;
+var entryNum = (pageIndex * 50) + currIndex;
+document.write(entryNum.toString());
+</script>
+</b>
+</td>
+<td align='center' class='data-area-canvas'width=30%>
+<INPUT  TYPE=HIDDEN name="(dot1qFdbId<4096)?18" disabled    value="OK" SIZE="20" MAXLENGTH="20">
+
+
+
+VLAN
+
+1
+
+
+
+</td>
+<td align='center' class='data-area-canvas'width=33%>
+743e2b1be3d0
+</td>
+<td align='center' class='data-area-canvas'width=30%>
+<INPUT  TYPE=hidden NAME=PortString$repeat?18  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+g1
+<INPUT  TYPE=hidden NAME=Default$repeat?18  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+</td>
+<td nowrap class="data-area-canvas" width="1%">&nbsp;</td>
+<td nowrap width="1%">&nbsp;</td>
+
+<INPUT  TYPE=HIDDEN NAME=dot1qTpFdbAddress$repeat?18 disabled    value="743e2b1be3d0" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qFdbId$repeat?18 disabled    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=PortString$repeat?18  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qTpFdbPort$repeat?18 disabled    value="g1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=Default$repeat?18  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=AddressDynamicVT$endRepeat?18  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+</tr>
+
+<tr>
+<td nowrap width="10" class="data-area-canvas">&nbsp;</td>
+<td nowrap width="10" class="data-area-canvas">
+<b>
+<script>
+currIndex++;
+var entryNum = (pageIndex * 50) + currIndex;
+document.write(entryNum.toString());
+</script>
+</b>
+</td>
+<td align='center' class='data-area-canvas-odd'width=30%>
+<INPUT  TYPE=HIDDEN name="(dot1qFdbId<4096)?19" disabled    value="OK" SIZE="20" MAXLENGTH="20">
+
+
+
+VLAN
+
+1
+
+
+
+</td>
+<td align='center' class='data-area-canvas-odd'width=33%>
+743e2b1d2340
+</td>
+<td align='center' class='data-area-canvas-odd'width=30%>
+<INPUT  TYPE=hidden NAME=PortString$repeat?19  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+g1
+<INPUT  TYPE=hidden NAME=Default$repeat?19  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+</td>
+<td nowrap class="data-area-canvas" width="1%">&nbsp;</td>
+<td nowrap width="1%">&nbsp;</td>
+
+<INPUT  TYPE=HIDDEN NAME=dot1qTpFdbAddress$repeat?19 disabled    value="743e2b1d2340" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qFdbId$repeat?19 disabled    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=PortString$repeat?19  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qTpFdbPort$repeat?19 disabled    value="g1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=Default$repeat?19  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=AddressDynamicVT$endRepeat?19  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+</tr>
+
+<tr>
+<td nowrap width="10" class="data-area-canvas">&nbsp;</td>
+<td nowrap width="10" class="data-area-canvas">
+<b>
+<script>
+currIndex++;
+var entryNum = (pageIndex * 50) + currIndex;
+document.write(entryNum.toString());
+</script>
+</b>
+</td>
+<td align='center' class='data-area-canvas'width=30%>
+<INPUT  TYPE=HIDDEN name="(dot1qFdbId<4096)?20" disabled    value="OK" SIZE="20" MAXLENGTH="20">
+
+
+
+VLAN
+
+1
+
+
+
+</td>
+<td align='center' class='data-area-canvas'width=33%>
+823428787a48
+</td>
+<td align='center' class='data-area-canvas'width=30%>
+<INPUT  TYPE=hidden NAME=PortString$repeat?20  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+g1
+<INPUT  TYPE=hidden NAME=Default$repeat?20  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+</td>
+<td nowrap class="data-area-canvas" width="1%">&nbsp;</td>
+<td nowrap width="1%">&nbsp;</td>
+
+<INPUT  TYPE=HIDDEN NAME=dot1qTpFdbAddress$repeat?20 disabled    value="823428787a48" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qFdbId$repeat?20 disabled    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=PortString$repeat?20  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qTpFdbPort$repeat?20 disabled    value="g1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=Default$repeat?20  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=AddressDynamicVT$endRepeat?20  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+</tr>
+
+<tr>
+<td nowrap width="10" class="data-area-canvas">&nbsp;</td>
+<td nowrap width="10" class="data-area-canvas">
+<b>
+<script>
+currIndex++;
+var entryNum = (pageIndex * 50) + currIndex;
+document.write(entryNum.toString());
+</script>
+</b>
+</td>
+<td align='center' class='data-area-canvas-odd'width=30%>
+<INPUT  TYPE=HIDDEN name="(dot1qFdbId<4096)?21" disabled    value="OK" SIZE="20" MAXLENGTH="20">
+
+
+
+VLAN
+
+1
+
+
+
+</td>
+<td align='center' class='data-area-canvas-odd'width=33%>
+8c86dd7fd418
+</td>
+<td align='center' class='data-area-canvas-odd'width=30%>
+<INPUT  TYPE=hidden NAME=PortString$repeat?21  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+g1
+<INPUT  TYPE=hidden NAME=Default$repeat?21  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+</td>
+<td nowrap class="data-area-canvas" width="1%">&nbsp;</td>
+<td nowrap width="1%">&nbsp;</td>
+
+<INPUT  TYPE=HIDDEN NAME=dot1qTpFdbAddress$repeat?21 disabled    value="8c86dd7fd418" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qFdbId$repeat?21 disabled    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=PortString$repeat?21  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qTpFdbPort$repeat?21 disabled    value="g1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=Default$repeat?21  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=AddressDynamicVT$endRepeat?21  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+</tr>
+
+<tr>
+<td nowrap width="10" class="data-area-canvas">&nbsp;</td>
+<td nowrap width="10" class="data-area-canvas">
+<b>
+<script>
+currIndex++;
+var entryNum = (pageIndex * 50) + currIndex;
+document.write(entryNum.toString());
+</script>
+</b>
+</td>
+<td align='center' class='data-area-canvas'width=30%>
+<INPUT  TYPE=HIDDEN name="(dot1qFdbId<4096)?22" disabled    value="OK" SIZE="20" MAXLENGTH="20">
+
+
+
+VLAN
+
+1
+
+
+
+</td>
+<td align='center' class='data-area-canvas'width=33%>
+8c86dd7fd463
+</td>
+<td align='center' class='data-area-canvas'width=30%>
+<INPUT  TYPE=hidden NAME=PortString$repeat?22  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+g1
+<INPUT  TYPE=hidden NAME=Default$repeat?22  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+</td>
+<td nowrap class="data-area-canvas" width="1%">&nbsp;</td>
+<td nowrap width="1%">&nbsp;</td>
+
+<INPUT  TYPE=HIDDEN NAME=dot1qTpFdbAddress$repeat?22 disabled    value="8c86dd7fd463" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qFdbId$repeat?22 disabled    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=PortString$repeat?22  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qTpFdbPort$repeat?22 disabled    value="g1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=Default$repeat?22  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=AddressDynamicVT$endRepeat?22  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+</tr>
+
+<tr>
+<td nowrap width="10" class="data-area-canvas">&nbsp;</td>
+<td nowrap width="10" class="data-area-canvas">
+<b>
+<script>
+currIndex++;
+var entryNum = (pageIndex * 50) + currIndex;
+document.write(entryNum.toString());
+</script>
+</b>
+</td>
+<td align='center' class='data-area-canvas-odd'width=30%>
+<INPUT  TYPE=HIDDEN name="(dot1qFdbId<4096)?23" disabled    value="OK" SIZE="20" MAXLENGTH="20">
+
+
+
+VLAN
+
+1
+
+
+
+</td>
+<td align='center' class='data-area-canvas-odd'width=33%>
+aebdc80a97f6
+</td>
+<td align='center' class='data-area-canvas-odd'width=30%>
+<INPUT  TYPE=hidden NAME=PortString$repeat?23  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+g1
+<INPUT  TYPE=hidden NAME=Default$repeat?23  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+</td>
+<td nowrap class="data-area-canvas" width="1%">&nbsp;</td>
+<td nowrap width="1%">&nbsp;</td>
+
+<INPUT  TYPE=HIDDEN NAME=dot1qTpFdbAddress$repeat?23 disabled    value="aebdc80a97f6" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qFdbId$repeat?23 disabled    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=PortString$repeat?23  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qTpFdbPort$repeat?23 disabled    value="g1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=Default$repeat?23  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=AddressDynamicVT$endRepeat?23  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+</tr>
+
+<tr>
+<td nowrap width="10" class="data-area-canvas">&nbsp;</td>
+<td nowrap width="10" class="data-area-canvas">
+<b>
+<script>
+currIndex++;
+var entryNum = (pageIndex * 50) + currIndex;
+document.write(entryNum.toString());
+</script>
+</b>
+</td>
+<td align='center' class='data-area-canvas'width=30%>
+<INPUT  TYPE=HIDDEN name="(dot1qFdbId<4096)?24" disabled    value="OK" SIZE="20" MAXLENGTH="20">
+
+
+
+VLAN
+
+20
+
+
+
+</td>
+<td align='center' class='data-area-canvas'width=33%>
+480fcf488337
+</td>
+<td align='center' class='data-area-canvas'width=30%>
+<INPUT  TYPE=hidden NAME=PortString$repeat?24  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+g5
+<INPUT  TYPE=hidden NAME=Default$repeat?24  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+</td>
+<td nowrap class="data-area-canvas" width="1%">&nbsp;</td>
+<td nowrap width="1%">&nbsp;</td>
+
+<INPUT  TYPE=HIDDEN NAME=dot1qTpFdbAddress$repeat?24 disabled    value="480fcf488337" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qFdbId$repeat?24 disabled    value="20" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=PortString$repeat?24  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qTpFdbPort$repeat?24 disabled    value="g5" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=Default$repeat?24  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=AddressDynamicVT$endRepeat?24  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+</tr>
+
+<tr>
+<td nowrap width="10" class="data-area-canvas">&nbsp;</td>
+<td nowrap width="10" class="data-area-canvas">
+<b>
+<script>
+currIndex++;
+var entryNum = (pageIndex * 50) + currIndex;
+document.write(entryNum.toString());
+</script>
+</b>
+</td>
+<td align='center' class='data-area-canvas-odd'width=30%>
+<INPUT  TYPE=HIDDEN name="(dot1qFdbId<4096)?25" disabled    value="OK" SIZE="20" MAXLENGTH="20">
+
+
+
+VLAN
+
+20
+
+
+
+</td>
+<td align='center' class='data-area-canvas-odd'width=33%>
+823428787a48
+</td>
+<td align='center' class='data-area-canvas-odd'width=30%>
+<INPUT  TYPE=hidden NAME=PortString$repeat?25  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+g1
+<INPUT  TYPE=hidden NAME=Default$repeat?25  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+</td>
+<td nowrap class="data-area-canvas" width="1%">&nbsp;</td>
+<td nowrap width="1%">&nbsp;</td>
+
+<INPUT  TYPE=HIDDEN NAME=dot1qTpFdbAddress$repeat?25 disabled    value="823428787a48" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qFdbId$repeat?25 disabled    value="20" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=PortString$repeat?25  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qTpFdbPort$repeat?25 disabled    value="g1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=Default$repeat?25  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=AddressDynamicVT$endRepeat?25  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+</tr>
+
+<tr>
+<td nowrap width="10" class="data-area-canvas">&nbsp;</td>
+<td nowrap width="10" class="data-area-canvas">
+<b>
+<script>
+currIndex++;
+var entryNum = (pageIndex * 50) + currIndex;
+document.write(entryNum.toString());
+</script>
+</b>
+</td>
+<td align='center' class='data-area-canvas'width=30%>
+<INPUT  TYPE=HIDDEN name="(dot1qFdbId<4096)?26" disabled    value="OK" SIZE="20" MAXLENGTH="20">
+
+
+
+VLAN
+
+30
+
+
+
+</td>
+<td align='center' class='data-area-canvas'width=33%>
+3417ebd2aec9
+</td>
+<td align='center' class='data-area-canvas'width=30%>
+<INPUT  TYPE=hidden NAME=PortString$repeat?26  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+g12
+<INPUT  TYPE=hidden NAME=Default$repeat?26  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+</td>
+<td nowrap class="data-area-canvas" width="1%">&nbsp;</td>
+<td nowrap width="1%">&nbsp;</td>
+
+<INPUT  TYPE=HIDDEN NAME=dot1qTpFdbAddress$repeat?26 disabled    value="3417ebd2aec9" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qFdbId$repeat?26 disabled    value="30" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=PortString$repeat?26  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qTpFdbPort$repeat?26 disabled    value="g12" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=Default$repeat?26  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=AddressDynamicVT$endRepeat?26  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+</tr>
+
+<tr>
+<td nowrap width="10" class="data-area-canvas">&nbsp;</td>
+<td nowrap width="10" class="data-area-canvas">
+<b>
+<script>
+currIndex++;
+var entryNum = (pageIndex * 50) + currIndex;
+document.write(entryNum.toString());
+</script>
+</b>
+</td>
+<td align='center' class='data-area-canvas-odd'width=30%>
+<INPUT  TYPE=HIDDEN name="(dot1qFdbId<4096)?27" disabled    value="OK" SIZE="20" MAXLENGTH="20">
+
+
+
+VLAN
+
+30
+
+
+
+</td>
+<td align='center' class='data-area-canvas-odd'width=33%>
+823428787a48
+</td>
+<td align='center' class='data-area-canvas-odd'width=30%>
+<INPUT  TYPE=hidden NAME=PortString$repeat?27  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+g1
+<INPUT  TYPE=hidden NAME=Default$repeat?27  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+</td>
+<td nowrap class="data-area-canvas" width="1%">&nbsp;</td>
+<td nowrap width="1%">&nbsp;</td>
+
+<INPUT  TYPE=HIDDEN NAME=dot1qTpFdbAddress$repeat?27 disabled    value="823428787a48" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qFdbId$repeat?27 disabled    value="30" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=PortString$repeat?27  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot1qTpFdbPort$repeat?27 disabled    value="g1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=hidden NAME=Default$repeat?27  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=AddressDynamicVT$endRepeat?27  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+</tr>
+
+
+<script>
+if (top.sortFlag != "dot1qFdbId$repeat")
+updateSortFlag();
+</script>
+<tr>
+<td class="data-area-canvas" valign="bottom" align="right" width="10"><img style="width: 10px; height: 10px" src="../Images/bl.gif"></td>
+<td colspan="4" class="data-area-canvas" height="10"></td>
+<td valign="bottom" width="10" align="left"><img style="width: 10px; height: 10px" src="../Images/br.gif"></td>
+<td width="5"></td>
+</tr>
+</table>
+<br />
+<div align="center" class="management-only">
+<table id="tbl_navigate" cellspacing="0" cellpadding="0" border="0">
+<tr>
+<td nowrap style="width: 14px; height: 25px">
+<img style="width: 14px; height: 25px" src="../Images/lbutton.gif"></td>
+<td nowrap valign="middle" align="center" class="data-area-button">
+<a id="backLink" href="javascript:GetPreviousEntries();">Back</a></td>
+<td nowrap style="width: 14px; height: 25px">
+<img style="width: 14px; height: 25px" src="../Images/rbutton.gif"></td>
+<td nowrap style="width: 14px; height: 25px">
+</td>
+<td nowrap style="width: 14px; height: 25px">
+<img style="width: 14px; height: 25px" src="../Images/lbutton.gif"></td>
+<td nowrap valign="middle" align="center" class="data-area-button">
+<a id="nextLink" href="javascript:GetNextEntries();">Next</a></td>
+<td nowrap style="width: 14px; height: 25px">
+<img style="width: 14px; height: 25px" src="../Images/rbutton.gif"></td>
+<td nowrap style="width: 14px; height: 25px">
+</td>
+<td nowrap style="width: 14px; height: 25px">
+</td>
+</tr>
+</table>
+</div>
+<script>
+initPagerButtons();
+</script>
+
+</form>
+</body>
+</html>

@@ -1,0 +1,1284 @@
+
+
+
+<html>
+<head>
+<title>Green Ethernet Configuration</title>
+<link rel="stylesheet" href="../device/style.css" type="text/css">
+<script src="../js/globalFunctions.js"></script>
+<script language="JavaScript">
+if(top.MonitorMode) {
+document.write("<link rel='stylesheet' href='../device/monitorMode.css' type='text/css'>")
+}
+var currIndex=0;
+var tableIndex=1;
+function reset()
+{
+formele["rlGreenEthCumulativePowerSaveMeterReset"].value=1;
+disableHtml();
+document.GreenEthernetConfiguration.submit();
+}
+function updateLinkShortSel()
+{
+formele["rlGreenEthShortReachEnable"].value=formele["LinkShortSel"].value;
+}
+function updateLinkDownSel()
+{
+formele["rlGreenEthEnergyDetectEnable"].value=formele["LinkDownSel"].value;
+}
+function signIndex()
+{
+formele["LinkDownSel"].value=formele["rlGreenEthEnergyDetectEnable"].value;
+formele["LinkShortSel"].value=formele["rlGreenEthShortReachEnable"].value;
+updateLinkShortSel();
+}
+function disableHtml()
+{
+formele["LinkDownSel"].disabled=true;
+formele["LinkShortSel"].disabled=true;
+formele["unit"].disabled=true;
+}
+function formSubmit()
+{
+disableHtml();
+document.GreenEthernetConfiguration.submit();
+}
+function displayAdmin(state)
+{
+if (state==1)
+document.write("on");
+if (state==2)
+document.write("off");
+}
+function displayPort()
+{
+document.write(getPortNameFromNumber(formele["ifIndex$repeat11?"+currIndex].value));
+}
+function displayReason(reason)
+{
+var typeStr="";
+switch (reason)
+{
+case "1":
+typeStr="Not Present";
+break;
+case "2":
+typeStr="LinkType";
+break;
+case "3":
+typeStr="LinkUp";
+break;
+case "4":
+typeStr="LinkSpeed";
+break;
+case "5":
+typeStr="LinkLength";
+break;
+case "6":
+typeStr="Error";
+break;
+case "7":
+typeStr="LinkDown";
+break;
+case "8":
+typeStr=" ";
+break;
+}
+document.write(typeStr);
+}
+function displayCable(ind)
+{
+var resStr = "";
+var reason = formele["rlGreenEthPortNonOperReason$repeat11?"+ind].value;
+var thresh = formele["rlGreenEthShortReachThreshold"].value;
+if(reason == "5")
+resStr = "More than " + thresh + "m";
+document.write(resStr);
+}
+// --End of Java code -->
+</script>
+</head>
+<body bgcolor="#ffffff" leftmargin="15" onload="setScreenMonitorState();">
+<script language="JavaScript">
+top.Draw_Header(document.title);
+</script>
+<br>
+<FORM METHOD='POST' name="GreenEthernetConfiguration"  ACTION="/config/green_ethernet.htm"  >
+<form name="GreenEthernetConfiguration" method="post" action="/Form/config/green_ethernet.htm" onsubmit="return(formSubmit();" ID="Form1" >
+
+<script>
+var formele = document.GreenEthernetConfiguration.elements;
+var precentage;
+</script>
+<INPUT  Type="HIDDEN" Name="restoreUrl" SIZE=256   value="">
+<INPUT  TYPE="HIDDEN" NAME="errorCollector"   value="" SIZE="20" MAXLENGTH="20">
+<INPUT  type="hidden" name="rlGreenEthCurrentEnergyConsumption" disabled   value="1496" SIZE="20" MAXLENGTH="20">
+<INPUT  type="hidden" name="rlGreenEthShortReachThreshold" disabled   value="40" SIZE="20" MAXLENGTH="20">
+<INPUT  type="hidden" name="rlGreenEthCurrentMaxEnergyConsumption" disabled   value="2644" SIZE="20" MAXLENGTH="20">
+<INPUT  type="hidden" name="rlGreenEthCumulativePowerSaveMeter" disabled   value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  type="hidden" name="rlGreenEthCumulativePowerSaveMeterReset"   value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  type="hidden" name="rlGreenEthShortReachEnable"   value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  type="hidden" name="rlGreenEthEnergyDetectEnable"   value="1" SIZE="20" MAXLENGTH="20">
+<script language="JavaScript">
+precentage=1-(formele["rlGreenEthCurrentEnergyConsumption"].value/formele["rlGreenEthCurrentMaxEnergyConsumption"].value);
+percentageDisp = Math.round(precentage*100, 10);
+</script>
+<INPUT  Type=HIDDEN Name=GreenEthVT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rlGreenEthPortTable$VT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=ifIndex$VT SIZE=128   value="Type=0;Access=1;NumOfEnumerations=0;Range0=[1,2147483647]">
+<INPUT  Type=HIDDEN Name=rlGreenEthPortSavingTypeValue$VT SIZE=128   value="Type=0;Access=1;NumOfEnumerations=2;Range0=[1,2]">
+<INPUT  Type=HIDDEN Name= rlGreenEthPortAdminState$VT SIZE=128   value="Type=0;Access=2;NumOfEnumerations=2;Range0=[1,2];Default value=1">
+<INPUT  Type=HIDDEN Name=rlGreenEthPortOperState$VT SIZE=128   value="Type=0;Access=1;NumOfEnumerations=2;Range0=[1,2]">
+<INPUT  Type=HIDDEN Name=rlGreenEthPortNonOperReason$VT SIZE=128   value="Type=0;Access=1;NumOfEnumerations=8;Range0=[1,8]">
+<INPUT  Type=HIDDEN Name=GreenEthVT$endVT   value="OK" SIZE="20" MAXLENGTH="20">
+<input type="hidden" name="unit" value="1" ID="Hidden1" >
+<table border="0" cellspacing="0" cellpadding="0" width="100%" ID="Table1">
+<script language="JavaScript">
+top.Draw_TableTop(2);top.Draw_TableHeader();
+</script>
+<tr height=25px>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas-odd" width="70%">Cumulative Energy Saved: <script> document.write(formele["rlGreenEthCumulativePowerSaveMeter"].value);</script> W * H </td>
+<td class="data-area-canvas-odd" valign="top">
+<div align="right" class="management-only">
+<table cellspacing="0" cellpadding="0" border="0" style="margin-top:5px; margin-bottom:5px;" ID="Table2">
+<tr valign="top" height=20px>
+<td style="width: 14px; height: 20px"><img style="width: 14px; height: 25px" src="../images/lbutton.gif"></td>
+<td valign="middle" align="center" class="data-area-button"><a href="javascript:reset()">Reset</a></td>
+<td style="width: 14px; height: 20px"><img style="width: 14px; height: 25px" src="../images/rbutton.gif"></td>
+<td style="width: 14px; height: 20px"></td>
+</tr>
+</table>
+</div>
+</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<script language="JavaScript">top.Draw_TableBottom(2)</script>
+</table>
+<br>
+<table border="0" cellspacing="0" cellpadding="0" width="100%" ID="Table3">
+<script language="JavaScript">
+top.Draw_TableTop(2);top.Draw_TableHeader();
+</script>
+<tr height=25px>
+<td style="WIDTH: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas" width="40%">Link Down Energy-Detect Mode</td>
+<td class="data-area-canvas">
+<select id=select1 name=LinkDownSel onchange=updateLinkDownSel()>
+<option value="1">On</option>
+<option value="2">Off</option>
+</select>
+</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="WIDTH: 15px">&nbsp;</td>
+</tr>
+<tr height=25px>
+<td style="WIDTH: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas-odd" width="40%">Link Short-Reach Energy-Detect Mode</td>
+<td class="data-area-canvas-odd"><select id=selectonoff name=LinkShortSel onchange=updateLinkShortSel()>
+<option value="1">On</option>
+<option value="2">Off</option></select></td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="WIDTH: 15px">&nbsp;</td>
+</tr>
+<tr height=25px>
+<td style="WIDTH: 10px;" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas">Current Power Consumption</td>
+<td class="data-area-canvas"><script> document.write(formele["rlGreenEthCurrentEnergyConsumption"].value);</script> mW</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="WIDTH: 15px">&nbsp;</td>
+</tr>
+<tr height=25px>
+<td style="WIDTH: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas-odd">Power Saving</td>
+<td class="data-area-canvas-odd">
+<table cellspacing="0" cellpadding="0" ID="Table4">
+<tr><td>
+<DIV style="width:150;BORDER-LEFT: 1px outset;BORDER-TOP: 1px outset;BORDER-RIGHT: 1px outset;BORDER-BOTTOM: 1px outset;">
+<table cellspacing="0" cellpadding="0" ID="Table5">
+<tr><script>document.write("<TD width='"+precentage*150+"' style='background:#60ff0b'>&nbsp;</TD><TD width='00' align='center'>");</script></TD>
+</tr>
+</table></div>
+</td><TD class="data-area-canvas-odd" width='10'>&nbsp;<script>document.write( percentageDisp +"% ");
+</script></TD></tr></table>
+</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="WIDTH: 15px">&nbsp;</td>
+</tr>
+<script language="JavaScript">top.Draw_TableBottom(2)</script>
+</table>
+<br>
+<script>signIndex();</script>
+<br>
+
+<div class="management-only">
+
+<div align="center"><table id="apply_tbl" cellspacing="0" cellpadding="0" border="0"><tr>
+<td nowrap nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/lbutton.gif"></td>
+<td nowrap nowrap valign="middle" align="center" class="data-area-button"><a href="javascript:preSubmit();">Apply Changes</a></td>
+<td nowrap nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/rbutton.gif"></td>
+</tr></table></div><br>
+<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
+<!--
+if(document.forms[0] && document.forms[0].elements.length<=1000)
+{
+for(i=0;(document.forms[0] && i<document.forms[0].elements.length);i++)
+{
+if(document.forms[0] && document.forms[0].elements[i].type=="select-one")
+if(document.forms[0] && document.forms[0].elements[i].length==0)
+document.forms[0].elements[i].style.width="70px";
+}
+}
+//-->
+</SCRIPT>
+
+</div>
+<br>
+<table border="0" cellspacing="0" cellpadding="0" width="100%" align="center" id=tblhidden name=tblHidden>
+<tr><td colspan=9 id="pagetitle" class="data-area-page-title">
+<span id="Span1" class="data-area-page-title">Green Ethernet Ports Table</span>
+</td></tr>
+<tr height=20px><td colspan=9>
+</td></tr>
+<tr>
+<td><img style="width: 10px; height: 10px" src="../images/tl.gif"></td>
+<td colspan="9" width=100% class="data-area-canvas"><font style="font-size: 8px">&nbsp;</font></td>
+<td><img style="width: 10px; height: 10px" src="../images/tr.gif"></td>
+<td style="width: 5px"></td>
+</tr>
+<tr>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas" valign="top" width=50px><b>Port</b></td>
+<td class="data-area-canvas" valign="top" align="center" width=170px colspan=3><b>Energy-Detect</b></td>
+<td class="data-area-canvas" valign="top" align="center" width=170px colspan=3><b>Short-Reach</b></td>
+<td class="data-area-canvas" valign="top" ><b>Cable Length</b></td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td class="data-area-canvas" valign="top">&nbsp;</td>
+<td class="data-area-canvas" valign="top"><b>Admin</b></td>
+<td class="data-area-canvas" valign="top"><b>Oper</b></td>
+<td class="data-area-canvas" valign="top"><b>Reason</b></td>
+<td class="data-area-canvas" valign="top"><b>Admin</b></td>
+<td class="data-area-canvas" valign="top"><b>Oper</b></td>
+<td class="data-area-canvas" valign="top"><b>Reason</b></td>
+<td class="data-area-canvas" valign="top">&nbsp;</td>
+<td class="data-area-canvas">&nbsp;</td>
+<td style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td style="height: 1px; width: 10px" class="data-area-canvas"><img style="width: 1px; height: 1px" src=""></td>
+<td colspan="9" style="height: 1px" class="data-area-separator"><img style="width: 1px; height: 1px" src=""></td>
+<td style="height: 1px" class="data-area-canvas"><img style="width: 1px; height: 1px" src=""></td>
+<td style="height: 1px; width: 5px"><img style="width: 1px; height: 1px" src=""></td>
+</tr>
+
+
+<script> currIndex=  1 ;</script>
+
+<INPUT  TYPE=hidden NAME=ifIndex$repeat11?1  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortSavingTypeValue$repeat11?1  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortAdminState$repeat11?1  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortOperState$repeat11?1  MAXLENGTH=64 disabled   value="2">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortNonOperReason$repeat11?1  MAXLENGTH=64 disabled   value="3">
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<tr>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;</td>');</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;<b>'+tableIndex+' </b></td> ');
+tableIndex++;} </script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1){ document.write(' <td class='+colorClass()+' valign="top" style="height: 24px">');displayPort(); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write(' <td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayCable(currIndex); document.write("</td>");}</script>
+<script>
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write('<td class="data-area-canvas">&nbsp;</td>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write("</tr>");</script>
+<script>
+if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) ChangeRowColor();
+</script>
+<INPUT  type=hidden Name=GreenEthVT$endRepeat?1  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+
+<script> currIndex=  2 ;</script>
+
+<INPUT  TYPE=hidden NAME=ifIndex$repeat11?2  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortSavingTypeValue$repeat11?2  MAXLENGTH=64 disabled   value="2">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortAdminState$repeat11?2  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortOperState$repeat11?2  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortNonOperReason$repeat11?2  MAXLENGTH=64 disabled   value="8">
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<tr>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;</td>');</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;<b>'+tableIndex+' </b></td> ');
+tableIndex++;} </script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1){ document.write(' <td class='+colorClass()+' valign="top" style="height: 24px">');displayPort(); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write(' <td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayCable(currIndex); document.write("</td>");}</script>
+<script>
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write('<td class="data-area-canvas">&nbsp;</td>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write("</tr>");</script>
+<script>
+if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) ChangeRowColor();
+</script>
+<INPUT  type=hidden Name=GreenEthVT$endRepeat?2  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+
+<script> currIndex=  3 ;</script>
+
+<INPUT  TYPE=hidden NAME=ifIndex$repeat11?3  MAXLENGTH=64 disabled   value="2">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortSavingTypeValue$repeat11?3  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortAdminState$repeat11?3  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortOperState$repeat11?3  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortNonOperReason$repeat11?3  MAXLENGTH=64 disabled   value="8">
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<tr>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;</td>');</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;<b>'+tableIndex+' </b></td> ');
+tableIndex++;} </script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1){ document.write(' <td class='+colorClass()+' valign="top" style="height: 24px">');displayPort(); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write(' <td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayCable(currIndex); document.write("</td>");}</script>
+<script>
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write('<td class="data-area-canvas">&nbsp;</td>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write("</tr>");</script>
+<script>
+if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) ChangeRowColor();
+</script>
+<INPUT  type=hidden Name=GreenEthVT$endRepeat?3  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+
+<script> currIndex=  4 ;</script>
+
+<INPUT  TYPE=hidden NAME=ifIndex$repeat11?4  MAXLENGTH=64 disabled   value="2">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortSavingTypeValue$repeat11?4  MAXLENGTH=64 disabled   value="2">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortAdminState$repeat11?4  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortOperState$repeat11?4  MAXLENGTH=64 disabled   value="2">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortNonOperReason$repeat11?4  MAXLENGTH=64 disabled   value="7">
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<tr>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;</td>');</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;<b>'+tableIndex+' </b></td> ');
+tableIndex++;} </script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1){ document.write(' <td class='+colorClass()+' valign="top" style="height: 24px">');displayPort(); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write(' <td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayCable(currIndex); document.write("</td>");}</script>
+<script>
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write('<td class="data-area-canvas">&nbsp;</td>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write("</tr>");</script>
+<script>
+if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) ChangeRowColor();
+</script>
+<INPUT  type=hidden Name=GreenEthVT$endRepeat?4  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+
+<script> currIndex=  5 ;</script>
+
+<INPUT  TYPE=hidden NAME=ifIndex$repeat11?5  MAXLENGTH=64 disabled   value="3">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortSavingTypeValue$repeat11?5  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortAdminState$repeat11?5  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortOperState$repeat11?5  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortNonOperReason$repeat11?5  MAXLENGTH=64 disabled   value="8">
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<tr>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;</td>');</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;<b>'+tableIndex+' </b></td> ');
+tableIndex++;} </script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1){ document.write(' <td class='+colorClass()+' valign="top" style="height: 24px">');displayPort(); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write(' <td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayCable(currIndex); document.write("</td>");}</script>
+<script>
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write('<td class="data-area-canvas">&nbsp;</td>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write("</tr>");</script>
+<script>
+if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) ChangeRowColor();
+</script>
+<INPUT  type=hidden Name=GreenEthVT$endRepeat?5  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+
+<script> currIndex=  6 ;</script>
+
+<INPUT  TYPE=hidden NAME=ifIndex$repeat11?6  MAXLENGTH=64 disabled   value="3">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortSavingTypeValue$repeat11?6  MAXLENGTH=64 disabled   value="2">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortAdminState$repeat11?6  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortOperState$repeat11?6  MAXLENGTH=64 disabled   value="2">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortNonOperReason$repeat11?6  MAXLENGTH=64 disabled   value="7">
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<tr>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;</td>');</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;<b>'+tableIndex+' </b></td> ');
+tableIndex++;} </script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1){ document.write(' <td class='+colorClass()+' valign="top" style="height: 24px">');displayPort(); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write(' <td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayCable(currIndex); document.write("</td>");}</script>
+<script>
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write('<td class="data-area-canvas">&nbsp;</td>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write("</tr>");</script>
+<script>
+if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) ChangeRowColor();
+</script>
+<INPUT  type=hidden Name=GreenEthVT$endRepeat?6  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+
+<script> currIndex=  7 ;</script>
+
+<INPUT  TYPE=hidden NAME=ifIndex$repeat11?7  MAXLENGTH=64 disabled   value="4">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortSavingTypeValue$repeat11?7  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortAdminState$repeat11?7  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortOperState$repeat11?7  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortNonOperReason$repeat11?7  MAXLENGTH=64 disabled   value="8">
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<tr>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;</td>');</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;<b>'+tableIndex+' </b></td> ');
+tableIndex++;} </script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1){ document.write(' <td class='+colorClass()+' valign="top" style="height: 24px">');displayPort(); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write(' <td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayCable(currIndex); document.write("</td>");}</script>
+<script>
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write('<td class="data-area-canvas">&nbsp;</td>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write("</tr>");</script>
+<script>
+if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) ChangeRowColor();
+</script>
+<INPUT  type=hidden Name=GreenEthVT$endRepeat?7  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+
+<script> currIndex=  8 ;</script>
+
+<INPUT  TYPE=hidden NAME=ifIndex$repeat11?8  MAXLENGTH=64 disabled   value="4">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortSavingTypeValue$repeat11?8  MAXLENGTH=64 disabled   value="2">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortAdminState$repeat11?8  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortOperState$repeat11?8  MAXLENGTH=64 disabled   value="2">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortNonOperReason$repeat11?8  MAXLENGTH=64 disabled   value="7">
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<tr>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;</td>');</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;<b>'+tableIndex+' </b></td> ');
+tableIndex++;} </script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1){ document.write(' <td class='+colorClass()+' valign="top" style="height: 24px">');displayPort(); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write(' <td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayCable(currIndex); document.write("</td>");}</script>
+<script>
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write('<td class="data-area-canvas">&nbsp;</td>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write("</tr>");</script>
+<script>
+if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) ChangeRowColor();
+</script>
+<INPUT  type=hidden Name=GreenEthVT$endRepeat?8  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+
+<script> currIndex=  9 ;</script>
+
+<INPUT  TYPE=hidden NAME=ifIndex$repeat11?9  MAXLENGTH=64 disabled   value="5">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortSavingTypeValue$repeat11?9  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortAdminState$repeat11?9  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortOperState$repeat11?9  MAXLENGTH=64 disabled   value="2">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortNonOperReason$repeat11?9  MAXLENGTH=64 disabled   value="3">
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<tr>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;</td>');</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;<b>'+tableIndex+' </b></td> ');
+tableIndex++;} </script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1){ document.write(' <td class='+colorClass()+' valign="top" style="height: 24px">');displayPort(); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write(' <td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayCable(currIndex); document.write("</td>");}</script>
+<script>
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write('<td class="data-area-canvas">&nbsp;</td>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write("</tr>");</script>
+<script>
+if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) ChangeRowColor();
+</script>
+<INPUT  type=hidden Name=GreenEthVT$endRepeat?9  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+
+<script> currIndex=  10 ;</script>
+
+<INPUT  TYPE=hidden NAME=ifIndex$repeat11?10  MAXLENGTH=64 disabled   value="5">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortSavingTypeValue$repeat11?10  MAXLENGTH=64 disabled   value="2">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortAdminState$repeat11?10  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortOperState$repeat11?10  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortNonOperReason$repeat11?10  MAXLENGTH=64 disabled   value="8">
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<tr>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;</td>');</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;<b>'+tableIndex+' </b></td> ');
+tableIndex++;} </script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1){ document.write(' <td class='+colorClass()+' valign="top" style="height: 24px">');displayPort(); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write(' <td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayCable(currIndex); document.write("</td>");}</script>
+<script>
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write('<td class="data-area-canvas">&nbsp;</td>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write("</tr>");</script>
+<script>
+if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) ChangeRowColor();
+</script>
+<INPUT  type=hidden Name=GreenEthVT$endRepeat?10  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+
+<script> currIndex=  11 ;</script>
+
+<INPUT  TYPE=hidden NAME=ifIndex$repeat11?11  MAXLENGTH=64 disabled   value="6">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortSavingTypeValue$repeat11?11  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortAdminState$repeat11?11  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortOperState$repeat11?11  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortNonOperReason$repeat11?11  MAXLENGTH=64 disabled   value="8">
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<tr>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;</td>');</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;<b>'+tableIndex+' </b></td> ');
+tableIndex++;} </script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1){ document.write(' <td class='+colorClass()+' valign="top" style="height: 24px">');displayPort(); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write(' <td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayCable(currIndex); document.write("</td>");}</script>
+<script>
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write('<td class="data-area-canvas">&nbsp;</td>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write("</tr>");</script>
+<script>
+if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) ChangeRowColor();
+</script>
+<INPUT  type=hidden Name=GreenEthVT$endRepeat?11  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+
+<script> currIndex=  12 ;</script>
+
+<INPUT  TYPE=hidden NAME=ifIndex$repeat11?12  MAXLENGTH=64 disabled   value="6">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortSavingTypeValue$repeat11?12  MAXLENGTH=64 disabled   value="2">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortAdminState$repeat11?12  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortOperState$repeat11?12  MAXLENGTH=64 disabled   value="2">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortNonOperReason$repeat11?12  MAXLENGTH=64 disabled   value="7">
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<tr>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;</td>');</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;<b>'+tableIndex+' </b></td> ');
+tableIndex++;} </script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1){ document.write(' <td class='+colorClass()+' valign="top" style="height: 24px">');displayPort(); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write(' <td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayCable(currIndex); document.write("</td>");}</script>
+<script>
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write('<td class="data-area-canvas">&nbsp;</td>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write("</tr>");</script>
+<script>
+if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) ChangeRowColor();
+</script>
+<INPUT  type=hidden Name=GreenEthVT$endRepeat?12  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+
+<script> currIndex=  13 ;</script>
+
+<INPUT  TYPE=hidden NAME=ifIndex$repeat11?13  MAXLENGTH=64 disabled   value="7">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortSavingTypeValue$repeat11?13  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortAdminState$repeat11?13  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortOperState$repeat11?13  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortNonOperReason$repeat11?13  MAXLENGTH=64 disabled   value="8">
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<tr>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;</td>');</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;<b>'+tableIndex+' </b></td> ');
+tableIndex++;} </script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1){ document.write(' <td class='+colorClass()+' valign="top" style="height: 24px">');displayPort(); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write(' <td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayCable(currIndex); document.write("</td>");}</script>
+<script>
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write('<td class="data-area-canvas">&nbsp;</td>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write("</tr>");</script>
+<script>
+if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) ChangeRowColor();
+</script>
+<INPUT  type=hidden Name=GreenEthVT$endRepeat?13  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+
+<script> currIndex=  14 ;</script>
+
+<INPUT  TYPE=hidden NAME=ifIndex$repeat11?14  MAXLENGTH=64 disabled   value="7">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortSavingTypeValue$repeat11?14  MAXLENGTH=64 disabled   value="2">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortAdminState$repeat11?14  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortOperState$repeat11?14  MAXLENGTH=64 disabled   value="2">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortNonOperReason$repeat11?14  MAXLENGTH=64 disabled   value="7">
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<tr>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;</td>');</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;<b>'+tableIndex+' </b></td> ');
+tableIndex++;} </script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1){ document.write(' <td class='+colorClass()+' valign="top" style="height: 24px">');displayPort(); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write(' <td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayCable(currIndex); document.write("</td>");}</script>
+<script>
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write('<td class="data-area-canvas">&nbsp;</td>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write("</tr>");</script>
+<script>
+if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) ChangeRowColor();
+</script>
+<INPUT  type=hidden Name=GreenEthVT$endRepeat?14  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+
+<script> currIndex=  15 ;</script>
+
+<INPUT  TYPE=hidden NAME=ifIndex$repeat11?15  MAXLENGTH=64 disabled   value="8">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortSavingTypeValue$repeat11?15  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortAdminState$repeat11?15  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortOperState$repeat11?15  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortNonOperReason$repeat11?15  MAXLENGTH=64 disabled   value="8">
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<tr>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;</td>');</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;<b>'+tableIndex+' </b></td> ');
+tableIndex++;} </script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1){ document.write(' <td class='+colorClass()+' valign="top" style="height: 24px">');displayPort(); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write(' <td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayCable(currIndex); document.write("</td>");}</script>
+<script>
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write('<td class="data-area-canvas">&nbsp;</td>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write("</tr>");</script>
+<script>
+if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) ChangeRowColor();
+</script>
+<INPUT  type=hidden Name=GreenEthVT$endRepeat?15  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+
+<script> currIndex=  16 ;</script>
+
+<INPUT  TYPE=hidden NAME=ifIndex$repeat11?16  MAXLENGTH=64 disabled   value="8">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortSavingTypeValue$repeat11?16  MAXLENGTH=64 disabled   value="2">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortAdminState$repeat11?16  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortOperState$repeat11?16  MAXLENGTH=64 disabled   value="2">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortNonOperReason$repeat11?16  MAXLENGTH=64 disabled   value="7">
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<tr>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;</td>');</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;<b>'+tableIndex+' </b></td> ');
+tableIndex++;} </script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1){ document.write(' <td class='+colorClass()+' valign="top" style="height: 24px">');displayPort(); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write(' <td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayCable(currIndex); document.write("</td>");}</script>
+<script>
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write('<td class="data-area-canvas">&nbsp;</td>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write("</tr>");</script>
+<script>
+if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) ChangeRowColor();
+</script>
+<INPUT  type=hidden Name=GreenEthVT$endRepeat?16  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+
+<script> currIndex=  17 ;</script>
+
+<INPUT  TYPE=hidden NAME=ifIndex$repeat11?17  MAXLENGTH=64 disabled   value="9">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortSavingTypeValue$repeat11?17  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortAdminState$repeat11?17  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortOperState$repeat11?17  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortNonOperReason$repeat11?17  MAXLENGTH=64 disabled   value="8">
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<tr>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;</td>');</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;<b>'+tableIndex+' </b></td> ');
+tableIndex++;} </script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1){ document.write(' <td class='+colorClass()+' valign="top" style="height: 24px">');displayPort(); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write(' <td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayCable(currIndex); document.write("</td>");}</script>
+<script>
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write('<td class="data-area-canvas">&nbsp;</td>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write("</tr>");</script>
+<script>
+if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) ChangeRowColor();
+</script>
+<INPUT  type=hidden Name=GreenEthVT$endRepeat?17  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+
+<script> currIndex=  18 ;</script>
+
+<INPUT  TYPE=hidden NAME=ifIndex$repeat11?18  MAXLENGTH=64 disabled   value="9">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortSavingTypeValue$repeat11?18  MAXLENGTH=64 disabled   value="2">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortAdminState$repeat11?18  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortOperState$repeat11?18  MAXLENGTH=64 disabled   value="2">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortNonOperReason$repeat11?18  MAXLENGTH=64 disabled   value="7">
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<tr>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;</td>');</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;<b>'+tableIndex+' </b></td> ');
+tableIndex++;} </script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1){ document.write(' <td class='+colorClass()+' valign="top" style="height: 24px">');displayPort(); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write(' <td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayCable(currIndex); document.write("</td>");}</script>
+<script>
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write('<td class="data-area-canvas">&nbsp;</td>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write("</tr>");</script>
+<script>
+if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) ChangeRowColor();
+</script>
+<INPUT  type=hidden Name=GreenEthVT$endRepeat?18  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+
+<script> currIndex=  19 ;</script>
+
+<INPUT  TYPE=hidden NAME=ifIndex$repeat11?19  MAXLENGTH=64 disabled   value="10">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortSavingTypeValue$repeat11?19  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortAdminState$repeat11?19  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortOperState$repeat11?19  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortNonOperReason$repeat11?19  MAXLENGTH=64 disabled   value="8">
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<tr>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;</td>');</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;<b>'+tableIndex+' </b></td> ');
+tableIndex++;} </script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1){ document.write(' <td class='+colorClass()+' valign="top" style="height: 24px">');displayPort(); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write(' <td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayCable(currIndex); document.write("</td>");}</script>
+<script>
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write('<td class="data-area-canvas">&nbsp;</td>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write("</tr>");</script>
+<script>
+if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) ChangeRowColor();
+</script>
+<INPUT  type=hidden Name=GreenEthVT$endRepeat?19  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+
+<script> currIndex=  20 ;</script>
+
+<INPUT  TYPE=hidden NAME=ifIndex$repeat11?20  MAXLENGTH=64 disabled   value="10">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortSavingTypeValue$repeat11?20  MAXLENGTH=64 disabled   value="2">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortAdminState$repeat11?20  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortOperState$repeat11?20  MAXLENGTH=64 disabled   value="2">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortNonOperReason$repeat11?20  MAXLENGTH=64 disabled   value="7">
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<tr>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;</td>');</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;<b>'+tableIndex+' </b></td> ');
+tableIndex++;} </script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1){ document.write(' <td class='+colorClass()+' valign="top" style="height: 24px">');displayPort(); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write(' <td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayCable(currIndex); document.write("</td>");}</script>
+<script>
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write('<td class="data-area-canvas">&nbsp;</td>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write("</tr>");</script>
+<script>
+if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) ChangeRowColor();
+</script>
+<INPUT  type=hidden Name=GreenEthVT$endRepeat?20  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+
+<script> currIndex=  21 ;</script>
+
+<INPUT  TYPE=hidden NAME=ifIndex$repeat11?21  MAXLENGTH=64 disabled   value="11">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortSavingTypeValue$repeat11?21  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortAdminState$repeat11?21  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortOperState$repeat11?21  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortNonOperReason$repeat11?21  MAXLENGTH=64 disabled   value="8">
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<tr>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;</td>');</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;<b>'+tableIndex+' </b></td> ');
+tableIndex++;} </script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1){ document.write(' <td class='+colorClass()+' valign="top" style="height: 24px">');displayPort(); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write(' <td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayCable(currIndex); document.write("</td>");}</script>
+<script>
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write('<td class="data-area-canvas">&nbsp;</td>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write("</tr>");</script>
+<script>
+if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) ChangeRowColor();
+</script>
+<INPUT  type=hidden Name=GreenEthVT$endRepeat?21  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+
+<script> currIndex=  22 ;</script>
+
+<INPUT  TYPE=hidden NAME=ifIndex$repeat11?22  MAXLENGTH=64 disabled   value="11">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortSavingTypeValue$repeat11?22  MAXLENGTH=64 disabled   value="2">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortAdminState$repeat11?22  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortOperState$repeat11?22  MAXLENGTH=64 disabled   value="2">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortNonOperReason$repeat11?22  MAXLENGTH=64 disabled   value="7">
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<tr>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;</td>');</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;<b>'+tableIndex+' </b></td> ');
+tableIndex++;} </script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1){ document.write(' <td class='+colorClass()+' valign="top" style="height: 24px">');displayPort(); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write(' <td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayCable(currIndex); document.write("</td>");}</script>
+<script>
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write('<td class="data-area-canvas">&nbsp;</td>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write("</tr>");</script>
+<script>
+if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) ChangeRowColor();
+</script>
+<INPUT  type=hidden Name=GreenEthVT$endRepeat?22  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+
+<script> currIndex=  23 ;</script>
+
+<INPUT  TYPE=hidden NAME=ifIndex$repeat11?23  MAXLENGTH=64 disabled   value="12">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortSavingTypeValue$repeat11?23  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortAdminState$repeat11?23  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortOperState$repeat11?23  MAXLENGTH=64 disabled   value="2">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortNonOperReason$repeat11?23  MAXLENGTH=64 disabled   value="3">
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<tr>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;</td>');</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;<b>'+tableIndex+' </b></td> ');
+tableIndex++;} </script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1){ document.write(' <td class='+colorClass()+' valign="top" style="height: 24px">');displayPort(); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write(' <td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayCable(currIndex); document.write("</td>");}</script>
+<script>
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write('<td class="data-area-canvas">&nbsp;</td>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write("</tr>");</script>
+<script>
+if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) ChangeRowColor();
+</script>
+<INPUT  type=hidden Name=GreenEthVT$endRepeat?23  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+
+<script> currIndex=  24 ;</script>
+
+<INPUT  TYPE=hidden NAME=ifIndex$repeat11?24  MAXLENGTH=64 disabled   value="12">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortSavingTypeValue$repeat11?24  MAXLENGTH=64 disabled   value="2">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortAdminState$repeat11?24  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortOperState$repeat11?24  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortNonOperReason$repeat11?24  MAXLENGTH=64 disabled   value="8">
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<tr>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;</td>');</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;<b>'+tableIndex+' </b></td> ');
+tableIndex++;} </script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1){ document.write(' <td class='+colorClass()+' valign="top" style="height: 24px">');displayPort(); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write(' <td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayCable(currIndex); document.write("</td>");}</script>
+<script>
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write('<td class="data-area-canvas">&nbsp;</td>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write("</tr>");</script>
+<script>
+if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) ChangeRowColor();
+</script>
+<INPUT  type=hidden Name=GreenEthVT$endRepeat?24  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+
+<script> currIndex=  25 ;</script>
+
+<INPUT  TYPE=hidden NAME=ifIndex$repeat11?25  MAXLENGTH=64 disabled   value="13">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortSavingTypeValue$repeat11?25  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortAdminState$repeat11?25  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortOperState$repeat11?25  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortNonOperReason$repeat11?25  MAXLENGTH=64 disabled   value="8">
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<tr>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;</td>');</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;<b>'+tableIndex+' </b></td> ');
+tableIndex++;} </script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1){ document.write(' <td class='+colorClass()+' valign="top" style="height: 24px">');displayPort(); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write(' <td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayCable(currIndex); document.write("</td>");}</script>
+<script>
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write('<td class="data-area-canvas">&nbsp;</td>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write("</tr>");</script>
+<script>
+if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) ChangeRowColor();
+</script>
+<INPUT  type=hidden Name=GreenEthVT$endRepeat?25  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+
+<script> currIndex=  26 ;</script>
+
+<INPUT  TYPE=hidden NAME=ifIndex$repeat11?26  MAXLENGTH=64 disabled   value="13">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortSavingTypeValue$repeat11?26  MAXLENGTH=64 disabled   value="2">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortAdminState$repeat11?26  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortOperState$repeat11?26  MAXLENGTH=64 disabled   value="2">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortNonOperReason$repeat11?26  MAXLENGTH=64 disabled   value="7">
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<tr>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;</td>');</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;<b>'+tableIndex+' </b></td> ');
+tableIndex++;} </script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1){ document.write(' <td class='+colorClass()+' valign="top" style="height: 24px">');displayPort(); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write(' <td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayCable(currIndex); document.write("</td>");}</script>
+<script>
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write('<td class="data-area-canvas">&nbsp;</td>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write("</tr>");</script>
+<script>
+if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) ChangeRowColor();
+</script>
+<INPUT  type=hidden Name=GreenEthVT$endRepeat?26  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+
+<script> currIndex=  27 ;</script>
+
+<INPUT  TYPE=hidden NAME=ifIndex$repeat11?27  MAXLENGTH=64 disabled   value="14">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortSavingTypeValue$repeat11?27  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortAdminState$repeat11?27  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortOperState$repeat11?27  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortNonOperReason$repeat11?27  MAXLENGTH=64 disabled   value="8">
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<tr>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;</td>');</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;<b>'+tableIndex+' </b></td> ');
+tableIndex++;} </script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1){ document.write(' <td class='+colorClass()+' valign="top" style="height: 24px">');displayPort(); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write(' <td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayCable(currIndex); document.write("</td>");}</script>
+<script>
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write('<td class="data-area-canvas">&nbsp;</td>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write("</tr>");</script>
+<script>
+if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) ChangeRowColor();
+</script>
+<INPUT  type=hidden Name=GreenEthVT$endRepeat?27  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+
+<script> currIndex=  28 ;</script>
+
+<INPUT  TYPE=hidden NAME=ifIndex$repeat11?28  MAXLENGTH=64 disabled   value="14">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortSavingTypeValue$repeat11?28  MAXLENGTH=64 disabled   value="2">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortAdminState$repeat11?28  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortOperState$repeat11?28  MAXLENGTH=64 disabled   value="2">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortNonOperReason$repeat11?28  MAXLENGTH=64 disabled   value="7">
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<tr>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;</td>');</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;<b>'+tableIndex+' </b></td> ');
+tableIndex++;} </script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1){ document.write(' <td class='+colorClass()+' valign="top" style="height: 24px">');displayPort(); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write(' <td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayCable(currIndex); document.write("</td>");}</script>
+<script>
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write('<td class="data-area-canvas">&nbsp;</td>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write("</tr>");</script>
+<script>
+if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) ChangeRowColor();
+</script>
+<INPUT  type=hidden Name=GreenEthVT$endRepeat?28  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+
+<script> currIndex=  29 ;</script>
+
+<INPUT  TYPE=hidden NAME=ifIndex$repeat11?29  MAXLENGTH=64 disabled   value="15">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortSavingTypeValue$repeat11?29  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortAdminState$repeat11?29  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortOperState$repeat11?29  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortNonOperReason$repeat11?29  MAXLENGTH=64 disabled   value="8">
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<tr>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;</td>');</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;<b>'+tableIndex+' </b></td> ');
+tableIndex++;} </script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1){ document.write(' <td class='+colorClass()+' valign="top" style="height: 24px">');displayPort(); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write(' <td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayCable(currIndex); document.write("</td>");}</script>
+<script>
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write('<td class="data-area-canvas">&nbsp;</td>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write("</tr>");</script>
+<script>
+if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) ChangeRowColor();
+</script>
+<INPUT  type=hidden Name=GreenEthVT$endRepeat?29  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+
+<script> currIndex=  30 ;</script>
+
+<INPUT  TYPE=hidden NAME=ifIndex$repeat11?30  MAXLENGTH=64 disabled   value="15">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortSavingTypeValue$repeat11?30  MAXLENGTH=64 disabled   value="2">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortAdminState$repeat11?30  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortOperState$repeat11?30  MAXLENGTH=64 disabled   value="2">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortNonOperReason$repeat11?30  MAXLENGTH=64 disabled   value="7">
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<tr>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;</td>');</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;<b>'+tableIndex+' </b></td> ');
+tableIndex++;} </script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1){ document.write(' <td class='+colorClass()+' valign="top" style="height: 24px">');displayPort(); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write(' <td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayCable(currIndex); document.write("</td>");}</script>
+<script>
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write('<td class="data-area-canvas">&nbsp;</td>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write("</tr>");</script>
+<script>
+if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) ChangeRowColor();
+</script>
+<INPUT  type=hidden Name=GreenEthVT$endRepeat?30  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+
+<script> currIndex=  31 ;</script>
+
+<INPUT  TYPE=hidden NAME=ifIndex$repeat11?31  MAXLENGTH=64 disabled   value="16">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortSavingTypeValue$repeat11?31  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortAdminState$repeat11?31  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortOperState$repeat11?31  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortNonOperReason$repeat11?31  MAXLENGTH=64 disabled   value="8">
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<tr>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;</td>');</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;<b>'+tableIndex+' </b></td> ');
+tableIndex++;} </script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1){ document.write(' <td class='+colorClass()+' valign="top" style="height: 24px">');displayPort(); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write(' <td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayCable(currIndex); document.write("</td>");}</script>
+<script>
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write('<td class="data-area-canvas">&nbsp;</td>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write("</tr>");</script>
+<script>
+if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) ChangeRowColor();
+</script>
+<INPUT  type=hidden Name=GreenEthVT$endRepeat?31  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+
+<script> currIndex=  32 ;</script>
+
+<INPUT  TYPE=hidden NAME=ifIndex$repeat11?32  MAXLENGTH=64 disabled   value="16">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortSavingTypeValue$repeat11?32  MAXLENGTH=64 disabled   value="2">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortAdminState$repeat11?32  MAXLENGTH=64 disabled   value="1">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortOperState$repeat11?32  MAXLENGTH=64 disabled   value="2">
+<INPUT  TYPE=hidden NAME=rlGreenEthPortNonOperReason$repeat11?32  MAXLENGTH=64 disabled   value="7">
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<tr>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;</td>');</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td style="width: 10px" class="data-area-canvas">&nbsp;<b>'+tableIndex+' </b></td> ');
+tableIndex++;} </script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1){ document.write(' <td class='+colorClass()+' valign="top" style="height: 24px">');displayPort(); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==1) {document.write(' <td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortAdminState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayAdmin(formele["rlGreenEthPortOperState$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayReason(formele["rlGreenEthPortNonOperReason$repeat11?"+currIndex].value); document.write("</td>");}</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) {document.write('<td class='+colorClass()+' valign="top">');displayCable(currIndex); document.write("</td>");}</script>
+<script>
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write('<td class="data-area-canvas">&nbsp;</td>');
+</script>
+<script> if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) document.write("</tr>");</script>
+<script>
+if (formele["rlGreenEthPortSavingTypeValue$repeat11?"+currIndex].value==2) ChangeRowColor();
+</script>
+<INPUT  type=hidden Name=GreenEthVT$endRepeat?32  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<tr>
+<td><img style="width: 10px; height: 10px" src="../images/bl.gif"></td>
+<td colspan="9" width=100% class="data-area-canvas"><font style="font-size: 8px">&nbsp;</font></td>
+<td><img style="width: 10px; height: 10px" src="../images/br.gif"></td>
+<td style="width: 5px"></td>
+</tr>
+</tr>
+</table>
+<br>
+</form>
+</body>
+</html>

@@ -1,0 +1,224 @@
+
+
+
+<html>
+<head>
+<script>
+if(top.DeviceType && top.DeviceType==1)
+{
+document.write("<title>General Settings</title>");
+}
+else
+{
+document.write("<title>General Settings</title>");
+}
+</script>
+
+
+<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
+<!--
+if(top.location==self.location )
+{
+var refStr=self.location + " ";
+var ind=0;
+refStr.toLowerCase();
+ind=refStr.indexOf("config");
+var locationStr=refStr.substring(0,ind);
+if (opener)
+{
+if (opener.opener)
+{
+if(opener.opener.top.location==opener.opener.location)
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+else
+{
+if(opener.top.location==opener.location)
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+}
+else
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+//-->
+</SCRIPT>
+
+
+<link rel="stylesheet" href="../device/style.css" type="text/css">
+<script src="../js/globalFunctions.js"></script>
+<script language="JavaScript">
+<!-- Beginng of JavaScript Applet
+if(top.MonitorMode)
+{
+document.write("<link rel='stylesheet' href='../device/monitorMode.css' type='text/css'>")
+}
+var JumboSupported=false;
+function formSubmit()
+{
+formele=document.TuningGeneralForm.elements;
+if (formele["rlJumboFramesStatusAfterReset"].selectedIndex == 0)
+alert("Jumbo frame support will be functional only after resetting the device.");
+disableHtml();
+document.TuningGeneralForm.submit();
+}
+function disableHtml()
+{
+formele=document.TuningGeneralForm.elements;
+if(JumboSupported==true)
+{
+fieldName = "rlJumboFramesStatusAfterReset";
+var changed = isChanged(formele[fieldName]);
+if(changed==false)
+{
+formele["rlJumboFramesStatusAfterReset"].disabled=true;
+}
+}
+}
+function checkValue(fieldName)
+{
+var formele=document.TuningGeneralForm.elements;
+var max,min;
+if(fieldName=="rlSyslogCacheSizeAfterReset")
+{
+max = 400;
+min = 20;
+}
+else
+{
+min = 0;
+max = formele["dot1qMaxSupportedVlans"].value;
+}
+checkValidation('','',fieldName,'','INT',min,max)
+}
+function displayJumbo()
+{
+formele=document.TuningGeneralForm.elements;
+switch (formele["rlJumboFramesCurrentStatus"].value)
+{
+case "1":
+document.write("Enabled");
+break;
+case "2":
+document.write("Disabled");
+break;
+}
+}
+function displaySwitchMode()
+{
+formele=document.TuningGeneralForm.elements;
+var slct = formele["slctSwitchMode"];
+var switchModeBits = formele["rlDependendFeaturesEnabledAfterReset"].value;
+if(switchModeBits.charAt(1)=="1" && switchModeBits.charAt(2)=="0")
+{
+document.getElementById("lblSwitchMode").innerHTML = "DVA&amp;iSCSI";
+slct.selectedIndex = 1;
+}
+else if(switchModeBits.charAt(1)=="0" && switchModeBits.charAt(2)=="1")
+{
+document.getElementById("lblSwitchMode").innerHTML = "ACL&amp;iSCSI";
+slct.selectedIndex = 0;
+}
+}
+// --End of Java code -->
+</script>
+</head>
+<body bgcolor="#FFFFFF" leftmargin="15" onload="setScreenMonitorState();">
+<script language="JavaScript">top.Draw_Header(document.title);</script>
+
+<FORM METHOD='POST' name="TuningGeneralForm"  ACTION="/config/tun_general.htm"  >
+<INPUT  Type="HIDDEN" Name="restoreUrl" SIZE=256   value="">
+<INPUT  TYPE="HIDDEN" NAME="errorCollector"   value="" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE="HIDDEN" NAME="dot1qMaxSupportedVlans" disabled   value="64" SIZE="20" MAXLENGTH="20">
+
+<table id="tun_general_tbl" border="0" cellspacing="0" cellpadding="0" width="100%">
+<script language="JavaScript">
+top.Draw_TableTop(3);
+</script>
+<tr>
+<td nowrap style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas" width="35%"><b>Attribute</b></td>
+<td nowrap class="data-area-canvas" width="25%"><b>Current</b></td>
+<td nowrap class="data-area-canvas"><b>After Reset</b></td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<tr><td nowrap style="height: 1px; width: 10px" class="data-area-canvas"></td>
+<td nowrap colspan="3" style="height: 1px" class="data-area-separator"></td>
+<td nowrap style="height: 1px" class="data-area-canvas"></td>
+<td nowrap style="height: 1px; width: 15px"></td>
+</tr>
+
+<INPUT  TYPE=HIDDEN Name="(rlJumboFramesCurrentStatus EXISTS)" size=128 disabled   value="OK">
+
+
+
+<tr>
+<td nowrap style="width: 10px;height:24px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd">Jumbo Frames</td>
+<td nowrap class="data-area-canvas-odd">
+
+<INPUT  TYPE=hidden NAME="rlJumboFramesCurrentStatus" disabled   value="2" SIZE="20" MAXLENGTH="20">
+
+<script language=javascript>displayJumbo();</script>
+&nbsp;
+</td>
+<td nowrap class="data-area-canvas-odd">
+
+<SELECT  NAME="rlJumboFramesStatusAfterReset" SIZE="1"
+ >
+
+<OPTION value=1> Enable
+
+<OPTION value=2 selected> Disable
+
+</select>
+</select>
+
+
+<script language="JavaScript">JumboSupported=true;</script>
+</td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+
+
+
+
+<script language="JavaScript">top.Draw_TableBottom(3)</script>
+</table>
+<br>
+<div class="management-only">
+
+
+<div align="center"><table id="apply_tbl" cellspacing="0" cellpadding="0" border="0"><tr>
+<td nowrap nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/lbutton.gif"></td>
+<td nowrap nowrap valign="middle" align="center" class="data-area-button"><a href="javascript:preSubmit();">Apply Changes</a></td>
+<td nowrap nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/rbutton.gif"></td>
+</tr></table></div><br>
+<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
+<!--
+if(document.forms[0] && document.forms[0].elements.length<=1000)
+{
+for(i=0;(document.forms[0] && i<document.forms[0].elements.length);i++)
+{
+if(document.forms[0] && document.forms[0].elements[i].type=="select-one")
+if(document.forms[0] && document.forms[0].elements[i].length==0)
+document.forms[0].elements[i].style.width="70px";
+}
+}
+//-->
+</SCRIPT>
+
+</div>
+</form>
+</body>
+</html>

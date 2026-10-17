@@ -1,0 +1,266 @@
+<script>
+</script>
+
+
+<html>
+
+<head>
+<title>CoS to Queue Mapping Table</title>
+
+
+<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
+<!--
+if(top.location==self.location )
+{
+var refStr=self.location + " ";
+var ind=0;
+refStr.toLowerCase();
+ind=refStr.indexOf("config");
+var locationStr=refStr.substring(0,ind);
+if (opener)
+{
+if (opener.opener)
+{
+if(opener.opener.top.location==opener.opener.location)
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+else
+{
+if(opener.top.location==opener.location)
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+}
+else
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+//-->
+</SCRIPT>
+
+
+<link rel="stylesheet" href="../device/style.css" type="text/css">
+<script src="../js/globalFunctions.js"></script>
+<script language="JavaScript">
+<!-- Beginng of JavaScript Applet
+if(top.MonitorMode) {
+document.write("<link rel='stylesheet' href='../device/monitorMode.css' type='text/css'>")
+}
+top.FirstTd=0;
+FieldsToCheck = new Array(3);
+FieldsToCheck[0] = "rlQosCosIndex$repeat";
+FieldsToCheck[1] = "rlQosCosQueueId$repeat";
+FieldsToCheck[2] = "QosCosQueueTable$endRepeat";
+var defValuesArr;
+var saveStateArr=new Array();;
+var Qnum;
+function formSubmit()
+{
+var COSNum=1;
+var formele=document.cosqosToForm.elements;
+while (formele["rlQosCosQueueId$select?"+COSNum]!=null)
+{
+formele["rlQosCosQueueId$repeat?"+COSNum].value=parseInt(formele["rlQosCosQueueId$select?"+COSNum].options[formele["rlQosCosQueueId$select?"+COSNum].selectedIndex].text);
+COSNum++;
+}
+disableHtml();
+DisableUnchanged(document.cosqosToForm,FieldsToCheck[0],FieldsToCheck);
+document.cosqosToForm.submit();
+}
+function disableHtml()
+{
+var COSNum=1;
+var formele=document.cosqosToForm.elements;
+while (formele["rlQosCosQueueId$select?"+COSNum]!=null)
+{
+formele["rlQosCosQueueId$select?"+COSNum].disabled=true;
+COSNum++;
+}
+formele["defCkbx"].disabled=true;
+}
+function disableQueueHtmlControls(action)
+{
+var COSNum=1;
+var state;
+var formele=document.cosqosToForm.elements;
+if(action == true)
+state = false;
+else
+state = true;
+while (formele["rlQosCosQueueId$select?"+COSNum]!=null)
+{
+if(formele["rlQosCosQueueId$select?"+COSNum].disabled == state)
+formele["rlQosCosQueueId$select?"+COSNum].disabled=action;
+COSNum++;
+}
+}
+function setDefValues()
+{
+var COSNum=1;
+var formele=document.cosqosToForm.elements;
+if (formele["defCkbx"].checked==true)
+{
+disableQueueHtmlControls(true);
+while (formele["rlQosCosQueueId$select?"+COSNum]!=null)
+{
+formele["rlQosCosQueueId$select?"+COSNum].selectedIndex=defValuesArr[COSNum-1]-1;
+COSNum++;
+}
+}
+else
+{
+disableQueueHtmlControls(false);
+while (formele["rlQosCosQueueId$select?"+COSNum]!=null)
+{
+formele["rlQosCosQueueId$select?"+COSNum].selectedIndex=saveStateArr[COSNum-1]-1;
+COSNum++;
+}
+}
+}
+function Change(COSNum)
+{
+var formele=document.cosqosToForm.elements;
+if (window.event && window.event.srcElement && window.event.srcElement.name)
+{
+e=window.event;
+fldName=e.srcElement.name;
+}
+else if (!window.event)
+{
+e=arguments.callee.caller.arguments[0];
+fldName=e.target.name ;
+}
+saveStateArr[COSNum-1]=parseInt(formele[fldName].options[formele[fldName].selectedIndex].text);
+}
+function writeCosToQ(COSNum)
+{
+var formObj=document.cosqosToForm;
+var selectName="rlQosCosQueueId$select?"+COSNum;
+var selectedVal=parseInt(formObj.elements["rlQosCosQueueId$repeat?"+COSNum].value);
+saveStateArr[COSNum-1]=selectedVal;
+var classID=formObj.elements["rlQosCosIndex$repeat?"+COSNum].value;
+document.write("<tr>");
+document.write("<td nowrap style='WIDTH: 10px' class='data-area-canvas'>&nbsp;</td>");
+document.write("<td nowrap class='"+colorClass()+"'>"+classID+"</td>");
+document.write("<td nowrap class='"+colorClass()+"'>");
+document.write("<select name='"+selectName+"'onChange='Change("+COSNum+")'>");
+document.write("<option value=' '></option></select>");
+addRangeSelectionList(formObj,selectName,1,Qnum,"",selectedVal);
+document.write("</td>");
+document.write("<td nowrap class='data-area-canvas'>&nbsp;</td>");
+document.write("<td nowrap style='WIDTH: 15px'>&nbsp;</td>");
+document.write("</tr>");
+ChangeRowColor();
+}
+// --End of Java code -->
+</script>
+</head>
+<body bgcolor="#ffffff" leftmargin="15" onload="setScreenMonitorState();">
+<script language="JavaScript">top.mapMenuIndex=1;top.Draw_Header(document.title);</script>
+<FORM METHOD='POST' name="cosqosToForm"  ACTION="/config/cosqos_to.htm"   >
+<INPUT  TYPE="HIDDEN" Name="restoreUrl" size=256   value="">
+
+<script>
+Qnum=top.numOfQueues;
+if (Qnum==8)
+defValuesArr=[3,1,2,4,5,6,7,8];
+else
+defValuesArr=[2,1,1,2,3,3,4,4];
+</script>
+<table id="cosqos_to_tbl" border="0" cellspacing="0" cellpadding="0" width="100%">
+<script language="JavaScript">
+top.Draw_TableTop(2)
+</script>
+<tr>
+<td nowrap style="WIDTH: 10px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-tab-header" valign="left" width="50%"><b>Class of Service</b></td>
+<td nowrap class="data-area-tab-header"><b>Queue</b></td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="WIDTH: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="WIDTH: 10px; HEIGHT: 1px" class="data-area-canvas"><img style="WIDTH: 1px; HEIGHT: 1px" src=""></td>
+<td nowrap colspan="2" style="HEIGHT: 1px" class="data-area-separator"><img style="WIDTH: 1px; HEIGHT: 1px" src=""></td>
+<td nowrap style="HEIGHT: 1px" class="data-area-canvas"><img style="WIDTH: 1px; HEIGHT: 1px" src=""></td>
+<td nowrap style="WIDTH: 15px; HEIGHT: 1px"></td>
+</tr>
+
+<INPUT  TYPE="HIDDEN" NAME="errorCollector"   value="" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=QosCosQueueTable   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rlQosCosQueueTable   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name= rlQosCosIndex$VT SIZE=128   value="Type=0;Access=1;NumOfEnumerations=0;Range0=[0,7]">
+<INPUT  Type=HIDDEN Name=rlQosCosQueueId$VT SIZE=128   value="Type=0;Access=2;NumOfEnumerations=0;Range0=[1,8]">
+<INPUT  Type=HIDDEN Name=QosCosQueueTable$endVT   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosCosIndex$repeat?1    value="0" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosCosQueueId$repeat?1    value="2" SIZE="20" MAXLENGTH="20">
+<script>writeCosToQ(1);</script>
+<INPUT  type=hidden Name=QosCosQueueTable$endRepeat?1    value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosCosIndex$repeat?2    value="1" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosCosQueueId$repeat?2    value="1" SIZE="20" MAXLENGTH="20">
+<script>writeCosToQ(2);</script>
+<INPUT  type=hidden Name=QosCosQueueTable$endRepeat?2    value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosCosIndex$repeat?3    value="2" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosCosQueueId$repeat?3    value="1" SIZE="20" MAXLENGTH="20">
+<script>writeCosToQ(3);</script>
+<INPUT  type=hidden Name=QosCosQueueTable$endRepeat?3    value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosCosIndex$repeat?4    value="3" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosCosQueueId$repeat?4    value="2" SIZE="20" MAXLENGTH="20">
+<script>writeCosToQ(4);</script>
+<INPUT  type=hidden Name=QosCosQueueTable$endRepeat?4    value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosCosIndex$repeat?5    value="4" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosCosQueueId$repeat?5    value="3" SIZE="20" MAXLENGTH="20">
+<script>writeCosToQ(5);</script>
+<INPUT  type=hidden Name=QosCosQueueTable$endRepeat?5    value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosCosIndex$repeat?6    value="5" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosCosQueueId$repeat?6    value="3" SIZE="20" MAXLENGTH="20">
+<script>writeCosToQ(6);</script>
+<INPUT  type=hidden Name=QosCosQueueTable$endRepeat?6    value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosCosIndex$repeat?7    value="6" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosCosQueueId$repeat?7    value="4" SIZE="20" MAXLENGTH="20">
+<script>writeCosToQ(7);</script>
+<INPUT  type=hidden Name=QosCosQueueTable$endRepeat?7    value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=rlQosCosIndex$repeat?8    value="7" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlQosCosQueueId$repeat?8    value="4" SIZE="20" MAXLENGTH="20">
+<script>writeCosToQ(8);</script>
+<INPUT  type=hidden Name=QosCosQueueTable$endRepeat?8    value="OK" SIZE="20" MAXLENGTH="20">
+
+
+<script language="JavaScript">top.Draw_TableBottom(2)</script>
+</table>
+<br>
+<table id="cosqos_to_restore_tbl" border="0" cellspacing="0" cellpadding="0" width="100%">
+<script language="JavaScript">
+top.Draw_TableTop(2);top.Draw_TableHeader();
+</script>
+<tr>
+<td nowrap style="WIDTH: 10px" class="data-area-canvas">&nbsp;</td>
+<td nowrap class="data-area-canvas-odd" width="50%">Restore Defaults</td>
+<td nowrap class="data-area-canvas-odd">
+<input name="defCkbx" type="checkbox" onclick = "setDefValues();"></td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="WIDTH: 15px"></td>
+</tr>
+<script language="JavaScript">top.Draw_TableBottom(2)</script>
+</table><br>
+<div class="management-only">
+<script language="JavaScript">top.Draw_ButtonApply("formSubmit")</script>
+</div>
+
+</form>
+</body>
+</html>

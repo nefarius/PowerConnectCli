@@ -1,0 +1,323 @@
+
+
+<html>
+
+<head>
+
+
+<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
+<!--
+if(top.location==self.location )
+{
+var refStr=self.location + " ";
+var ind=0;
+refStr.toLowerCase();
+ind=refStr.indexOf("config");
+var locationStr=refStr.substring(0,ind);
+if (opener)
+{
+if (opener.opener)
+{
+if(opener.opener.top.location==opener.opener.location)
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+else
+{
+if(opener.top.location==opener.location)
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+}
+else
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+//-->
+</SCRIPT>
+
+
+<title>Address Binding</title>
+<link rel="stylesheet" href="../device/style.css" type="text/css">
+<script src="../js/globalFunctions.js"></script>
+<script language="JavaScript">
+<!-- Beginng of JavaScript Applet
+if(top.MonitorMode) {
+document.write("<link rel='stylesheet' href='../device/monitorMode.css' type='text/css'>")
+}
+top.FirstTd=0;
+var monthArr = new Array('Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec');
+var delParams = new Array();
+var pageIndex = 0;
+top.FirstTd=0;
+function formSubmit()
+{
+var flagDel = false;
+var formObj=document.dhcpAddrBindForm;
+var i = 1;
+while (formele["del_cb"+i]!=null)
+{
+formele["del_cb"+i].disabled = true;
+if(formele["del_cb"+i].checked)
+{
+prepareHostEntry(i);
+flagDel = true;
+}
+i++;
+}
+if(!flagDel)
+{
+alert("No entries were selected for deletion.");
+return false;
+}
+formObj.submit();
+}
+function prepareHostEntry(ind)
+{
+formele["rlDhcpSrvIpAddrIpAddr$repeat?"+ind].disabled = false;
+formele["rlDhcpSrvIpAddrRowStatus$repeat?"+ind].disabled = false;
+formele["DHCPIPVT$endRepeat?"+ind].disabled = false;
+formele["rlDhcpSrvIpAddrRowStatus$repeat?"+ind].value = 6;
+}
+function isInDelArray(name)
+{
+for(var i = 0; i < delParams.length; i++)
+{
+if(name == delParams[i])
+return true;
+}
+return false;
+}
+function displayExpiration(index)
+{
+var val = "Infinite";
+if(getType(index)=="Dynamic")
+val = calculateExpiration(index);
+document.write(val);
+}
+function calculateExpiration(index)
+{
+var res = "";
+var currDate = formele["rndTimeSyncManagedDateTime"].value;
+var currDay = currDate.substr(0,2);
+var currMonth = currDate.substr(2,2);
+var currYear = "20"+currDate.substr(4,2);
+var currHour = currDate.substr(6,2);
+var currMin = currDate.substr(8,2);
+var currSec = currDate.substr(10,2);
+var dateNow = new Date();
+dateNow.setFullYear(parseInt(currYear),parseInt(currMonth-1),parseInt(currDay));
+dateNow.setHours(parseInt(currHour),parseInt(currMin),parseInt(currSec));
+var secLease = parseInt(formele["rlDhcpSrvDynamicLeaseTime$query"].value,10);
+var secAged = parseInt(formele["rlDhcpSrvIpAddrAgeTime$repeat?"+index].value,10);
+var milliSecRemain = (secLease - secAged) * 1000;
+var projectedExpiration = dateNow.getTime() + milliSecRemain;
+var dateExpire = new Date();
+dateExpire.setTime(projectedExpiration);
+var dispMonth = monthArr[parseInt(dateExpire.getMonth(),10)];
+var dispDay = dateExpire.getDate();
+var dispYear = dateExpire.getFullYear();
+var dispHour = prepForDisp(dateExpire.getHours());
+var dispMin = prepForDisp(dateExpire.getMinutes());
+var dispSec = prepForDisp(dateExpire.getSeconds());
+res = dispMonth + " " + dispDay + " " + dispYear + " " + dispHour + ":" + dispMin + ":" + dispSec;
+return res;
+}
+function prepForDisp(input)
+{
+var val = input.toString();
+if(val.length == 1)
+val = "0" + val;
+return val;
+}
+function getType(index)
+{
+var typeEnum = formele["rlDhcpSrvIpAddrMechanism$repeat?"+index].value;
+switch(typeEnum)
+{
+case "1":
+return "Static";
+case "2":
+return "Permanent";
+case "3":
+return "Dynamic";
+}
+}
+function displayID(index)
+{
+var val = formele["rlDhcpSrvIpAddrIdentifier$repeat?"+index].value;
+var type = formele["rlDhcpSrvIpAddrIdentifierType$repeat?"+index].value;
+if(type == "1")
+val = fromStringToMacAddress(val);
+document.write(val);
+}
+function initPaging()
+{
+if(loopIndex == 13)
+document.getElementById("repRow_13").style.display = "none";
+else
+disableButton('nextLink');
+if(formele["restoreUrl"].value.indexOf("partialKey")==-1)
+disableButton('backLink');
+}
+function disableButton(id)
+{
+var link = document.getElementById(id);
+link.href = "javascript:function(){return};";
+link.style.cursor = "default";
+}
+function GetNextEntries()
+{
+var lastEntryIndex = formele["rlDhcpSrvIpAddrIpAddr$repeat?12"].value;
+var navigateNext = "[DHCPIPVT]partialKey:From-rlDhcpSrvIpAddrIpAddr="+lastEntryIndex;
+var oldQuery = formele["restoreUrl"].value;
+var pagerIndex = oldQuery.indexOf("[DHCPIPVT]");
+var pageCounter = pageIndex + 1;
+if(pagerIndex != -1)
+{
+oldQuery = oldQuery.substring(0,pagerIndex)
+}
+var newUrlVal = 'DHCPSrv_AddrBind.htm?' + oldQuery + navigateNext + "^pagenum=" + pageCounter;
+document.location.href = newUrlVal;
+}
+function getPageIndex()
+{
+var urlVal = formele["restoreUrl"].value;
+var pagerIndex = urlVal.indexOf("pagenum");
+if(pagerIndex==-1)
+pageIndex = 0;
+else
+{
+var pagerStr = urlVal.substring(pagerIndex+8);
+pageIndex = parseInt(pagerStr,10);
+}
+}
+// --End of Java code -->
+</script>
+</head>
+<body bgcolor="#FFFFFF" leftmargin="15" onload="setScreenMonitorState();">
+<script language="JavaScript">
+top.Draw_Header(document.title);
+</script>
+<FORM METHOD='POST' name="dhcpAddrBindForm"  ACTION="/config/DHCPSrv_AddrBind.htm"   >
+<script>var formele=document.dhcpAddrBindForm.elements;</script>
+<INPUT  Type="HIDDEN" Name="restoreUrl" SIZE=256   value="">
+<INPUT  TYPE="HIDDEN" NAME="errorCollector"   value="" SIZE="20" MAXLENGTH="20">
+<script>getPageIndex();</script>
+<INPUT  TYPE=hidden NAME="rndTimeSyncManagedDateTime" disabled   value="010100023109" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=DHCPexcludeVT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rlDhcpSrvDynamicTable$VT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rlDhcpSrvDynamicPoolName$VT SIZE=128   value="Type=100;Access=2;NumOfEnumerations=0;Range0=[1,32]">
+<INPUT  Type=HIDDEN Name=rlDhcpSrvDynamicLeaseTime$VT SIZE=128   value="Type=7;Access=2;NumOfEnumerations=0;Range0=[-2147483648,2147483647];Default value=86400">
+<INPUT  Type=HIDDEN Name=DHCPexcludeVT$endVT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DHCPexcludeVT$query disabled   value=" " SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlDhcpSrvDynamicPoolName$query disabled   value=" " SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=rlDhcpSrvDynamicLeaseTime$query disabled   value=" " SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=DHCPexcludeVT$endQuery disabled   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=DHCPIPVT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rlDhcpSrvIpAddrTable$VT   value="OK" SIZE="20" MAXLENGTH="20">
+<INPUT  Type=HIDDEN Name=rlDhcpSrvIpAddrIpAddr$VT SIZE=128   value="Type=5;Access=2;NumOfEnumerations=0">
+<INPUT  Type=HIDDEN Name=rlDhcpSrvIpAddrIpNetMask$VT SIZE=128   value="Type=5;Access=2;NumOfEnumerations=0">
+<INPUT  Type=HIDDEN Name=rlDhcpSrvIpAddrIdentifier$VT SIZE=128   value="Type=2;Access=2;NumOfEnumerations=0;Range0=[2,32]">
+<INPUT  Type=HIDDEN Name=rlDhcpSrvIpAddrIdentifierType$VT SIZE=128   value="Type=0;Access=2;NumOfEnumerations=2;Range0=[1,2];Default value=2">
+<INPUT  Type=HIDDEN Name=rlDhcpSrvIpAddrClnHostName$VT SIZE=128   value="Type=2;Access=2;NumOfEnumerations=0;Range0=[0,32];Default value=">
+<INPUT  Type=HIDDEN Name=rlDhcpSrvIpAddrMechanism$VT SIZE=128   value="Type=0;Access=2;NumOfEnumerations=3;Range0=[1,3];Default value=1">
+<INPUT  Type=HIDDEN Name=rlDhcpSrvIpAddrAgeTime$VT SIZE=128   value="Type=7;Access=1;NumOfEnumerations=0;Range0=[-2147483648,2147483647];Default value=0">
+<INPUT  Type=HIDDEN Name=rlDhcpSrvIpAddrPoolName$VT SIZE=128   value="Type=100;Access=2;NumOfEnumerations=0;Range0=[1,32]">
+<INPUT  Type=HIDDEN Name=rlDhcpSrvIpAddrConfParamsName$VT SIZE=128   value="Type=100;Access=2;NumOfEnumerations=0;Range0=[0,32];Default value=">
+<INPUT  Type=HIDDEN Name=rlDhcpSrvIpAddrRowStatus$VT SIZE=128   value="Type=0;Access=2;NumOfEnumerations=6;Range0=[1,6]">
+<INPUT  Type=HIDDEN Name=DHCPIPVT$endVT   value="OK" SIZE="20" MAXLENGTH="20">
+<table id="auth_table_tbl" border="0" cellspacing="0" cellpadding="0" width="100%" align="center">
+<tr>
+<td valign="bottom"><img style="width: 10px; height: 10px" src="../Images/tl.gif"></td>
+<td colspan="6" width=100% class="data-area-canvas"><font style="font-size: 8px">&nbsp;</font></td>
+<td valign="bottom"><img style="width: 10px; height: 10px" src="../Images/tr.gif"></td>
+<td style="width: 5px"></td>
+</tr>
+<tr>
+<td nowrap style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 10px" class="data-area-canvas">&nbsp;</td>
+<td nowrap align="left" class="data-area-canvas"><b>IP Address</b></td>
+<td nowrap align="center" class="data-area-canvas"><b>Client Identifier/MAC Address</b></td>
+<td nowrap align="center" class="data-area-canvas"><b>Lease Expiration</b></td>
+<td nowrap align="center" class="data-area-canvas"><b>Type</b></td>
+<td nowrap align="left" class="data-area-canvas"><b>Remove</b></td>
+<td nowrap class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 15px">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="height: 1px; width: 10px" class="data-area-canvas"><img style="width: 1px; height: 1px" src=""></td>
+<td nowrap colspan="6" style="height: 1px" class="data-area-separator"><img style="width: 1px; height: 1px" src=""></td>
+<td nowrap style="height: 1px" class="data-area-canvas"><img style="width: 1px; height: 1px" src=""></td>
+<td nowrap style="height: 1px; width: 5px"><img style="width: 1px; height: 1px" src=""></td>
+</tr>
+<INPUT  Type=HIDDEN NAME=rlDhcpSrvIpAddrIpAddr$14 SIZE=128   value="">
+<script>
+var loopIndex = 0;
+</script>
+
+
+
+<tr>
+<td nowrap><img width="10px" height="10px" src="../Images/bl.gif"></td>
+<td nowrap colspan="6" width=100% class="data-area-canvas"><font style="font-size: 8px">&nbsp;</font></td>
+<td nowrap><img width="10px" height="10px" src="../Images/br.gif"></td>
+<td nowrap style="width: 5px"></td>
+</tr>
+</table><br>
+<div align="center">
+<table cellspacing="0" cellpadding="0" border="0" ID="Table3">
+<tr>
+<td nowrap style="width: 14px; height: 25px">
+<img style="width: 14px; height: 25px" src="../Images/lbutton.gif"></td>
+<td nowrap valign="middle" align="center" class="data-area-button">
+<a id="backLink" href="javascript:history.back();">Back</a></td>
+<td nowrap style="width: 14px; height: 25px">
+<img style="width: 14px; height: 25px" src="../Images/rbutton.gif"></td>
+<td nowrap style="width: 14px; height: 25px">
+</td>
+<td nowrap style="width: 14px; height: 25px">
+<img style="width: 14px; height: 25px" src="../Images/lbutton.gif"></td>
+<td nowrap valign="middle" align="center" class="data-area-button">
+<a id="nextLink" href="javascript:GetNextEntries();">Next</a></td>
+<td nowrap style="width: 14px; height: 25px">
+<img style="width: 14px; height: 25px" src="../Images/rbutton.gif"></td>
+</tr>
+</table>
+</div>
+<br/>
+<div class="management-only">
+
+<div align="center"><table id="apply_tbl" cellspacing="0" cellpadding="0" border="0"><tr>
+<td nowrap nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/lbutton.gif"></td>
+<td nowrap nowrap valign="middle" align="center" class="data-area-button"><a href="javascript:preSubmit();">Apply Changes</a></td>
+<td nowrap nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/rbutton.gif"></td>
+</tr></table></div><br>
+<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
+<!--
+if(document.forms[0] && document.forms[0].elements.length<=1000)
+{
+for(i=0;(document.forms[0] && i<document.forms[0].elements.length);i++)
+{
+if(document.forms[0] && document.forms[0].elements[i].type=="select-one")
+if(document.forms[0] && document.forms[0].elements[i].length==0)
+document.forms[0].elements[i].style.width="70px";
+}
+}
+//-->
+</SCRIPT>
+
+</div><br>
+
+<script>
+initPaging();
+</script>
+</form>
+</body>
+</html>

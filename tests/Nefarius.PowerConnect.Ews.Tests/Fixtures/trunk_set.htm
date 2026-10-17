@@ -1,0 +1,648 @@
+
+
+
+<style type="text/css">
+font.small{color:black;font-size:9;}
+font.big{color:black;font-size:18;font-weight:bold;}
+</style>
+<html>
+<head>
+<script>
+if (top.DeviceType && top.DeviceType == 1)
+{
+document.write("<title>LAG Membership</title>");
+}
+else
+{
+document.write("<title>LAG Membership</title>");
+}
+</script>
+
+
+<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
+<!--
+if(top.location==self.location )
+{
+var refStr=self.location + " ";
+var ind=0;
+refStr.toLowerCase();
+ind=refStr.indexOf("config");
+var locationStr=refStr.substring(0,ind);
+if (opener)
+{
+if (opener.opener)
+{
+if(opener.opener.top.location==opener.opener.location)
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+else
+{
+if(opener.top.location==opener.location)
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+}
+else
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+//-->
+</SCRIPT>
+
+
+<script src="../js/globalFunctions.js"></script>
+<link rel="stylesheet" href="../device/style.css" type="text/css">
+<script language="javascript">
+<!-- Beginng of JavaScript Applet
+if(top.MonitorMode) {
+document.write("<link rel='stylesheet' href='../device/monitorMode.css' type='text/css'>")
+}
+var counter=0;
+var entrySize=200;
+var allowChanges=true;
+var entryInx=1;
+var formele;
+if (document.images) {
+cellImages = new Array(3)
+cellImages[0] = new Array(10)
+cellImages[0][0] = new Image(20,20)
+cellImages[0][0].src = '../Images/blankup.gif'
+cellImages[0][1] = new Image(20,20)
+cellImages[0][1].src = '../Images/tr1up.gif'
+cellImages[0][2] = new Image(20,20)
+cellImages[0][2].src = '../Images/tr2up.gif'
+cellImages[0][3] = new Image(20,20)
+cellImages[0][3].src = '../Images/tr3up.gif'
+cellImages[0][4] = new Image(20,20)
+cellImages[0][4].src = '../Images/tr4up.gif'
+cellImages[0][5] = new Image(20,20)
+cellImages[0][5].src = '../Images/tr5up.gif'
+cellImages[0][6] = new Image(20,20)
+cellImages[0][6].src = '../Images/tr6up.gif'
+cellImages[0][7] = new Image(20,20)
+cellImages[0][7].src = '../Images/tr7up.gif'
+cellImages[0][8] = new Image(20,20)
+cellImages[0][8].src = '../Images/tr8up.gif'
+cellImages[0][9] = new Image(20,20)
+cellImages[0][9].src = '../Images/tr0up.gif'
+cellImages[1] = new Array(10)
+cellImages[1][0] = new Image(20,20)
+cellImages[1][0].src = '../Images/blankup.gif'
+cellImages[1][1] = new Image(20,20)
+cellImages[1][1].src = '../Images/tr1up.gif'
+cellImages[1][2] = new Image(20,20)
+cellImages[1][2].src = '../Images/tr2up.gif'
+cellImages[1][3] = new Image(20,20)
+cellImages[1][3].src = '../Images/tr3up.gif'
+cellImages[1][4] = new Image(20,20)
+cellImages[1][4].src = '../Images/tr4up.gif'
+cellImages[1][5] = new Image(20,20)
+cellImages[1][5].src = '../Images/tr5up.gif'
+cellImages[1][6] = new Image(20,20)
+cellImages[1][6].src = '../Images/tr6up.gif'
+cellImages[1][7] = new Image(20,20)
+cellImages[1][7].src = '../Images/tr7up.gif'
+cellImages[1][8] = new Image(20,20)
+cellImages[1][8].src = '../Images/tr8up.gif'
+cellImages[1][9] = new Image(20,20)
+cellImages[1][9].src = '../Images/tr0up.gif'
+cellImages[2] = new Array(10)
+cellImages[2][0] = new Image(20,20)
+cellImages[2][0].src = '../Images/blankdown.gif'
+cellImages[2][1] = new Image(20,20)
+cellImages[2][1].src = '../Images/tr1down.gif'
+cellImages[2][2] = new Image(20,20)
+cellImages[2][2].src = '../Images/tr2down.gif'
+cellImages[2][3] = new Image(20,20)
+cellImages[2][3].src = '../Images/tr3down.gif'
+cellImages[2][4] = new Image(20,20)
+cellImages[2][4].src = '../Images/tr4down.gif'
+cellImages[2][5] = new Image(20,20)
+cellImages[2][5].src = '../Images/tr5down.gif'
+cellImages[2][6] = new Image(20,20)
+cellImages[2][6].src = '../Images/tr6down.gif'
+cellImages[2][7] = new Image(20,20)
+cellImages[2][7].src = '../Images/tr7down.gif'
+cellImages[2][8] = new Image(20,20)
+cellImages[2][8].src = '../Images/tr8down.gif'
+cellImages[2][9] = new Image(20,20)
+cellImages[2][9].src = '../Images/tr0down.gif'
+}
+amMaxTrunkCount = top.NumberOfTrunks;
+amMaxPortCount = top.NumberOfPorts;
+var isEntryChanged=new Array(top.NumberOfPorts);
+var columnsPerRow;
+var portPerRow;
+function setRow(moduleIndex)
+{
+if(top.NumberOfPortPerModuleArr[moduleIndex-1] == 24){
+columnsPerRow = 34
+portPerRow = 24
+} else if(top.NumberOfPortPerModuleArr[moduleIndex-1] == 48) {
+columnsPerRow = 30
+portPerRow = 24
+}else if(top.NumberOfPortPerModuleArr[moduleIndex-1] == 16){
+columnsPerRow = 20
+portPerRow = 16
+}else if(top.NumberOfPortPerModuleArr[moduleIndex-1] == 8){
+columnsPerRow = 10
+portPerRow = 8
+}
+}
+var amPortTypes = new iniPortTypes();
+function iniPortTypes()
+{
+var i;
+for (i = 0; i<amMaxPortCount; i++)
+{
+this[i] = 0;
+}
+return this;
+}
+var lacpMembers = new iniLacpMembers();
+function iniLacpMembers()
+{
+var i;
+for (i = 0; i<amMaxPortCount; i++)
+{
+this[i] = 0;
+}
+return this;
+}
+function formSubmit()
+{
+document.TrunkForm.submit();
+}
+function writeSpaceLine() {
+document.writeln('<tr><td nowrap colspan="', columnsPerRow, '">&nbsp;</td></tr>')
+}
+function DrawModuleNumber(moduleIndex,numberOfModules)
+{
+document.write("<table id='trunk_set_DrawModuleNumber_tbl' align='center' valign='center' border='0'><tr>");
+if ((numberOfModules==1)||(!isShowModuleNumber))
+{
+moduleIndex=" ";
+}
+else moduleIndex=top.RealModuleNameArr[moduleIndex-1]
+isShowModuleNumber=false;
+document.write("<td nowrap><font class='big'>"+moduleIndex+"</td>");
+document.write("</tr></table>");
+}
+var isShowModuleNumber;
+function writeTrunks()
+{
+var trunkIndex
+document.writeln('<tr><td nowrap colspan="', (columnsPerRow), '"></td></tr>')
+for (var moduleIndex=1; moduleIndex<=top.NumberOfModules; moduleIndex++)
+{
+isShowModuleNumber=true;
+setRow(moduleIndex);
+writeSpaceLine();
+writeOneTrunkLacp(moduleIndex);
+displaySeparator(columnsPerRow);
+}
+}
+function flat(portId) {
+if (document.images) {
+document.images['cell_'+portId].src =
+cellImages[0][amPortTypes[portId]].src
+}
+}
+function raise(portId) {
+if (document.images) {
+document.images['cell_'+portId].src =
+cellImages[1][amPortTypes[portId]].src
+}
+}
+function lower(portId) {
+if (document.images) {
+document.images['cell_'+portId].src =
+cellImages[2][amPortTypes[portId]].src
+}
+}
+function toggle(portData)
+{
+portData=sliceString(portData,",");
+var portId=parseInt(portData[0]);
+var entryNo=parseInt(portData[1]);
+if (!top.MonitorMode)
+{
+if (allowChanges || isEntryChanged[portId])
+{
+if (lacpMembers[portId] != 1)
+{
+amPortTypes[portId]++
+amPortTypes[portId] %= (amMaxTrunkCount+1)
+if (amPortTypes[portId]!=0)
+formele["dot3adAggPortActorAdminKey$repeat?"+entryNo].value=amPortTypes[portId]+parseInt(top.trunkFirstIndex)-1;
+else formele["dot3adAggPortActorAdminKey$repeat?"+entryNo].value=amPortTypes[portId];
+raise(portId);
+allowChanges=disableEnableEntry(portId,entryNo);
+}
+}
+else
+{
+msg="You can't change anymore objects at this request,\ncause the browser cannot send all data simultaneously.\n";
+msg+="Please send your request now."
+alert (msg);
+}
+}
+}
+function writeOneTrunkLacp(moduleIndex)
+{
+var portBase
+var portId = 0
+var portEntry;
+entryInx=top.StartingPortPerModuleArr[moduleIndex-1]-1;
+for (portBase = 0; ((portBase+portId) < top.NumberOfPortPerModuleArr[moduleIndex-1]); portBase += portPerRow)
+{
+document.writeln('<tr>')
+document.write("<td nowrap height='24' width='10%' valign='center' >");
+DrawModuleNumber(moduleIndex,top.NumberOfModules)
+document.write("</td>");
+document.writeln('<td nowrap valign="top">\
+<font size="1" face="Helvetica"><br><br></font>\
+<font size="1" face="Helvetica">LAG</font></td>');
+for (portId = 0; ( ((portId < portPerRow) && (portBase+portId < top.NumberOfPortPerModuleArr[moduleIndex-1])) ||
+((top.TypePerModuleArr[moduleIndex-1]==30)&&((portBase+portId) < top.NumberOfPortPerModuleArr[moduleIndex-1])&&((portBase+portId) >= 24))||
+((top.TypePerModuleArr[moduleIndex-1]==31)&&((portBase+portId) < top.NumberOfPortPerModuleArr[moduleIndex-1])&&((portBase+portId) >= 48)) ); portId++)
+{
+if (portId !=0 && portId%12==0 && top.TypePerModuleArr[moduleIndex-1]==30)
+document.writeln('<td nowrap width="20" bgcolor="#eeeeee">&nbsp;</td>')
+if (portId !=0 && portId%13==0 && top.TypePerModuleArr[moduleIndex-1]==31)
+document.writeln('<td nowrap width="20" bgcolor="#eeeeee">&nbsp;</td>')
+if (portId==0)
+str="Ports";
+else str="";
+if ((top.TypePerModuleArr[moduleIndex-1]==31)&&((portBase+portId) < top.NumberOfPortPerModuleArr[moduleIndex-1])&&((portBase+portId) >= 4))
+{
+portEntry=top.StartingPortPerModuleArr[moduleIndex-1]+(72-top.NumberOfPortPerModuleArr[moduleIndex-1])+(portBase+portId)-1;
+}
+else portEntry=portBase+portId+top.StartingPortPerModuleArr[moduleIndex-1]-1;
+if ((top.TypePerModuleArr[moduleIndex-1]==31)&&((portBase+portId) == 4))
+{
+entryInx=portEntry+1;
+}
+else entryInx++;
+if ((top.TypePerModuleArr[moduleIndex-1]==31)&&((portBase+portId) < top.NumberOfPortPerModuleArr[moduleIndex-1])&&((portBase+portId) < 4))
+{
+portName=getPortNameFromNumber(portEntry+1);
+portName=(portName.slice((portName.indexOf("/")+1),portName.length)).toUpperCase();
+}
+else if ((top.TypePerModuleArr[moduleIndex-1]==31)&&((portBase+portId) < top.NumberOfPortPerModuleArr[moduleIndex-1])&&((portBase+portId) >= 4))
+portName=(portBase+portId+1-4);
+else portName=(portBase+portId+1);
+if (top.NumberOfModules==1 || (top.NumberOfModules>1 && (portBase+portId)<top.NumberOfPortPerModuleArr[moduleIndex-1]))
+{
+document.writeln('<td nowrap align="center" width="20" bgcolor="#eeeeee"><font size="1"\
+face="Helvetica">'+str+'<br></font><font size="1"\
+face="Helvetica">'+portName+'<br></font>\
+\
+<a href="javascript:void(0)"\
+onMouseOver="window.status=\'\'; raise(\'', portEntry, '\'); return true"\
+onMouseOut="flat(\'', portEntry, '\')"\
+onMouseDown="lower(\'', portEntry, '\')"\
+onMouseUp="window.status=\'\'; return true"\
+onClick="toggle(\''+ portEntry+','+entryInx+ '\'); return false">\
+<img src="', cellImages[0][amPortTypes[portEntry]].src, '"\
+border="0" width="20" height="20" name="cell_'+(portEntry)+'"></a></td>');
+}
+}
+portId=0;
+document.writeln('</tr>')
+writeSpaceLine()
+}
+}
+function initArrays()
+{
+var entryNo=-1;
+var adminState;
+var portBase
+var portId = 0
+var portEntry;
+for (var moduleIndex=1; moduleIndex<=top.NumberOfModules; moduleIndex++)
+{
+for (portId = 0; ( (portId < top.NumberOfPortPerModuleArr[moduleIndex-1])); portId++)
+{
+if ((top.TypePerModuleArr[moduleIndex-1]==31)&&(portId < top.NumberOfPortPerModuleArr[moduleIndex-1])&&(portId >= 4))
+{
+portEntry=top.StartingPortPerModuleArr[moduleIndex-1]+(72-top.NumberOfPortPerModuleArr[moduleIndex-1])+portId-1;
+}
+else portEntry=portId+top.StartingPortPerModuleArr[moduleIndex-1]-1;
+if ((top.TypePerModuleArr[moduleIndex-1]==31)&&(portId == 4))
+{
+entryNo=portEntry;
+}
+else entryNo++;
+if (formele[8+(entryNo*6)])
+{
+isEntryChanged[portEntry]=false;
+if ( '0'!=formele[8+(entryNo*6)+1].value)
+amPortTypes[portEntry]=parseInt(formele[8+(entryNo*6)+1].value)-parseInt(top.trunkFirstIndex)+1;
+adminState=formele[8+(entryNo*6)+3].value;
+if (adminState.charAt(0)=='1')
+lacpMembers[portEntry]=1;
+}
+}
+entryNo=top.StartingPortPerModuleArr[moduleIndex]-2;
+portId=0;
+}
+}
+function startLacp(portId) {
+var startImage= ''
+if (lacpMembers[portId] != 1){
+startImage = cellImages[0][0].src
+}else{
+startImage = cellImages[0][9].src
+}
+return startImage
+}
+function lowerLacp(portId)
+{
+if ((document.images) && (amPortTypes[portId]!=0))
+{
+if (lacpMembers[portId] != 1)
+{
+document.images['cell_lacp_'+portId].src =
+cellImages[2][0].src
+}
+else
+{
+document.images['cell_lacp_'+portId].src =
+cellImages[2][9].src
+}
+}
+}
+function raiseLacp(portId) {
+if (document.images) {
+if (lacpMembers[portId] != 1){
+document.images['cell_lacp_'+portId].src =
+cellImages[1][0].src
+}
+else{
+document.images['cell_lacp_'+portId].src =
+cellImages[1][9].src
+}
+}
+}
+function toggleLacp( portData)
+{
+portData=sliceString(portData,",");
+var portId=parseInt(portData[0]);
+var entryNo=parseInt(portData[1]);
+if (!top.MonitorMode)
+{
+if (allowChanges || isEntryChanged[portId])
+{
+if ( amPortTypes[portId]!=0)
+{
+if (lacpMembers[portId] != 1)
+{
+lacpMembers[portId] = 1
+}
+else
+{
+lacpMembers[portId] = 0
+}
+raiseLacp( portId);
+var lacpBefore=0;
+var adminState=formele["dot3adAggPortActorAdminState$repeat?"+entryNo].value;
+if (adminState.charAt(0)=='1')
+{
+lacpBefore=1;
+}
+else lacpBefore=0;
+var adminStateObj=formele["dot3adAggPortActorAdminState$repeat?"+entryNo];
+if ( (lacpMembers[portId]==1) && ( lacpBefore==0 ) )
+{
+adminStateObj.value="1"+adminState.slice(1,(adminState.length));
+}
+else if ( (lacpMembers[portId]==0) && ( lacpBefore==1 ) )
+{
+adminStateObj.value="0"+adminState.slice(1,(adminState.length));
+}
+allowChanges=disableEnableEntry(portId,entryNo);
+}
+}
+else
+{
+msg="You can't change anymore objects at this request,\ncause the browser cannot send all data simultaneously.\n";
+msg+="Please send your request now."
+alert (msg);
+}
+}
+}
+function memberToStringLacp() {
+var memberString
+var portId
+memberString = ''
+for (portId = 0; portId < amMaxPortCount; portId++) {
+memberString += lacpMembers[portId]
+}
+return memberString
+}
+function disableEnableEntry(portId,entryNo)
+{
+var isDisable=true;
+portId=parseInt(portId);
+if ((formele["dot3adAggPortActorAdminKey$repeat?"+entryNo].value!=formele["dot3adAggPortActorAdminKey$default?"+entryNo].value)||
+(formele["dot3adAggPortActorAdminState$repeat?"+entryNo].value!=formele["dot3adAggPortActorAdminState$default?"+entryNo].value))
+{
+isDisable=false;
+}
+formele["dot3adAggPortIndex$repeat?"+entryNo].disabled=isDisable;
+formele["dot3adAggPortActorAdminKey$repeat?"+entryNo].disabled=isDisable;
+formele["dot3adAggPortActorAdminState$repeat?"+entryNo].disabled=isDisable;
+formele["Agg_Port_Tab$endRepeat?"+entryNo].disabled=isDisable;
+if (isEntryChanged[portId] && isDisable)
+{
+counter--;
+isEntryChanged[portId]=false;
+}
+else if (!isEntryChanged[portId] && !isDisable)
+{
+counter++;
+isEntryChanged[portId]=true;
+}
+var bytes2Send=(counter+1)*entrySize;
+if ((bytes2Send)>BufferSize)
+{
+return false;
+}
+return true;
+}
+//-->
+</script>
+</head>
+<body bgcolor="#FFFFFF" leftmargin="15" onload="setScreenMonitorState();">
+<script language="JavaScript">top.Draw_Header(document.title);</script>
+
+<FORM METHOD='POST' name="TrunkForm"  ACTION="/config/trunk_set.htm"   >
+<INPUT  TYPE="HIDDEN" NAME="errorCollector"   value="" SIZE="20" MAXLENGTH="20">
+<INPUT  Type="HIDDEN" Name="restoreUrl" SIZE=256   value="">
+<INPUT  Type=HIDDEN Name=Agg_Port_Tab SIZE=128   value="OK">
+<INPUT  Type=HIDDEN Name=dot3adAggPortTable$VT SIZE=128   value="OK">
+<INPUT  Type=HIDDEN Name=dot3adAggPortIndex$VT size=128   value="Type=0;Access=1;NumOfEnumerations=0;Range0=[1,2147483647]">
+<INPUT  Type=HIDDEN Name=dot3adAggPortActorAdminKey$VT size=128   value="Type=0;Access=2;NumOfEnumerations=0;Range0=[0,65535];Default value=0">
+<INPUT  Type=HIDDEN Name=dot3adAggPortActorAdminState$VT size=128   value="Type=1;Access=2;NumOfEnumerations=8;Default value=00100010">
+<INPUT  Type=HIDDEN Name=Agg_Port_Tab$endVT   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortIndex$repeat?1 size=40  disabled   value="1">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminKey$repeat?1 size=40  disabled   value="0">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminKey$default?1  disabled   value="0" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminState$repeat?1 size=40  disabled   value="00100010">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminState$default?1  disabled   value="00100010" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=Agg_Port_Tab$endRepeat?1  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortIndex$repeat?2 size=40  disabled   value="2">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminKey$repeat?2 size=40  disabled   value="0">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminKey$default?2  disabled   value="0" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminState$repeat?2 size=40  disabled   value="00100010">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminState$default?2  disabled   value="00100010" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=Agg_Port_Tab$endRepeat?2  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortIndex$repeat?3 size=40  disabled   value="3">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminKey$repeat?3 size=40  disabled   value="0">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminKey$default?3  disabled   value="0" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminState$repeat?3 size=40  disabled   value="00100010">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminState$default?3  disabled   value="00100010" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=Agg_Port_Tab$endRepeat?3  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortIndex$repeat?4 size=40  disabled   value="4">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminKey$repeat?4 size=40  disabled   value="0">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminKey$default?4  disabled   value="0" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminState$repeat?4 size=40  disabled   value="00100010">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminState$default?4  disabled   value="00100010" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=Agg_Port_Tab$endRepeat?4  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortIndex$repeat?5 size=40  disabled   value="5">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminKey$repeat?5 size=40  disabled   value="0">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminKey$default?5  disabled   value="0" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminState$repeat?5 size=40  disabled   value="00100010">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminState$default?5  disabled   value="00100010" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=Agg_Port_Tab$endRepeat?5  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortIndex$repeat?6 size=40  disabled   value="6">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminKey$repeat?6 size=40  disabled   value="0">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminKey$default?6  disabled   value="0" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminState$repeat?6 size=40  disabled   value="00100010">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminState$default?6  disabled   value="00100010" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=Agg_Port_Tab$endRepeat?6  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortIndex$repeat?7 size=40  disabled   value="7">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminKey$repeat?7 size=40  disabled   value="0">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminKey$default?7  disabled   value="0" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminState$repeat?7 size=40  disabled   value="00100010">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminState$default?7  disabled   value="00100010" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=Agg_Port_Tab$endRepeat?7  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortIndex$repeat?8 size=40  disabled   value="8">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminKey$repeat?8 size=40  disabled   value="0">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminKey$default?8  disabled   value="0" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminState$repeat?8 size=40  disabled   value="00100010">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminState$default?8  disabled   value="00100010" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=Agg_Port_Tab$endRepeat?8  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortIndex$repeat?9 size=40  disabled   value="9">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminKey$repeat?9 size=40  disabled   value="0">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminKey$default?9  disabled   value="0" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminState$repeat?9 size=40  disabled   value="00100010">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminState$default?9  disabled   value="00100010" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=Agg_Port_Tab$endRepeat?9  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortIndex$repeat?10 size=40  disabled   value="10">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminKey$repeat?10 size=40  disabled   value="0">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminKey$default?10  disabled   value="0" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminState$repeat?10 size=40  disabled   value="00100010">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminState$default?10  disabled   value="00100010" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=Agg_Port_Tab$endRepeat?10  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortIndex$repeat?11 size=40  disabled   value="11">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminKey$repeat?11 size=40  disabled   value="0">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminKey$default?11  disabled   value="0" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminState$repeat?11 size=40  disabled   value="00100010">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminState$default?11  disabled   value="00100010" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=Agg_Port_Tab$endRepeat?11  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortIndex$repeat?12 size=40  disabled   value="12">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminKey$repeat?12 size=40  disabled   value="0">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminKey$default?12  disabled   value="0" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminState$repeat?12 size=40  disabled   value="00100010">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminState$default?12  disabled   value="00100010" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=Agg_Port_Tab$endRepeat?12  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortIndex$repeat?13 size=40  disabled   value="13">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminKey$repeat?13 size=40  disabled   value="0">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminKey$default?13  disabled   value="0" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminState$repeat?13 size=40  disabled   value="00100010">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminState$default?13  disabled   value="00100010" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=Agg_Port_Tab$endRepeat?13  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortIndex$repeat?14 size=40  disabled   value="14">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminKey$repeat?14 size=40  disabled   value="0">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminKey$default?14  disabled   value="0" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminState$repeat?14 size=40  disabled   value="00100010">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminState$default?14  disabled   value="00100010" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=Agg_Port_Tab$endRepeat?14  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortIndex$repeat?15 size=40  disabled   value="15">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminKey$repeat?15 size=40  disabled   value="0">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminKey$default?15  disabled   value="0" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminState$repeat?15 size=40  disabled   value="00100010">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminState$default?15  disabled   value="00100010" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=Agg_Port_Tab$endRepeat?15  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortIndex$repeat?16 size=40  disabled   value="16">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminKey$repeat?16 size=40  disabled   value="0">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminKey$default?16  disabled   value="0" SIZE="20" MAXLENGTH="20">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminState$repeat?16 size=40  disabled   value="00100010">
+<INPUT  TYPE=HIDDEN NAME=dot3adAggPortActorAdminState$default?16  disabled   value="00100010" SIZE="20" MAXLENGTH="20">
+<INPUT  type=hidden Name=Agg_Port_Tab$endRepeat?16  disabled   value="OK" SIZE="20" MAXLENGTH="20">
+
+
+<script>
+formele=document.TrunkForm.elements;
+initArrays();
+</script>
+<table id="trunk_set_trunks_tbl" border="0" cellpadding="0" cellspacing="0">
+<tr>
+<td nowrap>
+<table border="0" cellpadding="0" cellspacing="0">
+<script>writeTrunks();
+</script>
+</table><td nowrap>
+</tr>
+</table>
+<br>
+
+<div class="management-only">
+
+<div align="center"><table id="apply_tbl" cellspacing="0" cellpadding="0" border="0"><tr>
+<td nowrap nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/lbutton.gif"></td>
+<td nowrap nowrap valign="middle" align="center" class="data-area-button"><a href="javascript:preSubmit();">Apply Changes</a></td>
+<td nowrap nowrap style="width: 14px; height: 25px"><img style="width: 14px; height: 25px" src="../Images/rbutton.gif"></td>
+</tr></table></div><br>
+<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
+<!--
+if(document.forms[0] && document.forms[0].elements.length<=1000)
+{
+for(i=0;(document.forms[0] && i<document.forms[0].elements.length);i++)
+{
+if(document.forms[0] && document.forms[0].elements[i].type=="select-one")
+if(document.forms[0] && document.forms[0].elements[i].length==0)
+document.forms[0].elements[i].style.width="70px";
+}
+}
+//-->
+</SCRIPT>
+
+</form>
+</body>
+</html>

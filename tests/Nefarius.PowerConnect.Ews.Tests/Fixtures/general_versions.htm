@@ -1,0 +1,111 @@
+
+
+
+<html>
+<head>
+<script>
+if(top.DeviceType && top.DeviceType==1)
+{
+document.write("<title>Versions</title>");
+}
+else
+{
+document.write("<title>Versions</title>");
+}
+</script>
+
+
+<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
+<!--
+if(top.location==self.location )
+{
+var refStr=self.location + " ";
+var ind=0;
+refStr.toLowerCase();
+ind=refStr.indexOf("config");
+var locationStr=refStr.substring(0,ind);
+if (opener)
+{
+if (opener.opener)
+{
+if(opener.opener.top.location==opener.opener.location)
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+else
+{
+if(opener.top.location==opener.location)
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+}
+else
+{
+alert("The method by which the window has been opened is not supported and may cause unexpected results.");
+document.location.href=locationStr;
+}
+}
+//-->
+</SCRIPT>
+
+
+<link rel="stylesheet" href="../device/style.css" type="text/css">
+<script src="../js/globalFunctions.js"></script>
+<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
+<!--
+//-->
+</SCRIPT>
+</head>
+<body bgcolor="#FFFFFF" leftmargin="15">
+<script language="JavaScript">top.Draw_Header(document.title);</script>
+
+<FORM METHOD='POST' name="GeneralVersionsForm"  ACTION="/config/general_versions.htm"  >
+<INPUT  Type="HIDDEN" Name="restoreUrl" SIZE=256   value="">
+
+<table id="general_versions_tbl" cellspacing="0" cellpadding="0" border="0" width="100%">
+<script language="JavaScript">
+top.Draw_TableTop(2);top.Draw_TableHeader();
+</script>
+<tr>
+<td nowrap style="width: 10px;height:24px" class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 50%" class="data-area-canvas-odd">Software Version</td>
+<td nowrap class="data-area-canvas-odd">
+
+<INPUT  TYPE=hidden NAME="rndBrgVersion"   value="1.0.0.45" SIZE="20" MAXLENGTH="20">
+
+<script>document.write(document.GeneralVersionsForm.rndBrgVersion.value);</script>
+</td>
+<td nowrap style="width: 5px" class="data-area-canvas">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="width: 10px;height:24px" class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 50%" class="data-area-canvas">Boot Version</td>
+<td nowrap class="data-area-canvas">
+
+<INPUT  TYPE=hidden NAME="rndBaseBootVersion"   value="1.0.0.13" SIZE="20" MAXLENGTH="20">
+
+<script>document.write(document.GeneralVersionsForm.rndBaseBootVersion.value);</script>
+</td>
+<td nowrap style="width: 5px" class="data-area-canvas">&nbsp;</td>
+</tr>
+<tr>
+<td nowrap style="width: 10px;height:24px" class="data-area-canvas">&nbsp;</td>
+<td nowrap style="width: 50%" class="data-area-canvas-odd">Hardware Version</td>
+<td nowrap class="data-area-canvas-odd">
+
+<INPUT  TYPE=hidden NAME="genGroupHWVersion"   value="00.00.03" SIZE="20" MAXLENGTH="20">
+
+<script>document.write(document.GeneralVersionsForm.genGroupHWVersion.value);</script>
+</td>
+<td nowrap style="width: 5px" class="data-area-canvas">&nbsp;</td>
+</tr>
+<script language="JavaScript">top.Draw_TableBottom(2)</script>
+</table>
+
+</form>
+</body>
+</html>
