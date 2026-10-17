@@ -60,6 +60,32 @@ public sealed class VlanPortSettings
 /// </summary>
 public sealed class VlanRepository
 {
+    /// <summary>
+    ///     Controls <c>formSubmit</c> disables before an edit. The switch rejects the post when those
+    ///     client-only fields, especially <c>indexNameRadio</c>, are included. The <c>$add</c> block is for create.
+    /// </summary>
+    internal static readonly string[] OmittedOnEdit =
+    {
+        "indexNameRadio",
+        "dot1qVlanIndex$select",
+        "dot1qVlanStaticName$select",
+        "String$select",
+        "Default$select",
+        "dot1qVlanName",
+        "dot1qVlanStatus$query",
+        "Unauthorized",
+        "RemoveCBox",
+        "dot1qVlanIndex$add",
+        "String$add",
+        "dot1qVlanStaticName$add",
+        "Default$add",
+        "dot1qVlanStaticEgressPorts$add",
+        "dot1qVlanForbiddenEgressPorts$add",
+        "dot1qVlanStaticUntaggedPorts$add",
+        "dot1qVlanStaticRowStatus$add",
+        "VlanMemberStaticVT$endAdd"
+    };
+
     private readonly SwitchClient _client;
 
     /// <summary>Creates a repository bound to a session.</summary>
@@ -170,15 +196,15 @@ public sealed class VlanRepository
         FormPage page = await LoadMembershipAsync(vlanId, cancellationToken).ConfigureAwait(false);
         Dictionary<string, string> mutations = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
-            ["dot1qVlanStaticRowStatus$query"] = "6",
-            ["dot1qVlanIndex$query"] = MibValues.Number(vlanId)
+            ["dot1qVlanStaticRowStatus$query"] = "6"
         };
         ChangePlan plan = new ChangePlan();
         plan.Add(FormChange.Post(
             _client,
             "Delete VLAN " + vlanId.ToString(CultureInfo.InvariantCulture),
             page,
-            mutations));
+            mutations,
+            omit: OmittedOnEdit));
         return plan;
     }
 
@@ -208,8 +234,7 @@ public sealed class VlanRepository
             ["dot1qVlanStaticEgressPorts$query"] = egress,
             ["dot1qVlanStaticUntaggedPorts$query"] = untaggedHex,
             ["dot1qVlanForbiddenEgressPorts$query"] = forbiddenHex,
-            ["dot1qVlanStaticRowStatus$query"] = "1",
-            ["dot1qVlanIndex$query"] = MibValues.Number(vlanId)
+            ["dot1qVlanStaticRowStatus$query"] = "1"
         };
         ChangePlan plan = new ChangePlan();
         plan.Add(FormChange.Post(
@@ -218,7 +243,8 @@ public sealed class VlanRepository
             page,
             mutations,
             verifyPath: MembershipUrl(vlanId),
-            verify: after => after.Query("dot1qVlanStaticEgressPorts") == egress ? null : "Egress bitmap did not stick"));
+            verify: after => after.Query("dot1qVlanStaticEgressPorts") == egress ? null : "Egress bitmap did not stick",
+            omit: OmittedOnEdit));
         return plan;
     }
 

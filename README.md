@@ -6,6 +6,9 @@
 
 `pc28xx` configures a Dell PowerConnect 28xx switch through its built-in web UI.
 
+> [!NOTE]
+> Ahoy, traveler! 👋 This project has been "vibe-coded", meaning that the vast majority of the code has been written with the assistance of AI coding agents. I use my own work in production and value stability and security. Bear in mind, though, that the code you browse might not be an accurate reflection of my personal "style" or taste. The primary goal was to make a useful product, quickly, rather than focus on the development process itself. With that out of the way, if you find it useful, feel free to get inspired by it 😁
+
 ## About
 
 The 2816 has no SSH and no documented API. Everything the browser can change is a form post to the GoAhead web server that ships with the Marvell EWS framework. This repository is a client for that interface:
