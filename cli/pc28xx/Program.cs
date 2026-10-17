@@ -5,6 +5,7 @@ using System.Text;
 using Nefarius.PowerConnect.Cli;
 using Nefarius.PowerConnect.Ews;
 using Nefarius.PowerConnect.Ews.Changes;
+using Nefarius.PowerConnect.Ews.Dhcp;
 using Nefarius.PowerConnect.Ews.Ews;
 using Nefarius.PowerConnect.Ews.Ports;
 using Nefarius.PowerConnect.Ews.Qos;
@@ -517,11 +518,11 @@ Bind(Add(staticHost, "list", "List static hosts"), async (device, session, token
     return 0;
 });
 BindParse(Add(staticHost, "add", "Add a static host", hostAddress, hostMac, hostName), async (device, session, token, parse) =>
-    await Apply(device, session, await device.Dhcp.PlanStaticAsync(parse.GetValue(hostAddress)!, parse.GetValue(hostMac) ?? "", parse.GetValue(hostName), false, token).ConfigureAwait(false)).ConfigureAwait(false));
+    await Apply(device, session, await device.Dhcp.PlanStaticAsync(parse.GetValue(hostAddress)!, parse.GetValue(hostMac) ?? "", parse.GetValue(hostName), DhcpStaticAction.Add, token).ConfigureAwait(false)).ConfigureAwait(false));
 BindParse(Add(staticHost, "set", "Update a static host", hostAddress, hostMac, hostName), async (device, session, token, parse) =>
-    await Apply(device, session, await device.Dhcp.PlanStaticAsync(parse.GetValue(hostAddress)!, parse.GetValue(hostMac) ?? "", parse.GetValue(hostName), false, token).ConfigureAwait(false)).ConfigureAwait(false));
+    await Apply(device, session, await device.Dhcp.PlanStaticAsync(parse.GetValue(hostAddress)!, parse.GetValue(hostMac) ?? "", parse.GetValue(hostName), DhcpStaticAction.Update, token).ConfigureAwait(false)).ConfigureAwait(false));
 BindParse(Add(staticHost, "delete", "Delete a static host", hostAddress), async (device, session, token, parse) =>
-    await Apply(device, session, await device.Dhcp.PlanStaticAsync(parse.GetValue(hostAddress)!, "", null, true, token).ConfigureAwait(false)).ConfigureAwait(false));
+    await Apply(device, session, await device.Dhcp.PlanStaticAsync(parse.GetValue(hostAddress)!, "", null, DhcpStaticAction.Delete, token).ConfigureAwait(false)).ConfigureAwait(false));
 Command bindings = Add(dhcp, "bindings", "Address bindings");
 Bind(Add(bindings, "list", "List bindings"), async (device, session, token) =>
 {

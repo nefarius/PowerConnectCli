@@ -5,6 +5,19 @@ using Nefarius.PowerConnect.Ews.Http;
 
 namespace Nefarius.PowerConnect.Ews.Dhcp;
 
+/// <summary>Create, update, or delete one static DHCP host.</summary>
+public enum DhcpStaticAction
+{
+    /// <summary>Post the <c>$add</c> fields with create-and-go status.</summary>
+    Add,
+
+    /// <summary>Post the selected row's <c>$query</c> fields with active status.</summary>
+    Update,
+
+    /// <summary>Post the <c>$add</c> fields with destroy status.</summary>
+    Delete
+}
+
 /// <summary>On-box DHCP server.</summary>
 public sealed class DhcpRepository
 {
@@ -152,28 +165,48 @@ public sealed class DhcpRepository
             cancellationToken);
     }
 
-    /// <summary>Plans a static host binding.</summary>
+    /// <summary>Plans a static host create, update, or delete.</summary>
     public async Task<ChangePlan> PlanStaticAsync(
         string address,
         string mac,
         string? name,
-        bool delete,
+        DhcpStaticAction action,
         CancellationToken cancellationToken = default)
     {
-        FormPage page = await StaticHostsAsync(cancellationToken).ConfigureAwait(false);
+        string path = action == DhcpStaticAction.Update
+            ? "/config/DHCPSrv_Static_Host.htm?[DHCPIPVT]Filter:rlDhcpSrvIpAddrMechanism=1^Query:rlDhcpSrvIpAddrIpAddr=" + Uri.EscapeDataString(address)
+            : "/config/DHCPSrv_Static_Host.htm?[DHCPIPVT]Filter:rlDhcpSrvIpAddrMechanism=1";
+        FormPage page = await _client.GetFormAsync(path, cancellationToken).ConfigureAwait(false);
+        string suffix = action == DhcpStaticAction.Update ? "$query" : "$add";
+        string status = action switch
+        {
+            DhcpStaticAction.Delete => "6",
+            DhcpStaticAction.Update => "1",
+            _ => "4"
+        };
         Dictionary<string, string> mutations = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
-            ["rlDhcpSrvIpAddrIpAddr$add"] = address,
-            ["rlDhcpSrvIpAddrIdentifier$add"] = mac,
-            ["rlDhcpSrvIpAddrRowStatus$add"] = delete ? "6" : "4"
+            ["rlDhcpSrvIpAddrIpAddr" + suffix] = address,
+            ["rlDhcpSrvIpAddrRowStatus" + suffix] = status
         };
-        if (name != null)
+        if (action != DhcpStaticAction.Update || mac.Length > 0)
         {
-            mutations["rlDhcpSrvIpAddrClnHostName$add"] = name;
+            mutations["rlDhcpSrvIpAddrIdentifier" + suffix] = mac;
         }
 
+        if (name != null)
+        {
+            mutations["rlDhcpSrvIpAddrClnHostName" + suffix] = name;
+        }
+
+        string verb = action switch
+        {
+            DhcpStaticAction.Delete => "Delete",
+            DhcpStaticAction.Update => "Update",
+            _ => "Add"
+        };
         ChangePlan plan = new ChangePlan();
-        plan.Add(FormChange.Post(_client, (delete ? "Delete" : "Set") + " DHCP static host " + address, page, mutations));
+        plan.Add(FormChange.Post(_client, verb + " DHCP static host " + address, page, mutations));
         return plan;
     }
 
