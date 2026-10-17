@@ -1,0 +1,47 @@
+name: Publish Nuget Package
+
+on:
+  push:
+    tags:
+      - v*
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .Net SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.x
+
+      - name: Modify README.md for NuGet
+        run: |
+          sed -i 's/# <img[^>]*>/# /' README.md
+
+      - name: Build
+        run: dotnet build -c Release
+
+      - name: Test
+        run: dotnet test -c Release --no-build
+
+      - name: Make Nuget Packages
+        run: dotnet pack -c Release --no-build -o artifacts
+
+      - name: NuGet login (OIDC -> temp API key)
+        uses: NuGet/login@v1
+        id: login
+        with:
+          user: nefarius
+
+      - name: Publish library to NuGet
+        run: dotnet nuget push artifacts/Nefarius.PowerConnect.Ews.*.nupkg --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json
+
+      - name: Publish tool to NuGet
+        run: dotnet nuget push artifacts/Nefarius.PowerConnect.CLI.*.nupkg --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json

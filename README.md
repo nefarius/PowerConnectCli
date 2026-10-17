@@ -2,6 +2,7 @@
 
 [![.NET](https://github.com/nefarius/PowerConnectCli/actions/workflows/build.yml/badge.svg)](https://github.com/nefarius/PowerConnectCli/actions/workflows/build.yml)
 [![Nuget](https://img.shields.io/nuget/v/Nefarius.PowerConnect.Ews)](https://www.nuget.org/packages/Nefarius.PowerConnect.Ews/)
+[![Nuget](https://img.shields.io/nuget/v/Nefarius.PowerConnect.CLI)](https://www.nuget.org/packages/Nefarius.PowerConnect.CLI/)
 [![Assisted by Cursor AI](https://img.shields.io/badge/Assisted%20by-Cursor%20AI-8B5CF6?style=flat)](https://cursor.com/)
 
 `pc28xx` configures a Dell PowerConnect 28xx switch through its built-in web UI.
@@ -17,6 +18,17 @@ The 2816 has no SSH and no documented API. Everything the browser can change is 
 - `pc28xx` is the command-line front end. Writes are printed and wait for confirmation. `--dry-run` never posts. `--yes` skips the prompt.
 
 The switch speaks plain HTTP. The password and every setting travel in cleartext on the LAN, and the session cookie is bound to the client IP. The web UI only allows a few sessions at once. Each command logs out when it finishes; leave a few seconds between commands so the switch can free the previous session.
+
+## Install
+
+`pc28xx` is published as the [`Nefarius.PowerConnect.CLI`](https://www.nuget.org/packages/Nefarius.PowerConnect.CLI/) .NET tool. The .NET 10 SDK is required.
+
+```text
+dotnet tool install --global Nefarius.PowerConnect.CLI
+dotnet tool update --global Nefarius.PowerConnect.CLI
+dotnet tool uninstall --global Nefarius.PowerConnect.CLI
+pc28xx --help
+```
 
 ## Usage
 
@@ -55,9 +67,12 @@ Port lists are hex bitmaps. Bit index equals ifIndex minus one, most significant
 ```text
 ./build.sh Compile
 ./build.sh Test
+./build.sh Pack
 ./build.sh PublishLinux
 ./build.sh PublishWindows
 ```
+
+`./build.sh Pack` writes `Nefarius.PowerConnect.Ews` and `Nefarius.PowerConnect.CLI` to `artifacts/`. A `v*` tag publishes both packages to nuget.org.
 
 Publish profiles under `cli/pc28xx/Properties/PublishProfiles` produce a self-contained single-file binary for `linux-x64` and `win-x64`.
 

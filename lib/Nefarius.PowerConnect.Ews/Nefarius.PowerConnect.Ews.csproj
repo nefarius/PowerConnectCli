@@ -6,6 +6,10 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <RootNamespace>Nefarius.PowerConnect.Ews</RootNamespace>
         <AssemblyName>Nefarius.PowerConnect.Ews</AssemblyName>
+        <PackageId>Nefarius.PowerConnect.Ews</PackageId>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <RepositoryUrl>https://github.com/nefarius/PowerConnectCli</RepositoryUrl>
+        <PackageProjectUrl>https://github.com/nefarius/PowerConnectCli</PackageProjectUrl>
         <Description>Client library for the Dell PowerConnect 28xx embedded web UI.</Description>
         <PackageTags>dell;powerconnect;networking;vlan</PackageTags>
         <MinVerTagPrefix>v</MinVerTagPrefix>
