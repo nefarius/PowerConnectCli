@@ -74,12 +74,12 @@ class Build : NukeBuild
 
     [UsedImplicitly]
     Target Pack => _ => _
-        .Description("Pack Nefarius.PowerConnect.Ews")
+        .Description("Pack Nefarius.PowerConnect.Ews and Nefarius.PowerConnect.CLI")
         .DependsOn(Compile)
         .Executes(() =>
         {
             DotNetTasks.DotNetPack(s => s
-                .SetProject(Solution.GetAllProjects("Nefarius.PowerConnect.Ews").Single())
+                .SetProject(Solution)
                 .SetConfiguration(Configuration.Release)
                 .SetOutput(RootDirectory / "artifacts"));
         });

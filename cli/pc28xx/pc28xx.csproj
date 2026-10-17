@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
@@ -7,11 +7,34 @@
         <Nullable>enable</Nullable>
         <AssemblyName>pc28xx</AssemblyName>
         <RootNamespace>Nefarius.PowerConnect.Cli</RootNamespace>
-        <IsPackable>false</IsPackable>
         <LangVersion>latest</LangVersion>
+
+        <IsPackable>true</IsPackable>
+        <PackAsTool>true</PackAsTool>
+        <ToolCommandName>pc28xx</ToolCommandName>
+        <PackageId>Nefarius.PowerConnect.CLI</PackageId>
+        <Authors>Benjamin Höglinger-Stelzer</Authors>
+        <Copyright>Copyright © Benjamin Höglinger-Stelzer 2026</Copyright>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <RepositoryUrl>https://github.com/nefarius/PowerConnectCli</RepositoryUrl>
+        <PackageProjectUrl>https://github.com/nefarius/PowerConnectCli</PackageProjectUrl>
+        <Description>Command-line tool for configuring a Dell PowerConnect 28xx switch through its embedded web UI.</Description>
+        <PackageTags>dell;powerconnect;networking;vlan;cli;dotnet-tool</PackageTags>
+        <PackageIcon>NSS-128x128.png</PackageIcon>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <MinVerTagPrefix>v</MinVerTagPrefix>
     </PropertyGroup>
 
     <ItemGroup>
+        <None Include="$(MSBuildThisFileDirectory)..\..\assets\NSS-128x128.png" Pack="true" PackagePath="\" />
+        <None Include="$(MSBuildThisFileDirectory)..\..\README.md" Pack="true" PackagePath="\" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="MinVer" Version="6.0.0">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
         <PackageReference Include="Serilog" Version="4.3.0" />
         <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
         <PackageReference Include="Spectre.Console" Version="0.51.1" />
