@@ -56,4 +56,16 @@ public sealed class ChangePlanTests
         Assert.Equal("***", diff.After);
         Assert.True(diff.Changed);
     }
+
+    [Theory]
+    [InlineData("rlRadiusServerInetKey$add")]
+    [InlineData("rlRadiusServerInetKey$query")]
+    public void RadiusKeyDiffsAreRedacted(string field)
+    {
+        FieldDiff diff = new FieldDiff(field, "", "secret");
+
+        Assert.Equal("", diff.Before);
+        Assert.Equal("***", diff.After);
+        Assert.True(diff.Changed);
+    }
 }

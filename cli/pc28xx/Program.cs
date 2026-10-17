@@ -1,5 +1,6 @@
 ﻿using System.CommandLine;
 using System.Globalization;
+using System.Text;
 
 using Nefarius.PowerConnect.Cli;
 using Nefarius.PowerConnect.Ews;
@@ -743,15 +744,7 @@ static string? ReadUserPassword(bool requested)
         return null;
     }
 
-    string password;
-    if (AnsiConsole.Profile.Capabilities.Interactive && !Console.IsInputRedirected)
-    {
-        password = AnsiConsole.Prompt(new TextPrompt<string>("User password:").Secret());
-    }
-    else
-    {
-        password = Console.ReadLine() ?? "";
-    }
+    string password = Console.IsInputRedirected ? Console.ReadLine() ?? "" : ReadSecretLine();
 
     if (password.Length == 0)
     {
@@ -759,6 +752,41 @@ static string? ReadUserPassword(bool requested)
     }
 
     return password;
+}
+
+static string ReadSecretLine()
+{
+    if (AnsiConsole.Profile.Capabilities.Interactive)
+    {
+        return AnsiConsole.Prompt(new TextPrompt<string>("User password:").Secret());
+    }
+
+    Console.Error.Write("User password: ");
+    StringBuilder builder = new StringBuilder();
+    while (true)
+    {
+        ConsoleKeyInfo key = Console.ReadKey(intercept: true);
+        if (key.Key == ConsoleKey.Enter)
+        {
+            Console.Error.WriteLine();
+            return builder.ToString();
+        }
+
+        if (key.Key == ConsoleKey.Backspace)
+        {
+            if (builder.Length > 0)
+            {
+                builder.Length--;
+            }
+
+            continue;
+        }
+
+        if (!char.IsControl(key.KeyChar))
+        {
+            builder.Append(key.KeyChar);
+        }
+    }
 }
 
 async Task<int> RadiusPlan(SwitchDevice device, CliSession session, CancellationToken token, ParseResult parse, RadiusRowAction action)

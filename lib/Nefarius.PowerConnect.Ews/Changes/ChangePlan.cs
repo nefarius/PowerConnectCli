@@ -1,5 +1,6 @@
 using Nefarius.PowerConnect.Ews.Ews;
 using Nefarius.PowerConnect.Ews.Http;
+using Nefarius.PowerConnect.Ews.Snapshot;
 
 namespace Nefarius.PowerConnect.Ews.Changes;
 
@@ -31,9 +32,7 @@ public sealed class FieldDiff
 
     private static string Redact(string field, string value)
     {
-        if (field.Contains("password", StringComparison.OrdinalIgnoreCase) ||
-            field.Contains("keystring", StringComparison.OrdinalIgnoreCase) ||
-            field.Contains("CommunityString", StringComparison.OrdinalIgnoreCase))
+        if (ConfigSnapshot.IsSensitive(field))
         {
             return value.Length == 0 ? "" : "***";
         }
