@@ -109,7 +109,7 @@ public sealed class FormPage
             fields.Add(new FormField
             {
                 Name = name,
-                Value = value.Trim(),
+                Value = Normalize(value),
                 Disabled = disabled,
                 InputType = inputType,
                 Checked = isChecked || string.Equals(inputType, "radio", StringComparison.Ordinal) && isChecked,
@@ -222,15 +222,15 @@ public sealed class FormPage
         foreach (IGrouping<string, FormField> group in _fields.GroupBy(field => field.Name, StringComparer.OrdinalIgnoreCase))
         {
             string name = group.First().Name;
-            if (omit != null && omit.Contains(name, StringComparer.OrdinalIgnoreCase))
-            {
-                continue;
-            }
-
             if (changes.TryGetValue(name, out string? mutated))
             {
                 body.Add(new KeyValuePair<string, string>(name, mutated));
                 emitted.Add(name);
+                continue;
+            }
+
+            if (omit != null && omit.Contains(name, StringComparer.OrdinalIgnoreCase))
+            {
                 continue;
             }
 
@@ -274,6 +274,15 @@ public sealed class FormPage
             return collector.Value.Trim();
         }
 
+        foreach (FormField field in _fields)
+        {
+            if (field.Name.StartsWith("mibError", StringComparison.OrdinalIgnoreCase) &&
+                !string.IsNullOrWhiteSpace(field.Value))
+            {
+                return field.Value.Replace('\u00a0', ' ').Trim();
+            }
+        }
+
         return null;
     }
 
@@ -286,6 +295,11 @@ public sealed class FormPage
         {
             throw new Nefarius.PowerConnect.Ews.Http.SwitchException("The switch returned a Document Error page.");
         }
+    }
+
+    private static string Normalize(string value)
+    {
+        return value.Replace('\u00a0', ' ').Trim();
     }
 
     private static bool IsCheckable(FormField field)

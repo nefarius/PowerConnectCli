@@ -72,7 +72,12 @@ public sealed class PortUpdate
 /// <summary>Port Configuration page.</summary>
 public sealed class PortRepository
 {
-    private static readonly string[] OperationalFields =
+    /// <summary>
+    ///     Fields the page script disables before submit. Unchanged query fields are in this list too:
+    ///     posting them (for example speed 0 while auto-negotiation is on) makes the switch ignore the write.
+    ///     Mutated names are still sent.
+    /// </summary>
+    internal static readonly string[] OmittedUnlessMutated =
     {
         "ifOperStatus$query",
         "ifSpeed$query",
@@ -82,7 +87,22 @@ public sealed class PortRepository
         "swIfOperFlowControlMode$query",
         "swIfOperMdix$query",
         "swIfOperSuspendedStatus$query",
-        "swIfReActivateCB"
+        "swIfReActivateCB",
+        "swIfSpeedAdminMode$select",
+        "swIfDuplexAdminMode$select",
+        "ifIndex$select",
+        "adminAdvertisementFlags",
+        "ifAdminStatus$query",
+        "swIfSpeedAdminMode$query",
+        "swIfDuplexAdminMode$query",
+        "swIfSpeedDuplexAutoNegotiation$query",
+        "swIfBackPressureMode$query",
+        "swIfFlowControlMode$query",
+        "swIfAdminMdix$query",
+        "swIfType$query",
+        "swIfTransceiverType$query",
+        "rlPhdPortsModuleNumber$query",
+        "ifAlias$query"
     };
 
     private readonly SwitchClient _client;
@@ -169,7 +189,7 @@ public sealed class PortRepository
             {
                 if (update.Description != null && (after.Query("ifAlias") ?? "") != update.Description)
                 {
-                    return "Description did not stick";
+                    return "Description did not stick (read '" + (after.Query("ifAlias") ?? "") + "')";
                 }
 
                 if (update.AdminUp.HasValue && after.Query("ifAdminStatus") != (update.AdminUp.Value ? "1" : "2"))
@@ -179,7 +199,7 @@ public sealed class PortRepository
 
                 return null;
             },
-            omit: OperationalFields));
+            omit: OmittedUnlessMutated));
         return plan;
     }
 
