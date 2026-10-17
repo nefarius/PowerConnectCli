@@ -152,6 +152,11 @@ public sealed class PortRepository
             mutations["swIfSpeedDuplexAutoNegotiation$query"] = MibValues.Enable(update.AutoNegotiation.Value);
         }
 
+        if (update.SpeedMegabits.HasValue && update.AutoNegotiation == true)
+        {
+            throw new FormatException("Speed cannot be set while auto-negotiation is on.");
+        }
+
         if (update.SpeedMegabits.HasValue)
         {
             mutations["swIfSpeedAdminMode$query"] = MibValues.Speed(update.SpeedMegabits.Value);

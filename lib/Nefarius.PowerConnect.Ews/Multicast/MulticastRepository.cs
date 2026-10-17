@@ -169,6 +169,33 @@ public sealed class MulticastRepository
         return _client.GetFormAsync("/config/igmp_router_table.htm", cancellationToken);
     }
 
+    /// <summary>
+    ///     Plans the static forward-all port bitmap for one VLAN. Null ports only select the VLAN.
+    /// </summary>
+    public async Task<ChangePlan> PlanForwardAllAsync(
+        int vlanId,
+        IReadOnlyList<PortName>? ports,
+        CancellationToken cancellationToken = default)
+    {
+        FormPage page = await ForwardAllAsync(cancellationToken).ConfigureAwait(false);
+        Dictionary<string, string> mutations = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["OneVlanId"] = MibValues.Number(vlanId)
+        };
+        if (ports != null)
+        {
+            mutations["dot1qForwardAllStaticPorts$query"] = PortList.Encode(ports);
+        }
+
+        ChangePlan plan = new ChangePlan();
+        plan.Add(FormChange.Post(
+            _client,
+            "Set forward-all for VLAN " + vlanId.ToString(CultureInfo.InvariantCulture),
+            page,
+            mutations));
+        return plan;
+    }
+
     private static string SnoopUrl(int vlanId)
     {
         return EwsUrl.Config(

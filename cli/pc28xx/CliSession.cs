@@ -50,7 +50,9 @@ internal sealed class CliSession
             DryRun = DryRun,
             IUnderstand = IUnderstand,
             WriteLine = write,
-            ConfirmAsync = plan => Task.FromResult(AnsiConsole.Confirm("Apply these changes?"))
+            ConfirmAsync = AnsiConsole.Profile.Capabilities.Interactive && !Console.IsInputRedirected
+                ? plan => Task.FromResult(AnsiConsole.Confirm("Apply these changes?"))
+                : null
         };
     }
 }

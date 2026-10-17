@@ -12,6 +12,7 @@ public sealed class FieldDiff
     public FieldDiff(string field, string before, string after)
     {
         Field = field;
+        Changed = !string.Equals(before, after, StringComparison.Ordinal);
         Before = Redact(field, before);
         After = Redact(field, after);
     }
@@ -25,8 +26,8 @@ public sealed class FieldDiff
     /// <summary>Value that would be posted.</summary>
     public string After { get; }
 
-    /// <summary>True when the displayed values differ.</summary>
-    public bool Changed => !string.Equals(Before, After, StringComparison.Ordinal);
+    /// <summary>True when the raw values differ. Display values may both be redacted.</summary>
+    public bool Changed { get; }
 
     private static string Redact(string field, string value)
     {

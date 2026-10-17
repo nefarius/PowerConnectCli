@@ -20,6 +20,8 @@ public sealed class UserRepository
     public async Task<IReadOnlyList<IReadOnlyDictionary<string, string>>> ListAsync(CancellationToken cancellationToken = default)
     {
         FormPage page = await _client.GetFormAsync("/config/sec_db.htm", cancellationToken).ConfigureAwait(false);
+        string? queried = page.Query("rlAAALocalUserName");
+        string level = page.Query("rlAAALocalUserPrivilage") ?? "";
         List<Dictionary<string, string>> users = new List<Dictionary<string, string>>();
         foreach (SelectOption option in page.Options("rlAAALocalUserName$select"))
         {
@@ -28,11 +30,16 @@ public sealed class UserRepository
                 continue;
             }
 
-            users.Add(new Dictionary<string, string>
+            Dictionary<string, string> user = new Dictionary<string, string>
             {
-                ["name"] = option.Text.Trim(),
-                ["level"] = page.Query("rlAAALocalUserPrivilage") ?? ""
-            });
+                ["name"] = option.Text.Trim()
+            };
+            if (string.Equals(option.Text.Trim(), queried, StringComparison.Ordinal))
+            {
+                user["level"] = level;
+            }
+
+            users.Add(user);
         }
 
         if (users.Count == 0 && page.Query("rlAAALocalUserName") is string current && current.Length > 0)

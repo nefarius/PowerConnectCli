@@ -38,6 +38,24 @@ public sealed class PortListTests
         Assert.Contains("ch8", names);
     }
 
+    [Fact]
+    public void MembershipUpdatesKeepUnknownIfIndexes()
+    {
+        string unknown = "000080" + new string('0', PortList.DefaultHexLength - 6);
+        (string egress, string untagged, string forbidden) = PortList.UpdateMembership(
+            unknown,
+            unknown,
+            "0",
+            new[] { PortName.Parse("g1") },
+            Array.Empty<PortName>(),
+            Array.Empty<PortName>(),
+            Array.Empty<PortName>());
+
+        Assert.StartsWith("800080", egress);
+        Assert.StartsWith("000080", untagged);
+        Assert.Equal(PortList.DefaultHexLength, forbidden.Length);
+    }
+
     [Theory]
     [InlineData("g1", 1)]
     [InlineData("g16", 16)]

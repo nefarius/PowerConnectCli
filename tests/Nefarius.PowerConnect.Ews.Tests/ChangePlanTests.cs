@@ -54,5 +54,6 @@ public sealed class ChangePlanTests
 
         Assert.Equal("***", diff.Before);
         Assert.Equal("***", diff.After);
+        Assert.True(diff.Changed);
     }
 }

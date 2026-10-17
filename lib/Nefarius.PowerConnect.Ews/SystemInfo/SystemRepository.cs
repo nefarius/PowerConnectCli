@@ -121,15 +121,19 @@ public sealed class SystemRepository
     {
         FormPage page = await _client.GetFormAsync("/config/tun_general.htm", cancellationToken).ConfigureAwait(false);
         ChangePlan plan = new ChangePlan();
+        string expected = MibValues.Enable(enabled);
         plan.Add(FormChange.Post(
             _client,
             "Set jumbo frames " + (enabled ? "on" : "off") + " after reset",
             page,
             new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
             {
-                ["rlJumboFramesStatusAfterReset"] = MibValues.Enable(enabled)
+                ["rlJumboFramesStatusAfterReset"] = expected
             },
-            verifyPath: "/config/tun_general.htm"));
+            verifyPath: "/config/tun_general.htm",
+            verify: after => after.ValueOf("rlJumboFramesStatusAfterReset") == expected
+                ? null
+                : "Jumbo frames did not stick"));
         return plan;
     }
 }

@@ -91,7 +91,7 @@ BindParse(Add(port, "set", "Change port settings. With no options this resubmits
 {
     PortUpdate update = new PortUpdate
     {
-        AdminUp = parse.GetValue(admin) is string adminText ? adminText.Equals("up", StringComparison.OrdinalIgnoreCase) : null,
+        AdminUp = parse.GetValue(admin) is string adminText ? ParseAdmin(adminText) : null,
         SpeedMegabits = parse.GetValue(speed),
         Duplex = parse.GetValue(duplex),
         AutoNegotiation = parse.GetValue(autoneg) is string autoText ? On(autoText) : null,
@@ -276,13 +276,9 @@ Bind(Add(forwardAll, "show", "Show forward-all"), async (device, session, token)
 });
 BindParse(Add(forwardAll, "set", "Set forward-all ports", groupVlan, groupPorts), async (device, session, token, parse) =>
 {
-    FormPage page = await device.Multicast.ForwardAllAsync(token).ConfigureAwait(false);
-    ChangePlan plan = new ChangePlan();
-    plan.Add(FormChange.Post(device.Client, "Set forward-all", page, new Dictionary<string, string>
-    {
-        ["OneVlanId"] = parse.GetValue(groupVlan).ToString(CultureInfo.InvariantCulture)
-    }));
-    return await Apply(device, session, plan).ConfigureAwait(false);
+    string? portText = parse.GetValue(groupPorts);
+    IReadOnlyList<PortName>? ports = portText == null ? null : PortName.ParseList(portText);
+    return await Apply(device, session, await device.Multicast.PlanForwardAllAsync(parse.GetValue(groupVlan), ports, token).ConfigureAwait(false)).ConfigureAwait(false);
 });
 Command igmpSnoop = Add(root, "igmp-snooping", "IGMP snooping per VLAN");
 Option<string?> autoLearn = new("--auto-learn") { Description = "on or off" };
@@ -319,7 +315,7 @@ BindParse(Add(dot1x, "show", "Show 802.1X", dot1xPort), async (device, session, 
 });
 BindParse(Add(dot1x, "set", "Set 802.1X port control", dot1xPort, control, reauth), async (device, session, token, parse) =>
     await Apply(device, session, await device.Dot1x.PlanPortAsync(
-        PortName.Parse(parse.GetValue(dot1xPort) ?? "g1"),
+        PortName.Parse(parse.GetValue(dot1xPort) ?? throw new FormatException("--port is required.")),
         parse.GetValue(control),
         parse.GetValue(reauth) is string reauthText ? On(reauthText) : null,
         token).ConfigureAwait(false)).ConfigureAwait(false));
@@ -387,7 +383,7 @@ Bind(Add(diag, "transceiver", "Show transceiver diagnostics"), async (device, se
 
 Command users = Add(root, "users", "Local users");
 Argument<string> userNameArg = new("name") { Description = "User name" };
-Option<string?> userPassword = new("--password") { Description = "User password" };
+Option<string?> userPassword = new("--user-password") { Description = "User password" };
 Option<int?> level = new("--level") { Description = "Privilege level" };
 Bind(Add(users, "list", "List users"), async (device, session, token) =>
 {
@@ -405,7 +401,7 @@ Command radius = Add(root, "radius", "RADIUS servers");
 Argument<string> radiusAddress = new("address") { Description = "Server address" };
 Option<string?> radiusKey = new("--key");
 Option<int?> authPort = new("--auth-port");
-Option<int?> radiusTimeout = new("--timeout");
+Option<int?> radiusTimeout = new("--radius-timeout");
 Option<int?> retries = new("--retries");
 Bind(Add(radius, "list", "List RADIUS settings"), async (device, session, token) =>
 {
@@ -472,17 +468,18 @@ Bind(Add(file, "restore-defaults", "Restore configuration factory defaults"), as
 Command dhcp = Add(root, "dhcp-server", "DHCP server");
 Option<string?> dhcpEnable = new("--enable") { Description = "on or off" };
 Option<string?> probe = new("--probe") { Description = "on or off" };
+Option<int?> probeTimeout = new("--probe-timeout");
 Bind(Add(dhcp, "show", "Show DHCP server properties"), async (device, session, token) =>
 {
     TextOutput.Write(await device.Dhcp.GetPropertiesAsync(token).ConfigureAwait(false), session.Json);
     return 0;
 });
-BindParse(Add(dhcp, "set", "Set DHCP server properties", dhcpEnable, probe, retries, radiusTimeout), async (device, session, token, parse) =>
+BindParse(Add(dhcp, "set", "Set DHCP server properties", dhcpEnable, probe, retries, probeTimeout), async (device, session, token, parse) =>
     await Apply(device, session, await device.Dhcp.PlanPropertiesAsync(
         parse.GetValue(dhcpEnable) is string dhcpOn ? On(dhcpOn) : null,
         parse.GetValue(probe) is string probeText ? On(probeText) : null,
         parse.GetValue(retries),
-        parse.GetValue(radiusTimeout),
+        parse.GetValue(probeTimeout),
         token).ConfigureAwait(false)).ConfigureAwait(false));
 Command pool = Add(dhcp, "pool", "Network pool");
 Option<string?> poolStart = new("--start");
@@ -680,7 +677,33 @@ return await root.Parse(args).InvokeAsync().ConfigureAwait(false);
 
 static bool On(string text)
 {
-    return text.Trim().ToLowerInvariant() is "on" or "enable" or "true" or "1";
+    string normalized = text.Trim().ToLowerInvariant();
+    if (normalized is "on" or "enable" or "true" or "1")
+    {
+        return true;
+    }
+
+    if (normalized is "off" or "disable" or "false" or "0")
+    {
+        return false;
+    }
+
+    throw new FormatException("Expected on or off, got '" + text + "'.");
+}
+
+static bool ParseAdmin(string text)
+{
+    if (text.Equals("up", StringComparison.OrdinalIgnoreCase))
+    {
+        return true;
+    }
+
+    if (text.Equals("down", StringComparison.OrdinalIgnoreCase))
+    {
+        return false;
+    }
+
+    throw new FormatException("Admin status must be up or down.");
 }
 
 static Dictionary<string, string> Fields(FormPage page)

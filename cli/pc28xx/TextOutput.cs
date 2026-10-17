@@ -24,7 +24,7 @@ internal static class TextOutput
             table.AddColumn("Value");
             foreach (KeyValuePair<string, string> pair in map)
             {
-                table.AddRow(pair.Key, pair.Value);
+                table.AddRow(Markup.Escape(pair.Key), Markup.Escape(pair.Value));
             }
 
             AnsiConsole.Write(table);
@@ -66,12 +66,12 @@ internal static class TextOutput
             Table grid = new Table();
             foreach (string column in rows[0].Keys)
             {
-                grid.AddColumn(column);
+                grid.AddColumn(Markup.Escape(column));
             }
 
             foreach (Dictionary<string, string> row in rows)
             {
-                grid.AddRow(row.Values.ToArray());
+                grid.AddRow(row.Values.Select(Markup.Escape).ToArray());
             }
 
             AnsiConsole.Write(grid);
@@ -93,7 +93,7 @@ internal static class TextOutput
                 table.AddColumn("Value");
                 foreach (KeyValuePair<string, string> pair in properties)
                 {
-                    table.AddRow(pair.Key, pair.Value);
+                    table.AddRow(Markup.Escape(pair.Key), Markup.Escape(pair.Value));
                 }
 
                 AnsiConsole.Write(table);

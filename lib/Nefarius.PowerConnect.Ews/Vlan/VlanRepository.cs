@@ -271,7 +271,12 @@ public sealed class VlanRepository
         if (frameType != null)
         {
             string normalized = frameType.Trim().ToLowerInvariant();
-            mutations["dot1qPortAcceptableFrameTypes$query"] = normalized is "tagged-only" or "tagged" ? "2" : "1";
+            mutations["dot1qPortAcceptableFrameTypes$query"] = normalized switch
+            {
+                "tagged-only" or "tagged" => "2",
+                "admit-all" or "all" => "1",
+                _ => throw new FormatException("Frame type must be admit-all or tagged-only.")
+            };
         }
 
         if (ingressFiltering.HasValue)
@@ -305,26 +310,6 @@ public sealed class VlanRepository
     {
         IReadOnlyList<VlanSummary> vlans = await ListAsync(cancellationToken).ConfigureAwait(false);
         ChangePlan plan = new ChangePlan();
-        foreach (VlanSummary vlan in vlans)
-        {
-            if (vlan.Id == vlanId)
-            {
-                continue;
-            }
-
-            ChangePlan removal = await PlanSetAsync(
-                vlan.Id,
-                Array.Empty<PortName>(),
-                Array.Empty<PortName>(),
-                Array.Empty<PortName>(),
-                new[] { port },
-                cancellationToken).ConfigureAwait(false);
-            foreach (ChangeStep step in removal.Steps)
-            {
-                plan.Add(step);
-            }
-        }
-
         ChangePlan add = await PlanSetAsync(
             vlanId,
             Array.Empty<PortName>(),
@@ -341,6 +326,34 @@ public sealed class VlanRepository
         foreach (ChangeStep step in pvid.Steps)
         {
             plan.Add(step);
+        }
+
+        foreach (VlanSummary vlan in vlans)
+        {
+            if (vlan.Id == vlanId)
+            {
+                continue;
+            }
+
+            VlanDetails details = await GetAsync(vlan.Id, cancellationToken).ConfigureAwait(false);
+            if (!details.Egress.Contains(port.Name, StringComparer.OrdinalIgnoreCase) &&
+                !details.Untagged.Contains(port.Name, StringComparer.OrdinalIgnoreCase) &&
+                !details.Forbidden.Contains(port.Name, StringComparer.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            ChangePlan removal = await PlanSetAsync(
+                vlan.Id,
+                Array.Empty<PortName>(),
+                Array.Empty<PortName>(),
+                Array.Empty<PortName>(),
+                new[] { port },
+                cancellationToken).ConfigureAwait(false);
+            foreach (ChangeStep step in removal.Steps)
+            {
+                plan.Add(step);
+            }
         }
 
         return plan;

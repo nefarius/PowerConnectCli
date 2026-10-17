@@ -49,6 +49,16 @@ public sealed class FormPageTests
         Assert.Equal("/config/port_config.htm", page.Action);
     }
 
+    [Fact]
+    public void EnabledTextareaUsesItsContent()
+    {
+        const string html = "<form><textarea name=\"note$query\">line one</textarea><textarea name=\"locked$query\" disabled value=\"hidden\">body</textarea></form>";
+        FormPage page = FormPage.Parse(html);
+
+        Assert.Equal("line one", page.Query("note"));
+        Assert.Equal("hidden", page.ValueOf("locked$query"));
+    }
+
     private static string Fixture(string name)
     {
         return File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Fixtures", name));

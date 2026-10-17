@@ -12,8 +12,8 @@ namespace Nefarius.PowerConnect.Ews.Http;
 /// </summary>
 public sealed class SwitchClient : IAsyncDisposable
 {
-    private static readonly Regex PasswordField = new(
-        @"(password(?:\$[A-Za-z0-9?]*)?=)[^&]*",
+    private static readonly Regex SensitiveField = new(
+        @"((?:password|communitystring|keystring|inetkey)(?:(?:\$|%24)[A-Za-z0-9?]*)?=)[^&]*",
         RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
     private readonly HttpClient _http;
@@ -107,7 +107,9 @@ public sealed class SwitchClient : IAsyncDisposable
         using FormUrlEncodedContent content = new FormUrlEncodedContent(fields);
         using HttpResponseMessage response = await _http.PostAsync(relative, content, cancellationToken).ConfigureAwait(false);
         string body = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-        string requestText = string.Join("&", fields.Select(pair => pair.Key + "=" + pair.Value));
+        string requestText = string.Join(
+            "&",
+            fields.Select(pair => Uri.EscapeDataString(pair.Key) + "=" + Uri.EscapeDataString(pair.Value)));
         await CaptureAsync("POST", relative, requestText, (int)response.StatusCode, body, cancellationToken).ConfigureAwait(false);
         if (!response.IsSuccessStatusCode)
         {
@@ -115,6 +117,7 @@ public sealed class SwitchClient : IAsyncDisposable
         }
 
         FormPage.EnsureNoDocumentError(body);
+        EnsureAuthenticated(body);
         FormPage page = FormPage.Parse(body);
         string? error = page.ErrorMessage();
         if (error != null)
@@ -147,7 +150,7 @@ public sealed class SwitchClient : IAsyncDisposable
         {
             await GetAsync("/config/log_out.htm", cancellationToken).ConfigureAwait(false);
         }
-        catch (SwitchException exception)
+        catch (Exception exception) when (exception is SwitchException or HttpRequestException or TaskCanceledException)
         {
             _logger.Debug(exception, "Logout request failed");
         }
@@ -156,8 +159,14 @@ public sealed class SwitchClient : IAsyncDisposable
     /// <inheritdoc />
     public async ValueTask DisposeAsync()
     {
-        await LogoutAsync().ConfigureAwait(false);
-        _http.Dispose();
+        try
+        {
+            await LogoutAsync().ConfigureAwait(false);
+        }
+        finally
+        {
+            _http.Dispose();
+        }
     }
 
     private async Task LoginAsync(CancellationToken cancellationToken)
@@ -214,8 +223,8 @@ public sealed class SwitchClient : IAsyncDisposable
         }
 
         string file = Path.Combine(_connection.CaptureDirectory, $"{index:000}-{method}-{safePath}.txt");
-        string redactedRequest = requestBody == null ? "" : PasswordField.Replace(requestBody, "$1***");
-        string redactedResponse = PasswordField.Replace(responseBody, "$1***");
+        string redactedRequest = requestBody == null ? "" : SensitiveField.Replace(requestBody, "$1***");
+        string redactedResponse = SensitiveField.Replace(responseBody, "$1***");
         string text = method + " " + path + " -> " + status.ToString(System.Globalization.CultureInfo.InvariantCulture) +
                       Environment.NewLine + redactedRequest + Environment.NewLine + "-----" + Environment.NewLine +
                       redactedResponse;

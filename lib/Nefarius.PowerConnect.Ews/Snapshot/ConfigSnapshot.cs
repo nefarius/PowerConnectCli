@@ -111,7 +111,7 @@ public sealed class ConfigSnapshot
             Dictionary<string, string> mutations = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             foreach (KeyValuePair<string, string> field in pageFields.Value)
             {
-                if (field.Key.Contains("password", StringComparison.OrdinalIgnoreCase))
+                if (IsSensitive(field.Key))
                 {
                     continue;
                 }
@@ -146,7 +146,7 @@ public sealed class ConfigSnapshot
             return false;
         }
 
-        if (field.Name.Contains("password", StringComparison.OrdinalIgnoreCase) ||
+        if (IsSensitive(field.Name) ||
             field.Name.Contains("UpTime", StringComparison.OrdinalIgnoreCase) ||
             field.Name.Contains("Oper", StringComparison.OrdinalIgnoreCase))
         {
@@ -154,6 +154,14 @@ public sealed class ConfigSnapshot
         }
 
         return true;
+    }
+
+    private static bool IsSensitive(string name)
+    {
+        return name.Contains("password", StringComparison.OrdinalIgnoreCase) ||
+               name.Contains("CommunityString", StringComparison.OrdinalIgnoreCase) ||
+               name.Contains("KeyString", StringComparison.OrdinalIgnoreCase) ||
+               name.Contains("InetKey", StringComparison.OrdinalIgnoreCase);
     }
 
     private static bool IsProtected(string path)

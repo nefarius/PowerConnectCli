@@ -29,7 +29,7 @@ pc28xx config diff switch.json
 pc28xx config apply switch.json
 ```
 
-The password comes from `--password` or the `PC28XX_PASSWORD` environment variable. `--json` prints machine-readable output. `--capture-dir` stores redacted request and response bodies.
+The password comes from `--password` or the `PC28XX_PASSWORD` environment variable. `--json` prints machine-readable output. `--capture-dir` redacts passwords, RADIUS keys, and SNMP community strings in the saved form fields. A capture can still contain the rest of the configuration, so treat the files as sensitive.
 
 `system reset`, `file restore-defaults`, `file download --type firmware|boot`, `secure-mode set unmanaged`, `ip set`, and deleting the user you are logged in as also require `--i-understand`.
 
@@ -37,7 +37,7 @@ The password comes from `--password` or the `PC28XX_PASSWORD` environment variab
 
 `vlan`, `vlan port`, `port`, `port access`, `lag`, `lag members`, `green-ethernet`, `storm-control`, `mirror`, `mac-table`, `stp`, `stp port`, `multicast`, `multicast group`, `multicast forward-all`, `igmp-snooping`, `dot1x`, `dot1x hosts`, `dot1x users`, `system`, `ip`, `diag`, `users`, `radius`, `snmp`, `file`, `dhcp-server`, `jumbo-frames`, `stats`, `qos`, `config`, `raw`.
 
-`raw get <page>` and `raw set <page> field=value` replay any page the typed commands do not cover. On this firmware QoS `basic` and `advanced` both enable the global QoS mode; `disabled` turns it off.
+`raw get <page>` and `raw set <page> --set field=value` replay any page the typed commands do not cover. On this firmware QoS `basic` and `advanced` both enable the global QoS mode; `disabled` turns it off.
 
 ## Protocol
 

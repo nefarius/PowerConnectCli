@@ -217,7 +217,9 @@ public sealed class StpRepository
 
         if (migrate)
         {
-            FormPage tree = await _client.GetFormAsync("/config/sta_tree.htm", cancellationToken).ConfigureAwait(false);
+            FormPage tree = await _client.GetFormAsync(
+                "/config/sta_tree.htm?Query:dot1dStpPort=" + MibValues.Number(port.IfIndex),
+                cancellationToken).ConfigureAwait(false);
             plan.Add(FormChange.Post(
                 _client,
                 "Migrate " + port.Name + " to the point-to-point protocol",

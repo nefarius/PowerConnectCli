@@ -85,7 +85,24 @@ public sealed class GreenEthernetRepository
         }
 
         ChangePlan plan = new ChangePlan();
-        plan.Add(FormChange.Post(_client, "Set Green Ethernet", page, mutations, verifyPath: "/config/green_ethernet.htm"));
+        plan.Add(FormChange.Post(
+            _client,
+            "Set Green Ethernet",
+            page,
+            mutations,
+            verifyPath: "/config/green_ethernet.htm",
+            verify: after =>
+            {
+                foreach (KeyValuePair<string, string> pair in mutations)
+                {
+                    if ((after.ValueOf(pair.Key) ?? "") != pair.Value)
+                    {
+                        return pair.Key + " did not stick";
+                    }
+                }
+
+                return null;
+            }));
         return plan;
     }
 }

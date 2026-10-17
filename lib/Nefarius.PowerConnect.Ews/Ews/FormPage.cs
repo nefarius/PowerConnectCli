@@ -68,6 +68,11 @@ public sealed class FormPage
             bool disabled = element.HasAttribute("disabled");
             List<SelectOption> options = new List<SelectOption>();
             string value = element.GetAttribute("value") ?? "";
+            if (element is IHtmlTextAreaElement textarea && !disabled)
+            {
+                value = textarea.Value;
+            }
+
             bool isChecked = element.HasAttribute("checked");
 
             if (element is IHtmlSelectElement select)

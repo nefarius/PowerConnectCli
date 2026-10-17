@@ -103,9 +103,9 @@ public static class PortList
         IEnumerable<PortName> forbiddenPorts,
         IEnumerable<PortName> none)
     {
-        HashSet<int> egressSet = Decode(egress).Select(port => port.IfIndex).ToHashSet();
-        HashSet<int> untaggedSet = Decode(untagged).Select(port => port.IfIndex).ToHashSet();
-        HashSet<int> forbiddenSet = Decode(forbidden).Select(port => port.IfIndex).ToHashSet();
+        HashSet<int> egressSet = SetIndexes(egress);
+        HashSet<int> untaggedSet = SetIndexes(untagged);
+        HashSet<int> forbiddenSet = SetIndexes(forbidden);
 
         foreach (PortName port in none)
         {
@@ -159,6 +159,22 @@ public static class PortList
         }
 
         return ToHex(bytes);
+    }
+
+    private static HashSet<int> SetIndexes(string? hex)
+    {
+        byte[] bytes = ParseHex(hex);
+        HashSet<int> indexes = new HashSet<int>();
+        int bitCount = bytes.Length * 8;
+        for (int bitIndex = 0; bitIndex < bitCount; bitIndex++)
+        {
+            if (IsSet(bytes, bitIndex))
+            {
+                indexes.Add(bitIndex + 1);
+            }
+        }
+
+        return indexes;
     }
 
     private static int HexLength(params string?[] values)
