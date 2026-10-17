@@ -37,7 +37,7 @@ public sealed class PortConfiguration
     /// <summary>True when back pressure is enabled.</summary>
     public bool BackPressure { get; init; }
 
-    /// <summary>Operational status enumeration.</summary>
+    /// <summary>Operational link status: up, down, or another ifOperStatus name.</summary>
     public string OperStatus { get; init; } = "";
 }
 
@@ -242,7 +242,7 @@ public sealed class PortRepository
             FlowControl = flow,
             Mdix = mdix,
             BackPressure = MibValues.IsEnabled(page.Query("swIfBackPressureMode")),
-            OperStatus = page.Query("ifOperStatus") ?? ""
+            OperStatus = MibValues.OperStatusText(page.Query("ifOperStatus"))
         };
     }
 

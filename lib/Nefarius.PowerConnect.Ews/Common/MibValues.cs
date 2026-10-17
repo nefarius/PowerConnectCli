@@ -50,6 +50,25 @@ public static class MibValues
         };
     }
 
+    /// <summary>
+    ///     Display form of <c>ifOperStatus</c>: up, down, testing, unknown, dormant, not present, or lower layer down.
+    /// </summary>
+    public static string OperStatusText(string? value)
+    {
+        return value switch
+        {
+            "1" => "up",
+            "2" => "down",
+            "3" => "testing",
+            "4" => "unknown",
+            "5" => "dormant",
+            "6" => "not present",
+            "7" => "lower layer down",
+            null or "" => "",
+            _ => value
+        };
+    }
+
     /// <summary>Display form of an admin speed value.</summary>
     public static string SpeedText(string? value)
     {
