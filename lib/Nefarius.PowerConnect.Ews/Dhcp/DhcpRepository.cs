@@ -14,7 +14,7 @@ public enum DhcpStaticAction
     /// <summary>Post the selected row's <c>$query</c> fields with active status.</summary>
     Update,
 
-    /// <summary>Post the <c>$add</c> fields with destroy status.</summary>
+    /// <summary>Post the selected row's <c>$query</c> fields with destroy status.</summary>
     Delete
 }
 
@@ -173,11 +173,12 @@ public sealed class DhcpRepository
         DhcpStaticAction action,
         CancellationToken cancellationToken = default)
     {
-        string path = action == DhcpStaticAction.Update
+        bool existing = action != DhcpStaticAction.Add;
+        string path = existing
             ? "/config/DHCPSrv_Static_Host.htm?[DHCPIPVT]Filter:rlDhcpSrvIpAddrMechanism=1^Query:rlDhcpSrvIpAddrIpAddr=" + Uri.EscapeDataString(address)
             : "/config/DHCPSrv_Static_Host.htm?[DHCPIPVT]Filter:rlDhcpSrvIpAddrMechanism=1";
         FormPage page = await _client.GetFormAsync(path, cancellationToken).ConfigureAwait(false);
-        string suffix = action == DhcpStaticAction.Update ? "$query" : "$add";
+        string suffix = existing ? "$query" : "$add";
         string status = action switch
         {
             DhcpStaticAction.Delete => "6",
@@ -189,7 +190,7 @@ public sealed class DhcpRepository
             ["rlDhcpSrvIpAddrIpAddr" + suffix] = address,
             ["rlDhcpSrvIpAddrRowStatus" + suffix] = status
         };
-        if (action != DhcpStaticAction.Update || mac.Length > 0)
+        if (action == DhcpStaticAction.Add || mac.Length > 0)
         {
             mutations["rlDhcpSrvIpAddrIdentifier" + suffix] = mac;
         }

@@ -243,7 +243,25 @@ public sealed class VlanRepository
             page,
             mutations,
             verifyPath: MembershipUrl(vlanId),
-            verify: after => after.Query("dot1qVlanStaticEgressPorts") == egress ? null : "Egress bitmap did not stick",
+            verify: after =>
+            {
+                if (after.Query("dot1qVlanStaticEgressPorts") != egress)
+                {
+                    return "Egress bitmap did not stick";
+                }
+
+                if (after.Query("dot1qVlanStaticUntaggedPorts") != untaggedHex)
+                {
+                    return "Untagged bitmap did not stick";
+                }
+
+                if (after.Query("dot1qVlanForbiddenEgressPorts") != forbiddenHex)
+                {
+                    return "Forbidden bitmap did not stick";
+                }
+
+                return null;
+            },
             omit: OmittedOnEdit));
         return plan;
     }
