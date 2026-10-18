@@ -52,6 +52,13 @@ internal sealed class CliSession
             WriteLine = write,
             ConfirmAsync = AnsiConsole.Profile.Capabilities.Interactive && !Console.IsInputRedirected
                 ? plan => Task.FromResult(AnsiConsole.Confirm("Apply these changes?"))
+                : null,
+            ActivityAsync = CliActivity.IsEnabled(this)
+                ? (status, operation, cancellationToken) => CliActivity.RunAsync(this, status, async () =>
+                {
+                    await operation(cancellationToken).ConfigureAwait(false);
+                    return 0;
+                })
                 : null
         };
     }
@@ -165,7 +172,10 @@ internal static class CliHost
         };
     }
 
-    public static async Task<int> Run(ParseResult parse, Func<SwitchDevice, CliSession, CancellationToken, Task<int>> action)
+    public static async Task<int> Run(
+        ParseResult parse,
+        CancellationToken cancellationToken,
+        Func<SwitchDevice, CliSession, CancellationToken, Task<int>> action)
     {
         CliSession session = Read(parse);
         if (session.Verbose)
@@ -173,8 +183,11 @@ internal static class CliHost
             Log.Logger = new LoggerConfiguration().MinimumLevel.Debug().WriteTo.Console().CreateLogger();
         }
 
-        await using SwitchDevice device = await SwitchDevice.ConnectAsync(session.Connection, Log.Logger).ConfigureAwait(false);
-        return await action(device, session, CancellationToken.None).ConfigureAwait(false);
+        await using SwitchDevice device = await CliActivity.RunAsync(
+            session,
+            "Connecting…",
+            () => SwitchDevice.ConnectAsync(session.Connection, Log.Logger, cancellationToken)).ConfigureAwait(false);
+        return await action(device, session, cancellationToken).ConfigureAwait(false);
     }
 
     public static async Task<int> Apply(SwitchDevice device, CliSession session, ChangePlan plan)

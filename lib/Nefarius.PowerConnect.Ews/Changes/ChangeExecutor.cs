@@ -22,6 +22,12 @@ public sealed class ChangeExecutionOptions
 
     /// <summary>Receives human-readable plan lines.</summary>
     public Action<string>? WriteLine { get; init; }
+
+    /// <summary>
+    ///     Wraps a network-bound apply or read-back. The callback must invoke and await the operation.
+    ///     When null, the executor awaits the operation directly and prints a progress line.
+    /// </summary>
+    public Func<string, Func<CancellationToken, Task>, CancellationToken, Task>? ActivityAsync { get; init; }
 }
 
 /// <summary>
@@ -84,11 +90,33 @@ public sealed class ChangeExecutor
 
         foreach (ChangeStep step in plan.Steps)
         {
-            write("Applying: " + step.Title);
-            await step.ApplyAsync(cancellationToken).ConfigureAwait(false);
+            if (options.ActivityAsync != null)
+            {
+                await options.ActivityAsync("Applying: " + step.Title, step.ApplyAsync, cancellationToken).ConfigureAwait(false);
+            }
+            else
+            {
+                write("Applying: " + step.Title);
+                await step.ApplyAsync(cancellationToken).ConfigureAwait(false);
+            }
+
             if (step.VerifyAsync != null)
             {
-                string? error = await step.VerifyAsync(cancellationToken).ConfigureAwait(false);
+                string? error;
+                if (options.ActivityAsync != null)
+                {
+                    string? captured = null;
+                    await options.ActivityAsync(
+                        "Verifying: " + step.Title,
+                        async token => captured = await step.VerifyAsync(token).ConfigureAwait(false),
+                        cancellationToken).ConfigureAwait(false);
+                    error = captured;
+                }
+                else
+                {
+                    error = await step.VerifyAsync(cancellationToken).ConfigureAwait(false);
+                }
+
                 if (error != null)
                 {
                     throw new Nefarius.PowerConnect.Ews.Http.SwitchException("Read-back failed for '" + step.Title + "': " + error);

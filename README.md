@@ -46,6 +46,8 @@ pc28xx config apply switch.json
 
 The password comes from `--password` or the `PC28XX_PASSWORD` environment variable. `--json` prints machine-readable output. `--capture-dir` redacts passwords, RADIUS keys, and SNMP community strings in the saved form fields. A capture can still contain the rest of the configuration, so treat the files as sensitive.
 
+On an interactive terminal, `pc28xx` shows a spinner on standard error while it connects, reads, prepares a change, or applies one. The spinner is cleared before the result, the change plan, and confirmation prompts. It stays off for `--json`, `--verbose`, and when standard error is redirected, so scripts and logs stay clean.
+
 `system reset`, `file restore-defaults`, `file download --type firmware|boot`, `secure-mode set unmanaged`, `ip set`, and deleting the user you are logged in as also require `--i-understand`.
 
 ### Commands
