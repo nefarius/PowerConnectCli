@@ -1,0 +1,4 @@
+# Captured switch web UI pages used as test fixtures, not project source.
+# linguist-detectable=false keeps them out of the repository language statistics.
+*.htm linguist-detectable=false
+*.html linguist-detectable=false
