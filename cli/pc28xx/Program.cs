@@ -1,4 +1,4 @@
-﻿using System.CommandLine;
+using System.CommandLine;
 using System.Globalization;
 using System.Text;
 
@@ -567,6 +567,30 @@ BindParse(Add(raw, "set", "Replay a page with field=value mutations", page, assi
 
     return await Plan(device, session, "Preparing page change…", () => device.Raw.PlanSetAsync(parse.GetValue(page)!, mutations, session.IUnderstand, token)).ConfigureAwait(false);
 });
+
+CliCompletions.OnOff(ingress, autoneg, backPressure, energy, reach, broadcast, multicastFlag, unknown, enable, edge, restricted, filtering, igmp, autoLearn, querier, reauth, authTraps, alarms, dhcpEnable, probe);
+CliCompletions.OnOff(jumboState);
+CliCompletions.Values(["admit-all", "tagged-only"], frameType);
+CliCompletions.Values(["up", "down"], admin);
+CliCompletions.Values(["10", "100", "1000"], speed);
+CliCompletions.Values(["full", "half"], duplex);
+CliCompletions.Values(["on", "off", "autoneg"], flow);
+CliCompletions.Values(["auto", "on", "off"], mdix);
+CliCompletions.Values(["l2", "l3", "l2l3"], balance);
+CliCompletions.Values(["stp", "rstp"], mode);
+CliCompletions.Values(["short", "long"], pathCostMethod);
+CliCompletions.Values(["auto", "force-authorized", "force-unauthorized"], control);
+CliCompletions.Values(["single", "multiple", "multi-session"], hostMode);
+CliCompletions.Values(["managed", "unmanaged"], secureMode);
+CliCompletions.Values(["ro", "rw", "su"], access);
+CliCompletions.Values(["firmware", "boot", "config"], fileType);
+CliCompletions.Values(["config", "backup"], uploadType);
+CliCompletions.Values(["basic", "advanced", "disabled"], qosMode);
+CliCompletions.Values(["cos", "dscp"], trust);
+CliCompletions.Ports(portName);
+CliCompletions.Lags(channel);
+CliCompletions.Ports(greenPort, source, dest, macPort, dot1xPort);
+CliCompletions.PortList(tagged, untagged, forbidden, none, memberPorts, groupPorts);
 
 return await root.Parse(args).InvokeAsync().ConfigureAwait(false);
 
