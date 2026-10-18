@@ -2,7 +2,11 @@ version: 2
 
 updates:
   - package-ecosystem: "nuget"
-    directory: "/"
+    directories:
+      - "/build"
+      - "/cli/pc28xx"
+      - "/lib/Nefarius.PowerConnect.Ews"
+      - "/tests/Nefarius.PowerConnect.Ews.Tests"
     schedule:
       interval: "weekly"
 
