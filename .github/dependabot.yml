@@ -1,0 +1,16 @@
+version: 2
+
+updates:
+  - package-ecosystem: "nuget"
+    directories:
+      - "/build"
+      - "/cli/pc28xx"
+      - "/lib/Nefarius.PowerConnect.Ews"
+      - "/tests/Nefarius.PowerConnect.Ews.Tests"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
