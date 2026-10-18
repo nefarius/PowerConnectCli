@@ -81,3 +81,26 @@ Publish profiles under `cli/pc28xx/Properties/PublishProfiles` produce a self-co
 ## Tests
 
 The fixtures in `tests/Nefarius.PowerConnect.Ews.Tests/Fixtures` were captured from a live 2816 and then sanitized. Serial number, service tag, MAC addresses, and the password hash were replaced before they were committed.
+
+## Sources & 3rd party credits
+
+This application benefits from these awesome projects ❤ (appearance in no special order):
+
+### Switch web UI
+
+- [AngleSharp](https://github.com/AngleSharp/AngleSharp)
+
+### Command line
+
+- [System.CommandLine](https://github.com/dotnet/command-line-api)
+- [Spectre.Console](https://spectreconsole.net/)
+
+### Logging
+
+- [Serilog](https://serilog.net/)
+- [Serilog.Sinks.Console](https://github.com/serilog/serilog-sinks-console)
+
+### Build
+
+- [MinVer](https://github.com/adamralph/minver)
+- [NUKE](https://nuke.build/)
