@@ -46,6 +46,8 @@ dotnet-suggest script bash > ~/.dotnet-suggest-shim.bash
 echo '. ~/.dotnet-suggest-shim.bash' >> ~/.bashrc
 ```
 
+A login shell reads the first existing file among `~/.bash_profile`, `~/.bash_login`, and `~/.profile`, and skips `~/.bashrc`. Source `~/.bashrc` from that file, or append the shim line to the startup file that shell reads.
+
 zsh:
 
 ```text
@@ -58,6 +60,7 @@ PowerShell:
 
 ```text
 dotnet-suggest register --command-path (Get-Command pc28xx).Source
+if (-not (Test-Path -Path $PROFILE)) { New-Item -ItemType File -Path $PROFILE -Force }
 dotnet-suggest script powershell >> $PROFILE
 ```
 
