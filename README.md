@@ -17,7 +17,10 @@ The 2816 has no SSH and no documented API. Everything the browser can change is 
 - `Nefarius.PowerConnect.Ews` parses the pages, encodes port-list bitmaps, and turns a change into a before/after plan that is read back after it is applied.
 - `pc28xx` is the command-line front end. Writes are printed and wait for confirmation. `--dry-run` never posts. `--yes` skips the prompt.
 
-The switch speaks plain HTTP. The password and every setting travel in cleartext on the LAN, and the session cookie is bound to the client IP. The web UI only allows a few sessions at once. Each command logs out when it finishes; leave a few seconds between commands so the switch can free the previous session.
+> [!WARNING]  
+> The switch speaks plain HTTP. The password and every setting travel in cleartext on the LAN, and the session cookie is bound to the client IP.
+
+The web UI only allows a few sessions at once. Each command logs out when it finishes; leave a few seconds between commands so the switch can free the previous session.
 
 ## Install
 
