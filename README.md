@@ -1,4 +1,4 @@
-# <img src="assets/NSS-128x128.png" align="left" />PowerConnectCli
+# <img src="assets/NSS-Vibe.png" height="160" align="left" />PowerConnectCli
 
 [![.NET](https://github.com/nefarius/PowerConnectCli/actions/workflows/build.yml/badge.svg)](https://github.com/nefarius/PowerConnectCli/actions/workflows/build.yml)
 [![Nuget](https://img.shields.io/nuget/v/Nefarius.PowerConnect.Ews)](https://www.nuget.org/packages/Nefarius.PowerConnect.Ews/)
