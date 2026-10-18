@@ -30,6 +30,39 @@ dotnet tool uninstall --global Nefarius.PowerConnect.CLI
 pc28xx --help
 ```
 
+## Tab completion
+
+Commands, options, and fixed values such as `on`/`off`, port names, speeds, and modes complete through [`dotnet-suggest`](https://www.nuget.org/packages/dotnet-suggest). Install that global tool once, register the `pc28xx` command, and load the shim for your shell. Completion reads the command model only; it does not contact the switch.
+
+```text
+dotnet tool install --global dotnet-suggest
+```
+
+bash:
+
+```text
+dotnet-suggest register --command-path "$(command -v pc28xx)"
+dotnet-suggest script bash > ~/.dotnet-suggest-shim.bash
+echo '. ~/.dotnet-suggest-shim.bash' >> ~/.bashrc
+```
+
+zsh:
+
+```text
+dotnet-suggest register --command-path "$(command -v pc28xx)"
+dotnet-suggest script zsh > ~/.dotnet-suggest-shim.zsh
+echo '. ~/.dotnet-suggest-shim.zsh' >> ~/.zshrc
+```
+
+PowerShell:
+
+```text
+dotnet-suggest register --command-path (Get-Command pc28xx).Source
+dotnet-suggest script powershell >> $PROFILE
+```
+
+Open a new shell after registering the command and changing the profile. On PowerShell, `$PROFILE` is the file reported by `echo $PROFILE`. Windows Command Prompt has no pluggable completion mechanism, so `pc28xx` cannot complete there.
+
 ## Usage
 
 ```text
