@@ -33,13 +33,19 @@ internal sealed class CliSession
 
     public string? CaptureDirectory { get; init; }
 
+    public int LoginRetries { get; init; } = 3;
+
+    public double LoginRetryDelaySeconds { get; init; } = 2;
+
     public SwitchConnection Connection => new SwitchConnection
     {
         Host = Host,
         User = User,
         Password = Password,
         Timeout = TimeSpan.FromSeconds(TimeoutSeconds),
-        CaptureDirectory = CaptureDirectory
+        CaptureDirectory = CaptureDirectory,
+        LoginRetries = LoginRetries,
+        LoginRetryDelay = TimeSpan.FromSeconds(LoginRetryDelaySeconds)
     };
 
     public ChangeExecutionOptions Execution(Action<string> write)
@@ -130,6 +136,47 @@ internal static class CliHost
         Recursive = true
     };
 
+    public static readonly Option<int> LoginRetries = CreateRetries();
+
+    public static readonly Option<double> LoginRetryDelay = CreateRetryDelay();
+
+    private static Option<int> CreateRetries()
+    {
+        Option<int> option = new("--login-retries")
+        {
+            Description = "Extra login attempts with exponential backoff when the switch rejects the session (0 disables)",
+            Recursive = true,
+            DefaultValueFactory = _ => 3
+        };
+        option.Validators.Add(result =>
+        {
+            if (result.GetValueOrDefault<int>() < 0)
+            {
+                result.AddError("--login-retries must not be negative.");
+            }
+        });
+        return option;
+    }
+
+    private static Option<double> CreateRetryDelay()
+    {
+        Option<double> option = new("--login-retry-delay")
+        {
+            Description = "Seconds before the first login retry; doubles for each further retry",
+            Recursive = true,
+            DefaultValueFactory = _ => 2d
+        };
+        option.Validators.Add(result =>
+        {
+            double value = result.GetValueOrDefault<double>();
+            if (double.IsNaN(value) || value < 0 || value > TimeSpan.MaxValue.TotalSeconds)
+            {
+                result.AddError("--login-retry-delay must be a non-negative number of seconds that fits in a TimeSpan.");
+            }
+        });
+        return option;
+    }
+
     public static void AddGlobals(Command command)
     {
         command.Options.Add(Host);
@@ -142,6 +189,8 @@ internal static class CliHost
         command.Options.Add(Verbose);
         command.Options.Add(Timeout);
         command.Options.Add(CaptureDirectory);
+        command.Options.Add(LoginRetries);
+        command.Options.Add(LoginRetryDelay);
     }
 
     public static CliSession Read(ParseResult parse)
@@ -168,7 +217,9 @@ internal static class CliHost
             IUnderstand = parse.GetValue(IUnderstand),
             Verbose = parse.GetValue(Verbose),
             TimeoutSeconds = parse.GetValue(Timeout),
-            CaptureDirectory = parse.GetValue(CaptureDirectory)
+            CaptureDirectory = parse.GetValue(CaptureDirectory),
+            LoginRetries = parse.GetValue(LoginRetries),
+            LoginRetryDelaySeconds = parse.GetValue(LoginRetryDelay)
         };
     }
 
@@ -177,17 +228,35 @@ internal static class CliHost
         CancellationToken cancellationToken,
         Func<SwitchDevice, CliSession, CancellationToken, Task<int>> action)
     {
-        CliSession session = Read(parse);
-        if (session.Verbose)
+        bool verbose = parse.GetValue(Verbose);
+        try
         {
-            Log.Logger = new LoggerConfiguration().MinimumLevel.Debug().WriteTo.Console().CreateLogger();
-        }
+            CliSession session = Read(parse);
+            if (session.Verbose)
+            {
+                Log.Logger = new LoggerConfiguration().MinimumLevel.Debug().WriteTo.Console().CreateLogger();
+            }
 
-        await using SwitchDevice device = await CliActivity.RunAsync(
-            session,
-            "Connecting…",
-            () => SwitchDevice.ConnectAsync(session.Connection, Log.Logger, cancellationToken)).ConfigureAwait(false);
-        return await action(device, session, cancellationToken).ConfigureAwait(false);
+            await using SwitchDevice device = await CliActivity.RunAsync(
+                session,
+                "Connecting…",
+                () => SwitchDevice.ConnectAsync(session.Connection, Log.Logger, cancellationToken)).ConfigureAwait(false);
+            return await action(device, session, cancellationToken).ConfigureAwait(false);
+        }
+        catch (Exception exception) when (!cancellationToken.IsCancellationRequested &&
+                                          exception is SwitchException or HttpRequestException or TaskCanceledException)
+        {
+            string message = exception is TaskCanceledException
+                ? "The switch did not respond in time."
+                : exception.Message;
+            Console.Error.WriteLine("Error: " + message);
+            if (verbose)
+            {
+                Console.Error.WriteLine(exception.ToString());
+            }
+
+            return 1;
+        }
     }
 
     public static async Task<int> Apply(SwitchDevice device, CliSession session, ChangePlan plan)

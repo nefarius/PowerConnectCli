@@ -26,6 +26,16 @@ public sealed class SwitchConnection
     public TimeSpan Timeout { get; init; } = TimeSpan.FromSeconds(30);
 
     /// <summary>
+    ///     Number of additional login attempts after the first one fails. Zero disables retries.
+    /// </summary>
+    public int LoginRetries { get; init; } = 3;
+
+    /// <summary>
+    ///     Delay before the first login retry. Doubles with every further retry.
+    /// </summary>
+    public TimeSpan LoginRetryDelay { get; init; } = TimeSpan.FromSeconds(2);
+
+    /// <summary>
     ///     Optional directory that receives redacted request and response captures.
     /// </summary>
     public string? CaptureDirectory { get; init; }

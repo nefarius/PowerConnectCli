@@ -22,7 +22,7 @@ The 2816 has no SSH and no documented API. Everything the browser can change is 
 > [!WARNING]  
 > The switch speaks plain HTTP. The password and every setting travel in cleartext on the LAN, and the session cookie is bound to the client IP.
 
-The web UI only allows a few sessions at once. Each command logs out when it finishes; leave a few seconds between commands so the switch can free the previous session.
+The web UI only allows a few sessions at once. Each command logs out when it finishes. If the switch still rejects a login because the previous session has not been freed, `pc28xx` retries the login 3 times with exponential backoff (2s, 4s, 8s). Only the login is retried, never a write. Tune it with `--login-retries <n>` (`0` disables) and `--login-retry-delay <seconds>`; library users set `SwitchConnection.LoginRetries` and `LoginRetryDelay`.
 
 ## Getting a wiped switch online
 
