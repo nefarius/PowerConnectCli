@@ -169,9 +169,9 @@ internal static class CliHost
         option.Validators.Add(result =>
         {
             double value = result.GetValueOrDefault<double>();
-            if (value < 0 || double.IsNaN(value) || double.IsInfinity(value))
+            if (double.IsNaN(value) || value < 0 || value > TimeSpan.MaxValue.TotalSeconds)
             {
-                result.AddError("--login-retry-delay must be a non-negative number.");
+                result.AddError("--login-retry-delay must be a non-negative number of seconds that fits in a TimeSpan.");
             }
         });
         return option;
