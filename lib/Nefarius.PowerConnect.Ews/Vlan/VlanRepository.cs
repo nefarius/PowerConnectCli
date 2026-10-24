@@ -86,6 +86,11 @@ public sealed class VlanRepository
         "VlanMemberStaticVT$endAdd"
     };
 
+    /// <summary>
+    ///     <c>disableHtml</c> disables this control before submit. The switch rejects the create page when it is posted.
+    /// </summary>
+    internal static readonly string[] OmittedOnCreate = { "AuthNotReq" };
+
     private readonly SwitchClient _client;
 
     /// <summary>Creates a repository bound to a session.</summary>
@@ -161,19 +166,14 @@ public sealed class VlanRepository
         }
 
         FormPage page = await _client.GetFormAsync("/config/create_new_vlan.htm", cancellationToken).ConfigureAwait(false);
-        Dictionary<string, string> mutations = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
-        {
-            ["dot1qVlanIndex$add"] = MibValues.Number(vlanId),
-            ["dot1qVlanStaticName$add"] = name,
-            ["dot1qVlanStaticRowStatus$add"] = "4"
-        };
         ChangePlan plan = new ChangePlan();
         plan.Add(FormChange.Post(
             _client,
             "Create VLAN " + vlanId.ToString(CultureInfo.InvariantCulture) + " (" + name + ")",
             page,
-            mutations,
+            CreateMutations(vlanId, name),
             verifyPath: MembershipUrl(vlanId),
+            omit: OmittedOnCreate,
             verify: after =>
             {
                 bool created = after.Query("dot1qVlanIndex$queryStatic") == MibValues.Number(vlanId) ||
@@ -183,6 +183,22 @@ public sealed class VlanRepository
                     : "VLAN " + vlanId.ToString(CultureInfo.InvariantCulture) + " was not readable after create";
             }));
         return plan;
+    }
+
+    /// <summary>
+    ///     Fields the create page's <c>insertZeroValues</c> script submits. Port bitmaps are <c>00</c>, matching that script.
+    /// </summary>
+    internal static Dictionary<string, string> CreateMutations(int vlanId, string name)
+    {
+        return new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["dot1qVlanIndex$add"] = MibValues.Number(vlanId),
+            ["dot1qVlanStaticName$add"] = name,
+            ["dot1qVlanStaticEgressPorts$add"] = "00",
+            ["dot1qVlanForbiddenEgressPorts$add"] = "00",
+            ["dot1qVlanStaticUntaggedPorts$add"] = "00",
+            ["dot1qVlanStaticRowStatus$add"] = "4"
+        };
     }
 
     /// <summary>Plans deletion. VLAN 1 cannot be deleted.</summary>

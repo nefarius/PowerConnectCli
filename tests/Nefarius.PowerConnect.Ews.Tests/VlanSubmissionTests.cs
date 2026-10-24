@@ -29,4 +29,22 @@ public sealed class VlanSubmissionTests
         Assert.DoesNotContain(body, pair => pair.Key == "dot1qVlanStaticEgressPorts$add");
         Assert.DoesNotContain(body, pair => pair.Key == "dot1qVlanIndex$query");
     }
+
+    [Fact]
+    public void CreateSubmissionInitializesPortBitmapsAndOmitsAuthNotReq()
+    {
+        FormPage page = FormPage.Parse(File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Fixtures", "create_new_vlan.htm")));
+        IReadOnlyList<KeyValuePair<string, string>> body = page.BuildSubmission(
+            VlanRepository.CreateMutations(20, "Lab"),
+            VlanRepository.OmittedOnCreate);
+
+        Assert.Contains(body, pair => pair.Key == "dot1qVlanIndex$add" && pair.Value == "20");
+        Assert.Contains(body, pair => pair.Key == "dot1qVlanStaticName$add" && pair.Value == "Lab");
+        Assert.Contains(body, pair => pair.Key == "dot1qVlanStaticRowStatus$add" && pair.Value == "4");
+        Assert.Contains(body, pair => pair.Key == "dot1qVlanStaticEgressPorts$add" && pair.Value == "00");
+        Assert.Contains(body, pair => pair.Key == "dot1qVlanForbiddenEgressPorts$add" && pair.Value == "00");
+        Assert.Contains(body, pair => pair.Key == "dot1qVlanStaticUntaggedPorts$add" && pair.Value == "00");
+        Assert.Contains(body, pair => pair.Key == "VlanMemberStaticVT$endAdd" && pair.Value == "OK");
+        Assert.DoesNotContain(body, pair => pair.Key == "AuthNotReq");
+    }
 }
