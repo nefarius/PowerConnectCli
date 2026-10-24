@@ -24,6 +24,10 @@ The 2816 has no SSH and no documented API. Everything the browser can change is 
 
 The web UI only allows a few sessions at once. Each command logs out when it finishes; leave a few seconds between commands so the switch can free the previous session.
 
+## Getting a wiped switch online
+
+`pc28xx` needs an address it can reach. A factory-reset 2816 starts in Unmanaged mode and does not answer on the network until it is put in Managed mode and VLAN 1 has an address. [docs/bootstrap-2816.md](docs/bootstrap-2816.md) is the serial-console procedure, including boot-menu recovery when the password or address is unknown.
+
 ## Install
 
 `pc28xx` is published as the [`Nefarius.PowerConnect.CLI`](https://www.nuget.org/packages/Nefarius.PowerConnect.CLI/) .NET tool. The .NET 10 SDK is required.
