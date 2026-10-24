@@ -110,24 +110,46 @@ BindParse(Add(port, "access", "Make ports untagged members of one VLAN and set t
         token)));
 
 Command lag = Add(root, "lag", "Link aggregation");
-Argument<string> channel = new("channel") { Description = "LAG, range, or list (ch1-ch8, ch1-ch3)" };
+Argument<string[]> channel = new("channel")
+{
+    Description = "LAG, range, or list (ch1-ch8, ch1 ch2, ch1-ch3)",
+    Arity = ArgumentArity.OneOrMore
+};
+channel.Validators.Add(result =>
+{
+    foreach (string token in result.Tokens.Select(token => token.Value))
+    {
+        if (token.StartsWith('-'))
+        {
+            result.AddError("Unrecognized command or argument '" + token + "'.");
+        }
+    }
+});
 Bind(Add(lag, "list", "List LAGs"), (device, session, token) =>
     Show(session, "Reading LAGs…", () => device.Lags.ListAsync(token)));
 BindParse(Add(lag, "show", "Show LAGs", channel), (device, session, token, parse) =>
-    ShowEach(session, "Reading LAG…", PortName.ParseLagSelection(parse.GetValue(channel)), port => device.Lags.GetAsync(port, token)));
+    ShowEach(session, "Reading LAG…", PortName.ParseLagSelection(JoinPorts(parse.GetValue(channel))), port => device.Lags.GetAsync(port, token)));
 Option<string?> balance = new("--balance") { Description = "l2, l3, or l2l3" };
 BindParse(Add(lag, "set", "Set LAG description or load balance", channel, description, balance), (device, session, token, parse) =>
-    PlanEach(device, session, "Preparing LAG change…", PortName.ParseLagSelection(parse.GetValue(channel)), port =>
+    PlanEach(device, session, "Preparing LAG change…", PortName.ParseLagSelection(JoinPorts(parse.GetValue(channel))), port =>
         device.Lags.PlanSetAsync(port, parse.GetValue(description), parse.GetValue(balance), token)));
 Command lagMembers = Add(lag, "members", "LAG membership");
 Option<string> memberPorts = new("--ports") { Description = "Member ports", Required = true };
 Option<bool> lacp = new("--lacp") { Description = "Enable LACP actor state" };
 BindParse(Add(lagMembers, "set", "Replace LAG members", channel, memberPorts, lacp), (device, session, token, parse) =>
-    Plan(device, session, "Preparing LAG change…", () => device.Lags.PlanMembersAsync(
-        PortName.Parse(parse.GetValue(channel)!),
+{
+    string[] selected = parse.GetValue(channel) ?? Array.Empty<string>();
+    if (selected.Length != 1)
+    {
+        throw new FormatException("LAG membership takes one LAG (ch1-ch8).");
+    }
+
+    return Plan(device, session, "Preparing LAG change…", () => device.Lags.PlanMembersAsync(
+        PortName.Parse(selected[0]),
         PortName.ParseList(parse.GetValue(memberPorts)),
         parse.GetValue(lacp),
-        token)));
+        token));
+});
 
 Command green = Add(root, "green-ethernet", "Green Ethernet");
 Option<string?> energy = new("--energy-detect") { Description = "on or off" };
