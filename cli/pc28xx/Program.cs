@@ -42,30 +42,42 @@ BindParse(Add(vlan, "set", "Edit VLAN membership", vlanId, tagged, untagged, for
         token)));
 
 Command vlanPort = Add(vlan, "port", "Per-port VLAN settings");
-Argument<string> portName = new("port") { Description = "Port or LAG (g1-g16, ch1-ch8)" };
+Argument<string[]> portName = new("port")
+{
+    Description = "Port, LAG, range or list (g1-g8, g1 g2, g1-g4,g6, ch1-ch2)",
+    Arity = ArgumentArity.OneOrMore
+};
+portName.Validators.Add(result =>
+{
+    foreach (string token in result.Tokens.Select(token => token.Value))
+    {
+        if (token.StartsWith('-'))
+        {
+            result.AddError("Unrecognized command or argument '" + token + "'.");
+        }
+    }
+});
 Bind(Add(vlanPort, "list", "List PVID and ingress settings"), (device, session, token) =>
     Show(session, "Reading VLAN ports…", () => device.Vlans.ListPortsAsync(token)));
-BindParse(Add(vlanPort, "show", "Show one port", portName), (device, session, token, parse) =>
-    Show(session, "Reading VLAN port…", () => device.Vlans.GetPortAsync(PortName.Parse(parse.GetValue(portName)!), token)));
+BindParse(Add(vlanPort, "show", "Show VLAN settings for ports", portName), (device, session, token, parse) =>
+    ShowEach(session, "Reading VLAN port…", PortName.ParseSelection(JoinPorts(parse.GetValue(portName))), port => device.Vlans.GetPortAsync(port, token)));
 Option<int?> pvid = new("--pvid") { Description = "Port VLAN id" };
 Option<string?> frameType = new("--frame-type") { Description = "admit-all or tagged-only" };
 Option<string?> ingress = new("--ingress-filtering") { Description = "on or off" };
 BindParse(Add(vlanPort, "set", "Set PVID, frame type, or ingress filtering", portName, pvid, frameType, ingress), async (device, session, token, parse) =>
 {
     bool? filtering = parse.GetValue(ingress) is string text ? On(text) : null;
-    return await Plan(device, session, "Preparing VLAN change…", () => device.Vlans.PlanPortSetAsync(
-        PortName.Parse(parse.GetValue(portName)!),
-        parse.GetValue(pvid),
-        parse.GetValue(frameType),
-        filtering,
-        token)).ConfigureAwait(false);
+    int? vlanPvid = parse.GetValue(pvid);
+    string? frames = parse.GetValue(frameType);
+    return await PlanEach(device, session, "Preparing VLAN change…", PortName.ParseSelection(JoinPorts(parse.GetValue(portName))), port =>
+        device.Vlans.PlanPortSetAsync(port, vlanPvid, frames, filtering, token)).ConfigureAwait(false);
 });
 
 Command port = Add(root, "port", "Port configuration");
 Bind(Add(port, "list", "List copper ports"), (device, session, token) =>
     Show(session, "Reading ports…", () => device.Ports.ListAsync(token)));
-BindParse(Add(port, "show", "Show one port", portName), (device, session, token, parse) =>
-    Show(session, "Reading port…", () => device.Ports.GetAsync(PortName.Parse(parse.GetValue(portName)!), token)));
+BindParse(Add(port, "show", "Show ports", portName), (device, session, token, parse) =>
+    ShowEach(session, "Reading port…", PortName.ParseSelection(JoinPorts(parse.GetValue(portName))), port => device.Ports.GetAsync(port, token)));
 Option<string?> admin = new("--admin") { Description = "up or down" };
 Option<int?> speed = new("--speed") { Description = "10, 100, or 1000" };
 Option<string?> duplex = new("--duplex") { Description = "full or half" };
@@ -87,30 +99,57 @@ BindParse(Add(port, "set", "Change port settings. With no options this resubmits
         BackPressure = parse.GetValue(backPressure) is string backText ? On(backText) : null,
         Description = parse.GetValue(description)
     };
-    return await Plan(device, session, "Preparing port change…", () => device.Ports.PlanSetAsync(PortName.Parse(parse.GetValue(portName)!), update, token)).ConfigureAwait(false);
+    return await PlanEach(device, session, "Preparing port change…", PortName.ParseSelection(JoinPorts(parse.GetValue(portName))), port =>
+        device.Ports.PlanSetAsync(port, update, token)).ConfigureAwait(false);
 });
 Option<int> accessVlan = new("--vlan") { Description = "Access VLAN", Required = true };
-BindParse(Add(port, "access", "Make a port an untagged member of one VLAN and set its PVID", portName, accessVlan), (device, session, token, parse) =>
-    Plan(device, session, "Preparing port change…", () => device.Vlans.PlanAccessAsync(PortName.Parse(parse.GetValue(portName)!), parse.GetValue(accessVlan), token)));
+BindParse(Add(port, "access", "Make ports untagged members of one VLAN and set their PVID", portName, accessVlan), (device, session, token, parse) =>
+    Plan(device, session, "Preparing port change…", () => device.Vlans.PlanAccessAsync(
+        PortName.ParseSelection(JoinPorts(parse.GetValue(portName))),
+        parse.GetValue(accessVlan),
+        token)));
 
 Command lag = Add(root, "lag", "Link aggregation");
-Argument<string> channel = new("channel") { Description = "LAG ch1-ch8" };
+Argument<string[]> channel = new("channel")
+{
+    Description = "LAG, range, or list (ch1-ch8, ch1 ch2, ch1-ch3)",
+    Arity = ArgumentArity.OneOrMore
+};
+channel.Validators.Add(result =>
+{
+    foreach (string token in result.Tokens.Select(token => token.Value))
+    {
+        if (token.StartsWith('-'))
+        {
+            result.AddError("Unrecognized command or argument '" + token + "'.");
+        }
+    }
+});
 Bind(Add(lag, "list", "List LAGs"), (device, session, token) =>
     Show(session, "Reading LAGs…", () => device.Lags.ListAsync(token)));
-BindParse(Add(lag, "show", "Show one LAG", channel), (device, session, token, parse) =>
-    Show(session, "Reading LAG…", () => device.Lags.GetAsync(PortName.Parse(parse.GetValue(channel)!), token)));
+BindParse(Add(lag, "show", "Show LAGs", channel), (device, session, token, parse) =>
+    ShowEach(session, "Reading LAG…", PortName.ParseLagSelection(JoinPorts(parse.GetValue(channel))), port => device.Lags.GetAsync(port, token)));
 Option<string?> balance = new("--balance") { Description = "l2, l3, or l2l3" };
 BindParse(Add(lag, "set", "Set LAG description or load balance", channel, description, balance), (device, session, token, parse) =>
-    Plan(device, session, "Preparing LAG change…", () => device.Lags.PlanSetAsync(PortName.Parse(parse.GetValue(channel)!), parse.GetValue(description), parse.GetValue(balance), token)));
+    PlanEach(device, session, "Preparing LAG change…", PortName.ParseLagSelection(JoinPorts(parse.GetValue(channel))), port =>
+        device.Lags.PlanSetAsync(port, parse.GetValue(description), parse.GetValue(balance), token)));
 Command lagMembers = Add(lag, "members", "LAG membership");
 Option<string> memberPorts = new("--ports") { Description = "Member ports", Required = true };
 Option<bool> lacp = new("--lacp") { Description = "Enable LACP actor state" };
 BindParse(Add(lagMembers, "set", "Replace LAG members", channel, memberPorts, lacp), (device, session, token, parse) =>
-    Plan(device, session, "Preparing LAG change…", () => device.Lags.PlanMembersAsync(
-        PortName.Parse(parse.GetValue(channel)!),
+{
+    string[] selected = parse.GetValue(channel) ?? Array.Empty<string>();
+    if (selected.Length != 1)
+    {
+        throw new FormatException("LAG membership takes one LAG (ch1-ch8).");
+    }
+
+    return Plan(device, session, "Preparing LAG change…", () => device.Lags.PlanMembersAsync(
+        PortName.Parse(selected[0]),
         PortName.ParseList(parse.GetValue(memberPorts)),
         parse.GetValue(lacp),
-        token)));
+        token));
+});
 
 Command green = Add(root, "green-ethernet", "Green Ethernet");
 Option<string?> energy = new("--energy-detect") { Description = "on or off" };
@@ -131,15 +170,22 @@ Option<int?> rate = new("--rate") { Description = "Raw broadcast rate counter (U
 Option<string?> multicastFlag = new("--multicast") { Description = "on or off" };
 Option<string?> unknown = new("--unknown-unicast") { Description = "on or off" };
 BindParse(Add(storm, "show", "Show storm control", portName), (device, session, token, parse) =>
-    Show(session, "Reading storm control…", () => device.StormControl.GetAsync(PortName.Parse(parse.GetValue(portName)!), token)));
+    ShowEach(session, "Reading storm control…", PortName.ParseSelection(JoinPorts(parse.GetValue(portName))), port => device.StormControl.GetAsync(port, token)));
 BindParse(Add(storm, "set", "Set storm control", portName, broadcast, rate, multicastFlag, unknown), (device, session, token, parse) =>
-    Plan(device, session, "Preparing storm control change…", () => device.StormControl.PlanSetAsync(
-        PortName.Parse(parse.GetValue(portName)!),
-        parse.GetValue(broadcast) is string broadcastText ? On(broadcastText) : null,
-        parse.GetValue(rate),
-        parse.GetValue(multicastFlag) is string multiText ? On(multiText) : null,
-        parse.GetValue(unknown) is string unknownText ? On(unknownText) : null,
-        token)));
+{
+    string? broadcastText = parse.GetValue(broadcast);
+    int? stormRate = parse.GetValue(rate);
+    string? multiText = parse.GetValue(multicastFlag);
+    string? unknownText = parse.GetValue(unknown);
+    return PlanEach(device, session, "Preparing storm control change…", PortName.ParseSelection(JoinPorts(parse.GetValue(portName))), port =>
+        device.StormControl.PlanSetAsync(
+            port,
+            broadcastText is null ? null : On(broadcastText),
+            stormRate,
+            multiText is null ? null : On(multiText),
+            unknownText is null ? null : On(unknownText),
+            token));
+});
 
 Command mirror = Add(root, "mirror", "Port mirroring");
 Option<string?> source = new("--source") { Description = "Source port" };
@@ -197,16 +243,27 @@ Option<string?> restricted = new("--restricted-role") { Description = "on or off
 Option<bool> migrate = new("--migrate") { Description = "Send a protocol migration" };
 Bind(Add(stpPort, "list", "List STP port settings"), (device, session, token) =>
     Show(session, "Reading spanning tree ports…", () => device.Stp.ListPortsAsync(token)));
+BindParse(Add(stpPort, "show", "Show STP on ports or LAGs", portName), (device, session, token, parse) =>
+    ShowEach(session, "Reading spanning tree port…", PortName.ParseSelection(JoinPorts(parse.GetValue(portName))), port => device.Stp.GetPortAsync(port, token)));
 BindParse(Add(stpPort, "set", "Set STP on a port or LAG", portName, enable, priority, pathCost, edge, restricted, migrate), (device, session, token, parse) =>
-    Plan(device, session, "Preparing spanning tree change…", () => device.Stp.PlanPortAsync(
-        PortName.Parse(parse.GetValue(portName)!),
-        parse.GetValue(enable) is string stpEnable ? On(stpEnable) : null,
-        parse.GetValue(priority),
-        parse.GetValue(pathCost),
-        parse.GetValue(edge) is string edgeText ? On(edgeText) : null,
-        parse.GetValue(restricted) is string restrictedText ? On(restrictedText) : null,
-        parse.GetValue(migrate),
-        token)));
+{
+    string? stpEnable = parse.GetValue(enable);
+    int? stpPriority = parse.GetValue(priority);
+    int? stpCost = parse.GetValue(pathCost);
+    string? edgeText = parse.GetValue(edge);
+    string? restrictedText = parse.GetValue(restricted);
+    bool migrateNow = parse.GetValue(migrate);
+    return PlanEach(device, session, "Preparing spanning tree change…", PortName.ParseSelection(JoinPorts(parse.GetValue(portName))), port =>
+        device.Stp.PlanPortAsync(
+            port,
+            stpEnable is null ? null : On(stpEnable),
+            stpPriority,
+            stpCost,
+            edgeText is null ? null : On(edgeText),
+            restrictedText is null ? null : On(restrictedText),
+            migrateNow,
+            token));
+});
 
 Command mcast = Add(root, "multicast", "Bridge multicast");
 Option<string?> filtering = new("--bridge-filtering") { Description = "on or off" };
@@ -261,21 +318,26 @@ BindParse(Add(igmpSnoop, "set", "Set snooping for a VLAN", groupVlan, enable, au
 Command dot1x = Add(root, "dot1x", "802.1X");
 Option<string?> control = new("--control") { Description = "auto, force-authorized, or force-unauthorized" };
 Option<string?> reauth = new("--reauth") { Description = "on or off" };
-Option<string?> dot1xPort = new("--port") { Description = "Port" };
+Option<string?> dot1xPort = new("--port") { Description = "Port, range, or list" };
 BindParse(Add(dot1x, "show", "Show 802.1X", dot1xPort), (device, session, token, parse) =>
-    Show(session, "Reading 802.1X…", async () => Fields(await device.Dot1x.GetPortAsync(PortName.Parse(parse.GetValue(dot1xPort) ?? "g1"), token).ConfigureAwait(false))));
+    ShowEach(session, "Reading 802.1X…", PortName.ParseSelection(parse.GetValue(dot1xPort) ?? "g1"), async port =>
+        Fields(await device.Dot1x.GetPortAsync(port, token).ConfigureAwait(false))));
 BindParse(Add(dot1x, "set", "Set 802.1X port control", dot1xPort, control, reauth), (device, session, token, parse) =>
-    Plan(device, session, "Preparing 802.1X change…", () => device.Dot1x.PlanPortAsync(
-        PortName.Parse(parse.GetValue(dot1xPort) ?? throw new FormatException("--port is required.")),
-        parse.GetValue(control),
-        parse.GetValue(reauth) is string reauthText ? On(reauthText) : null,
-        token)));
+{
+    string portText = parse.GetValue(dot1xPort) ?? throw new FormatException("--port is required.");
+    string? controlText = parse.GetValue(control);
+    string? reauthText = parse.GetValue(reauth);
+    return PlanEach(device, session, "Preparing 802.1X change…", PortName.ParseSelection(portText), port =>
+        device.Dot1x.PlanPortAsync(port, controlText, reauthText is null ? null : On(reauthText), token));
+});
 Command dot1xHosts = Add(dot1x, "hosts", "Multiple hosts");
 Option<string> hostMode = new("--host-mode") { Description = "single, multiple, or multi-session", Required = true };
 BindParse(Add(dot1xHosts, "show", "Show host mode", portName), (device, session, token, parse) =>
-    Show(session, "Reading host mode…", async () => Fields(await device.Dot1x.GetHostsAsync(PortName.Parse(parse.GetValue(portName)!), token).ConfigureAwait(false))));
+    ShowEach(session, "Reading host mode…", PortName.ParseSelection(JoinPorts(parse.GetValue(portName))), async port =>
+        Fields(await device.Dot1x.GetHostsAsync(port, token).ConfigureAwait(false))));
 BindParse(Add(dot1xHosts, "set", "Set host mode", portName, hostMode), (device, session, token, parse) =>
-    Plan(device, session, "Preparing 802.1X change…", () => device.Dot1x.PlanHostsAsync(PortName.Parse(parse.GetValue(portName)!), parse.GetValue(hostMode)!, token)));
+    PlanEach(device, session, "Preparing 802.1X change…", PortName.ParseSelection(JoinPorts(parse.GetValue(portName))), port =>
+        device.Dot1x.PlanHostsAsync(port, parse.GetValue(hostMode)!, token)));
 Command dot1xUsers = Add(dot1x, "users", "Authenticated users");
 Bind(Add(dot1xUsers, "list", "List authenticated users"), (device, session, token) =>
     Show(session, "Reading authenticated users…", async () => Fields(await device.Dot1x.UsersAsync(token).ConfigureAwait(false))));
@@ -307,7 +369,8 @@ BindParse(Add(ip, "set", "Change the management address", address, mask, gateway
 
 Command diag = Add(root, "diag", "Diagnostics");
 BindParse(Add(diag, "cable-test", "Run the copper cable test", portName), (device, session, token, parse) =>
-    Show(session, "Running cable test…", async () => Fields(await device.Diagnostics.CableTestAsync(PortName.Parse(parse.GetValue(portName)!), token).ConfigureAwait(false))));
+    ShowEach(session, "Running cable test…", PortName.ParseSelection(JoinPorts(parse.GetValue(portName))), async port =>
+        Fields(await device.Diagnostics.CableTestAsync(port, token).ConfigureAwait(false))));
 Bind(Add(diag, "transceiver", "Show transceiver diagnostics"), (device, session, token) =>
     Show(session, "Reading transceiver diagnostics…", async () => Fields(await device.Diagnostics.TransceiverAsync(token).ConfigureAwait(false))));
 
@@ -442,13 +505,13 @@ Command stats = Add(root, "stats", "Statistics");
 Option<bool> resetCounters = new("--reset");
 BindParse(Add(stats, "rmon", "RMON counters", portName, resetCounters), async (device, session, token, parse) =>
 {
-    PortName statsPort = PortName.Parse(parse.GetValue(portName)!);
+    IReadOnlyList<PortName> statsPorts = PortName.ParseSelection(JoinPorts(parse.GetValue(portName)));
     if (parse.GetValue(resetCounters))
     {
-        return await Plan(device, session, "Preparing counter reset…", () => device.Stats.PlanResetAsync(statsPort, token)).ConfigureAwait(false);
+        return await PlanEach(device, session, "Preparing counter reset…", statsPorts, port => device.Stats.PlanResetAsync(port, token)).ConfigureAwait(false);
     }
 
-    return await Show(session, "Reading RMON counters…", () => device.Stats.RmonAsync(statsPort, token)).ConfigureAwait(false);
+    return await ShowEach(session, "Reading RMON counters…", statsPorts, port => device.Stats.RmonAsync(port, token)).ConfigureAwait(false);
 });
 Bind(Add(stats, "cpu", "CPU utilization"), (device, session, token) =>
     Show(session, "Reading CPU utilization…", () => device.Stats.CpuAsync(token)));
@@ -463,14 +526,27 @@ BindParse(Add(qos, "set", "Set global QoS", qosMode, trust), (device, session, t
 Command qosIf = Add(qos, "interface", "Interface QoS");
 Option<int> defaultPriority = new("--default-priority") { Required = true };
 BindParse(Add(qosIf, "show", "Show interface priority", portName), (device, session, token, parse) =>
-    Show(session, "Reading interface QoS…", async () =>
+{
+    string name = JoinPorts(parse.GetValue(portName));
+    IReadOnlyList<PortName> ports = PortName.ParseSelection(name);
+    if (ports.Count == 1)
     {
-        string name = parse.GetValue(portName)!;
-        string value = await device.Qos.GetInterfaceAsync(PortName.Parse(name), token).ConfigureAwait(false);
-        return new Dictionary<string, string> { ["port"] = name, ["priority"] = value };
-    }));
+        return Show(session, "Reading interface QoS…", async () =>
+        {
+            string value = await device.Qos.GetInterfaceAsync(ports[0], token).ConfigureAwait(false);
+            return new Dictionary<string, string> { ["port"] = name, ["priority"] = value };
+        });
+    }
+
+    return ShowEach(session, "Reading interface QoS…", ports, async port =>
+    {
+        string value = await device.Qos.GetInterfaceAsync(port, token).ConfigureAwait(false);
+        return new Dictionary<string, string> { ["port"] = port.Name, ["priority"] = value };
+    });
+});
 BindParse(Add(qosIf, "set", "Set interface priority", portName, defaultPriority), (device, session, token, parse) =>
-    Plan(device, session, "Preparing QoS change…", () => device.Qos.PlanInterfaceAsync(PortName.Parse(parse.GetValue(portName)!), parse.GetValue(defaultPriority), token)));
+    PlanEach(device, session, "Preparing QoS change…", PortName.ParseSelection(JoinPorts(parse.GetValue(portName))), port =>
+        device.Qos.PlanInterfaceAsync(port, parse.GetValue(defaultPriority), token)));
 Command qosQueue = Add(qos, "queue", "Queue scheduling");
 Option<string?> weights = new("--wrr") { Description = "Eight comma-separated weights" };
 Option<bool> strict = new("--strict");
@@ -587,12 +663,18 @@ CliCompletions.Values(["firmware", "boot", "config"], fileType);
 CliCompletions.Values(["config", "backup"], uploadType);
 CliCompletions.Values(["basic", "advanced", "disabled"], qosMode);
 CliCompletions.Values(["cos", "dscp"], trust);
-CliCompletions.Ports(portName);
+CliCompletions.PortList(portName);
 CliCompletions.Lags(channel);
-CliCompletions.Ports(greenPort, source, dest, macPort, dot1xPort);
+CliCompletions.Ports(greenPort, source, dest, macPort);
+CliCompletions.PortList(dot1xPort);
 CliCompletions.PortList(tagged, untagged, forbidden, none, memberPorts, groupPorts);
 
 return await root.Parse(args).InvokeAsync().ConfigureAwait(false);
+
+static string JoinPorts(IReadOnlyList<string>? tokens)
+{
+    return string.Join(" ", tokens ?? Array.Empty<string>());
+}
 
 static bool On(string text)
 {
@@ -659,10 +741,63 @@ static async Task<int> Show<T>(CliSession session, string status, Func<Task<T>> 
     return 0;
 }
 
+static async Task<int> ShowEach<T>(CliSession session, string status, IReadOnlyList<PortName> ports, Func<PortName, Task<T>> load)
+{
+    if (ports.Count == 1)
+    {
+        return await Show(session, status, () => load(ports[0])).ConfigureAwait(false);
+    }
+
+    List<PortBlock<T>> blocks = await CliActivity.RunAsync(session, status, async () =>
+    {
+        List<PortBlock<T>> values = new List<PortBlock<T>>();
+        foreach (PortName port in ports)
+        {
+            values.Add(new PortBlock<T>(port.Name, await load(port).ConfigureAwait(false)));
+        }
+
+        return values;
+    }).ConfigureAwait(false);
+
+    if (session.Json)
+    {
+        TextOutput.Write(blocks, true);
+        return 0;
+    }
+
+    for (int index = 0; index < blocks.Count; index++)
+    {
+        if (index > 0)
+        {
+            Console.WriteLine();
+        }
+
+        AnsiConsole.MarkupLine("[bold]" + Markup.Escape(blocks[index].Port) + "[/]");
+        TextOutput.Write(blocks[index].Value, false);
+    }
+
+    return 0;
+}
+
 static async Task<int> Plan(SwitchDevice device, CliSession session, string status, Func<Task<ChangePlan>> load)
 {
     ChangePlan plan = await CliActivity.RunAsync(session, status, load).ConfigureAwait(false);
     return await Apply(device, session, plan).ConfigureAwait(false);
+}
+
+// Each callback reads the device before any step runs. A shared form, such as VLAN membership, has to be planned once for the whole selection.
+static Task<int> PlanEach(SwitchDevice device, CliSession session, string status, IReadOnlyList<PortName> ports, Func<PortName, Task<ChangePlan>> planOne)
+{
+    return Plan(device, session, status, async () =>
+    {
+        ChangePlan combined = new ChangePlan();
+        foreach (PortName port in ports)
+        {
+            combined.AddRange(await planOne(port).ConfigureAwait(false));
+        }
+
+        return combined;
+    });
 }
 
 static string? ReadUserPassword(bool requested)
@@ -757,3 +892,5 @@ static void BindParse(Command command, Func<SwitchDevice, CliSession, Cancellati
 {
     command.SetAction((parse, token) => CliHost.Run(parse, token, (device, session, cancellationToken) => action(device, session, cancellationToken, parse)));
 }
+
+file sealed record PortBlock<T>(string Port, T Value);

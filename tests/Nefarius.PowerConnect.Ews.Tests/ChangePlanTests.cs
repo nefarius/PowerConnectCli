@@ -49,6 +49,22 @@ public sealed class ChangePlanTests
     }
 
     [Fact]
+    public void AddRangeKeepsStepOrder()
+    {
+        ChangePlan first = new ChangePlan();
+        first.Add(new ChangeStep("one", false, Array.Empty<FieldDiff>(), _ => Task.CompletedTask, null));
+        first.Add(new ChangeStep("two", false, Array.Empty<FieldDiff>(), _ => Task.CompletedTask, null));
+        ChangePlan second = new ChangePlan();
+        second.Add(new ChangeStep("three", false, Array.Empty<FieldDiff>(), _ => Task.CompletedTask, null));
+
+        ChangePlan combined = new ChangePlan();
+        combined.AddRange(first);
+        combined.AddRange(second);
+
+        Assert.Equal(new[] { "one", "two", "three" }, combined.Steps.Select(step => step.Title));
+    }
+
+    [Fact]
     public void PasswordDiffsAreRedacted()
     {
         FieldDiff diff = new FieldDiff("rlAAALocalUserPassword$query", "secret", "next");

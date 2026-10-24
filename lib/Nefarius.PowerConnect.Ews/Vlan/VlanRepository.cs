@@ -366,26 +366,38 @@ public sealed class VlanRepository
     /// <summary>
     ///     Puts a port into one VLAN as untagged, removes it from every other VLAN, and sets the PVID.
     /// </summary>
-    public async Task<ChangePlan> PlanAccessAsync(PortName port, int vlanId, CancellationToken cancellationToken = default)
+    public Task<ChangePlan> PlanAccessAsync(PortName port, int vlanId, CancellationToken cancellationToken = default)
     {
+        return PlanAccessAsync(new[] { port }, vlanId, cancellationToken);
+    }
+
+    /// <summary>
+    ///     Puts every port into one VLAN as untagged, removes those ports from every other VLAN, and sets each PVID.
+    ///     Membership is planned once per VLAN for the whole selection. Planning it per port would post stale bitmaps
+    ///     that overwrite earlier additions and put removed ports back.
+    /// </summary>
+    public async Task<ChangePlan> PlanAccessAsync(IReadOnlyList<PortName> ports, int vlanId, CancellationToken cancellationToken = default)
+    {
+        if (ports.Count == 0)
+        {
+            throw new SwitchException("At least one port is required.");
+        }
+
         IReadOnlyList<VlanSummary> vlans = await ListAsync(cancellationToken).ConfigureAwait(false);
         ChangePlan plan = new ChangePlan();
         ChangePlan add = await PlanSetAsync(
             vlanId,
             Array.Empty<PortName>(),
-            new[] { port },
+            ports,
             Array.Empty<PortName>(),
             Array.Empty<PortName>(),
             cancellationToken).ConfigureAwait(false);
-        foreach (ChangeStep step in add.Steps)
-        {
-            plan.Add(step);
-        }
+        plan.AddRange(add);
 
-        ChangePlan pvid = await PlanPortSetAsync(port, vlanId, "admit-all", true, cancellationToken).ConfigureAwait(false);
-        foreach (ChangeStep step in pvid.Steps)
+        foreach (PortName port in ports)
         {
-            plan.Add(step);
+            ChangePlan pvid = await PlanPortSetAsync(port, vlanId, "admit-all", true, cancellationToken).ConfigureAwait(false);
+            plan.AddRange(pvid);
         }
 
         foreach (VlanSummary vlan in vlans)
@@ -396,9 +408,18 @@ public sealed class VlanRepository
             }
 
             VlanDetails details = await GetAsync(vlan.Id, cancellationToken).ConfigureAwait(false);
-            if (!details.Egress.Contains(port.Name, StringComparer.OrdinalIgnoreCase) &&
-                !details.Untagged.Contains(port.Name, StringComparer.OrdinalIgnoreCase) &&
-                !details.Forbidden.Contains(port.Name, StringComparer.OrdinalIgnoreCase))
+            List<PortName> remove = new List<PortName>();
+            foreach (PortName port in ports)
+            {
+                if (details.Egress.Contains(port.Name, StringComparer.OrdinalIgnoreCase) ||
+                    details.Untagged.Contains(port.Name, StringComparer.OrdinalIgnoreCase) ||
+                    details.Forbidden.Contains(port.Name, StringComparer.OrdinalIgnoreCase))
+                {
+                    remove.Add(port);
+                }
+            }
+
+            if (remove.Count == 0)
             {
                 continue;
             }
@@ -408,12 +429,9 @@ public sealed class VlanRepository
                 Array.Empty<PortName>(),
                 Array.Empty<PortName>(),
                 Array.Empty<PortName>(),
-                new[] { port },
+                remove,
                 cancellationToken).ConfigureAwait(false);
-            foreach (ChangeStep step in removal.Steps)
-            {
-                plan.Add(step);
-            }
+            plan.AddRange(removal);
         }
 
         return plan;

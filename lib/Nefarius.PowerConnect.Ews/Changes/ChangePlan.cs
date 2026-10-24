@@ -95,6 +95,12 @@ public sealed class ChangePlan
     {
         _steps.Add(step);
     }
+
+    /// <summary>Appends every step from <paramref name="plan"/>, in order.</summary>
+    public void AddRange(ChangePlan plan)
+    {
+        _steps.AddRange(plan._steps);
+    }
 }
 
 /// <summary>
