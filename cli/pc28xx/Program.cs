@@ -100,10 +100,10 @@ Argument<string> channel = new("channel") { Description = "LAG, range, or list (
 Bind(Add(lag, "list", "List LAGs"), (device, session, token) =>
     Show(session, "Reading LAGs…", () => device.Lags.ListAsync(token)));
 BindParse(Add(lag, "show", "Show LAGs", channel), (device, session, token, parse) =>
-    ShowEach(session, "Reading LAG…", PortName.ParseSelection(parse.GetValue(channel)), port => device.Lags.GetAsync(port, token)));
+    ShowEach(session, "Reading LAG…", PortName.ParseLagSelection(parse.GetValue(channel)), port => device.Lags.GetAsync(port, token)));
 Option<string?> balance = new("--balance") { Description = "l2, l3, or l2l3" };
 BindParse(Add(lag, "set", "Set LAG description or load balance", channel, description, balance), (device, session, token, parse) =>
-    PlanEach(device, session, "Preparing LAG change…", PortName.ParseSelection(parse.GetValue(channel)), port =>
+    PlanEach(device, session, "Preparing LAG change…", PortName.ParseLagSelection(parse.GetValue(channel)), port =>
         device.Lags.PlanSetAsync(port, parse.GetValue(description), parse.GetValue(balance), token)));
 Command lagMembers = Add(lag, "members", "LAG membership");
 Option<string> memberPorts = new("--ports") { Description = "Member ports", Required = true };

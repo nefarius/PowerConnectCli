@@ -154,6 +154,23 @@ public readonly record struct PortName
         return ports;
     }
 
+    /// <summary>
+    ///     Parses a required LAG, range, or list. A physical port in the selection is an error.
+    /// </summary>
+    public static IReadOnlyList<PortName> ParseLagSelection(string? text)
+    {
+        IReadOnlyList<PortName> ports = ParseSelection(text);
+        foreach (PortName port in ports)
+        {
+            if (!port.IsLag)
+            {
+                throw new FormatException("'" + port.Name + "' is not a LAG (ch1-ch" + LagCount.ToString(CultureInfo.InvariantCulture) + ").");
+            }
+        }
+
+        return ports;
+    }
+
     private static IEnumerable<PortName> Expand(string part)
     {
         int dash = part.IndexOf('-');

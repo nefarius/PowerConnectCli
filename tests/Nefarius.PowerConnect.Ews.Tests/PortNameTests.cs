@@ -59,6 +59,15 @@ public sealed class PortNameTests
     }
 
     [Fact]
+    public void LagSelectionKeepsLagsAndRejectsPhysicalPorts()
+    {
+        Assert.Equal(new[] { "ch1", "ch2", "ch3" }, PortName.ParseLagSelection("ch1-ch3").Select(port => port.Name));
+        Assert.Equal(new[] { "ch2" }, PortName.ParseLagSelection("1001").Select(port => port.Name));
+        Assert.Throws<FormatException>(() => PortName.ParseLagSelection("g1"));
+        Assert.Throws<FormatException>(() => PortName.ParseLagSelection("ch1,g2"));
+    }
+
+    [Fact]
     public void EmptySelectionThrowsAndAnEmptyListStaysEmpty()
     {
         Assert.Throws<FormatException>(() => PortName.ParseSelection("  "));
