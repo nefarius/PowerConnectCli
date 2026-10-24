@@ -56,6 +56,11 @@ internal static class CliCompletions
         argument.CompletionSources.Add(LagNames);
     }
 
+    public static void PortList(Argument argument)
+    {
+        argument.CompletionSources.Add(context => CompletePortList(context.WordToComplete));
+    }
+
     public static void PortList(params Option[] options)
     {
         foreach (Option option in options)

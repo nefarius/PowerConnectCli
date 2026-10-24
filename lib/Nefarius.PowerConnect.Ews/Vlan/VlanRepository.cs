@@ -361,16 +361,10 @@ public sealed class VlanRepository
             Array.Empty<PortName>(),
             Array.Empty<PortName>(),
             cancellationToken).ConfigureAwait(false);
-        foreach (ChangeStep step in add.Steps)
-        {
-            plan.Add(step);
-        }
+        plan.AddRange(add);
 
         ChangePlan pvid = await PlanPortSetAsync(port, vlanId, "admit-all", true, cancellationToken).ConfigureAwait(false);
-        foreach (ChangeStep step in pvid.Steps)
-        {
-            plan.Add(step);
-        }
+        plan.AddRange(pvid);
 
         foreach (VlanSummary vlan in vlans)
         {
@@ -394,10 +388,7 @@ public sealed class VlanRepository
                 Array.Empty<PortName>(),
                 new[] { port },
                 cancellationToken).ConfigureAwait(false);
-            foreach (ChangeStep step in removal.Steps)
-            {
-                plan.Add(step);
-            }
+            plan.AddRange(removal);
         }
 
         return plan;

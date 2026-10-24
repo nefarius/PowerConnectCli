@@ -112,7 +112,9 @@ public readonly record struct PortName
     }
 
     /// <summary>
-    ///     Splits a comma or space separated port list.
+    ///     Splits a comma, space, or semicolon separated list. Each item is one port or an inclusive range
+    ///     such as <c>g1-g8</c>, <c>g1-8</c>, or <c>ch1-ch3</c>. Duplicates are dropped and the first
+    ///     occurrence keeps its place.
     /// </summary>
     public static IReadOnlyList<PortName> ParseList(string? text)
     {
@@ -122,13 +124,111 @@ public readonly record struct PortName
         }
 
         List<PortName> ports = new List<PortName>();
+        HashSet<string> seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         string[] parts = text.Split(new[] { ',', ' ', ';' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         foreach (string part in parts)
         {
-            ports.Add(Parse(part));
+            foreach (PortName port in Expand(part))
+            {
+                if (seen.Add(port.Name))
+                {
+                    ports.Add(port);
+                }
+            }
         }
 
         return ports;
+    }
+
+    /// <summary>
+    ///     Parses a required port, LAG, range, or list. An empty value is an error.
+    /// </summary>
+    public static IReadOnlyList<PortName> ParseSelection(string? text)
+    {
+        IReadOnlyList<PortName> ports = ParseList(text);
+        if (ports.Count == 0)
+        {
+            throw new FormatException("A port, LAG, range, or list is required (g1-g8, g1-g4,g6, ch1-ch2).");
+        }
+
+        return ports;
+    }
+
+    private static IEnumerable<PortName> Expand(string part)
+    {
+        int dash = part.IndexOf('-');
+        if (dash < 0)
+        {
+            yield return Parse(part);
+            yield break;
+        }
+
+        if (dash == 0 || part.IndexOf('-', dash + 1) >= 0)
+        {
+            throw new FormatException($"'{part}' is not a port range. Use g1-g8 or ch1-ch3.");
+        }
+
+        string left = part[..dash];
+        string right = part[(dash + 1)..];
+        if (IsBareIndex(left))
+        {
+            throw new FormatException($"'{part}' is not a port range. Use g1-g8 or ch1-ch3.");
+        }
+
+        if (!TryParse(left, out PortName start))
+        {
+            throw new FormatException($"'{part}' is not a port range. Use g1-g8 or ch1-ch3.");
+        }
+
+        PortName end = EndOf(start, right, part);
+        if (start.IsLag != end.IsLag)
+        {
+            throw new FormatException($"'{part}' mixes ports and LAGs.");
+        }
+
+        int from = Ordinal(start);
+        int to = Ordinal(end);
+        if (to < from)
+        {
+            throw new FormatException($"'{part}' is reversed. Put the lower port first.");
+        }
+
+        string prefix = start.IsLag ? "ch" : "g";
+        for (int index = from; index <= to; index++)
+        {
+            yield return Parse(prefix + index.ToString(CultureInfo.InvariantCulture));
+        }
+    }
+
+    private static PortName EndOf(PortName start, string right, string part)
+    {
+        if (IsBareIndex(right))
+        {
+            string prefix = start.IsLag ? "ch" : "g";
+            if (!TryParse(prefix + right, out PortName sameKind))
+            {
+                throw new FormatException($"'{part}' is outside g1-g{PortCount.ToString(CultureInfo.InvariantCulture)} or ch1-ch{LagCount.ToString(CultureInfo.InvariantCulture)}.");
+            }
+
+            return sameKind;
+        }
+
+        if (!TryParse(right, out PortName end))
+        {
+            throw new FormatException($"'{part}' is outside g1-g{PortCount.ToString(CultureInfo.InvariantCulture)} or ch1-ch{LagCount.ToString(CultureInfo.InvariantCulture)}.");
+        }
+
+        return end;
+    }
+
+    private static bool IsBareIndex(string text)
+    {
+        return int.TryParse(text, NumberStyles.Integer, CultureInfo.InvariantCulture, out _);
+    }
+
+    private static int Ordinal(PortName port)
+    {
+        return port.IsLag ? port.IfIndex - LagBaseIfIndex + 1 : port.IfIndex;
     }
 
     /// <inheritdoc />

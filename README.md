@@ -81,7 +81,10 @@ Open a new shell after registering the command and changing the profile. On Powe
 pc28xx --host 192.168.2.17 --user admin vlan list
 pc28xx vlan show 20
 pc28xx vlan set 20 --tagged g1 --untagged g5
+pc28xx vlan set 40 --untagged g1-g8
+pc28xx vlan port set g1-g4,g6,g8-g10 --pvid 40
 pc28xx port access g5 --vlan 20
+pc28xx port access g1-g8 --vlan 40
 pc28xx port set g16 --description spare --speed 100 --duplex full
 pc28xx --dry-run snmp community add lab --access ro --station 192.168.2.1
 pc28xx config export -o switch.json
@@ -90,6 +93,8 @@ pc28xx config apply switch.json
 ```
 
 The password comes from `--password` or the `PC28XX_PASSWORD` environment variable. `--json` prints machine-readable output. `--capture-dir` redacts passwords, RADIUS keys, and SNMP community strings in the saved form fields. A capture can still contain the rest of the configuration, so treat the files as sensitive.
+
+A port argument accepts one port (`g5`, `ch2`), an inclusive range (`g1-g8`, `g1-8`, `ch1-ch3`), or a list (`g1-g4,g6,g8-g10`). Commas, spaces, and semicolons separate list items. The same syntax works for `--tagged`, `--untagged`, `--forbidden`, `--none`, and other port lists. A write that names several ports is one change plan and one confirmation. `vlan port set g1-g8 --pvid 40` sets the PVID on each of those ports. `port access g1-g8 --vlan 40` makes the range an untagged member of VLAN 40, sets each PVID, and removes the ports from other VLANs.
 
 On an interactive terminal, `pc28xx` shows a spinner on standard error while it connects, reads, prepares a change, or applies one. The spinner is cleared before the result, the change plan, and confirmation prompts. It stays off for `--json`, `--verbose`, and when standard error is redirected, so scripts and logs stay clean.
 
