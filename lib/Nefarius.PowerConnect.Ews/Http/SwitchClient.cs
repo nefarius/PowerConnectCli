@@ -53,8 +53,45 @@ public sealed class SwitchClient : IAsyncDisposable
         };
 
         SwitchClient client = new SwitchClient(http, connection, log);
-        await client.LoginAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            await client.LoginWithRetryAsync(cancellationToken).ConfigureAwait(false);
+        }
+        catch
+        {
+            http.Dispose();
+            throw;
+        }
+
         return client;
+    }
+
+    private async Task LoginWithRetryAsync(CancellationToken cancellationToken)
+    {
+        int retries = Math.Max(0, _connection.LoginRetries);
+        TimeSpan delay = _connection.LoginRetryDelay < TimeSpan.Zero ? TimeSpan.Zero : _connection.LoginRetryDelay;
+        for (int attempt = 0; ; attempt++)
+        {
+            try
+            {
+                await LoginAsync(cancellationToken).ConfigureAwait(false);
+                return;
+            }
+            catch (Exception exception) when (attempt < retries && !cancellationToken.IsCancellationRequested &&
+                                              (exception is HttpRequestException ||
+                                               exception is TaskCanceledException ||
+                                               (exception is SwitchException && exception.Message.StartsWith("Login failed", StringComparison.Ordinal))))
+            {
+                _logger.Warning(
+                    "Login attempt {Attempt} of {Total} failed ({Reason}); retrying in {Delay:0.##}s",
+                    attempt + 1,
+                    retries + 1,
+                    exception.Message,
+                    delay.TotalSeconds);
+                await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
+                delay = TimeSpan.FromTicks(delay.Ticks * 2);
+            }
+        }
     }
 
     /// <summary>
