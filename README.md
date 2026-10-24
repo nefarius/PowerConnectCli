@@ -26,7 +26,7 @@ The web UI only allows a few sessions at once. Each command logs out when it fin
 
 ## Getting a wiped switch online
 
-`pc28xx` needs an address it can reach. A factory-reset 2816 starts in Unmanaged mode and does not answer on the network until it is put in Managed mode and VLAN 1 has an address. [docs/bootstrap-2816.md](docs/bootstrap-2816.md) is the serial-console procedure, including boot-menu recovery when the password or address is unknown.
+`pc28xx` needs an address it can reach. A factory-reset 2816 starts in Unmanaged mode and does not answer on the network until it is put in Managed mode and VLAN 1 has an address. [docs/bootstrap-2816.md](docs/bootstrap-2816.md) is the serial-console procedure, including how to set the web password from the console and boot-menu recovery when the password or address is unknown.
 
 ## Install
 

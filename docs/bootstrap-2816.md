@@ -39,7 +39,7 @@ In Managed mode, with an empty configuration, Dell documents these defaults:
 | Password | none |
 | DHCP client | off |
 
-An empty configuration also starts the Easy Setup Wizard on the console. It waits 60 seconds. Press Ctrl+Z to leave it. Answering `N` to the first question keeps the defaults above, and a browser on 192.168.2.1 can log in as `admin` with an empty password. Set the PC to another address in 192.168.2.0/24, such as 192.168.2.10, before opening that page.
+An empty configuration also starts the Easy Setup Wizard on the console. It waits 60 seconds. Press Ctrl+Z to leave it. Answering `N` to the first question keeps the defaults above. On software 1.0.0.45 the web UI rejected `admin` with that empty password, and the console logged `%AAA-W-REJECT`. Set a password from the console before opening the page; see [Set the login from the console](#set-the-login-from-the-console). Set the PC to another address in 192.168.2.0/24, such as 192.168.2.10, before opening that page.
 
 The wizard asks for an optional SNMP community, a level-15 user, the management address and mask, and the default gateway. Answer `Y` at the end to store that configuration. The address it configures is the VLAN 1 management address.
 
@@ -103,11 +103,23 @@ Privileged EXEC on this software has no separate save command. Its `copy` comman
 
 `copy run start` is the wrong shortcut on other Dell switches: it can create a file named `start` and leave the saved configuration unchanged. It is not a save command here either.
 
+## Set the login from the console
+
+The factory user is `admin` with an empty password. Software 1.0.0.45 rejected that login from the web UI. `pc28xx` also refuses to start when the password is empty. From global configuration, set the password and privilege level 15. That is the read/write level the setup wizard assigns to the management user.
+
+```text
+console# configure
+console(config)# username admin password admin level 15
+console(config)# end
+```
+
+The switch prints nothing and returns to the prompt when the command is accepted. The keyword on this software is `level`. One example in the printed command reference uses `privilege`; that word is not accepted here. Interactive help after the user name lists `password`, `level`, and `encrypted`.
+
+`admin` / `admin` is the password this procedure was checked with. A login with those values redirects to `/home.htm`. Use a different password when the switch is reachable from a network you do not trust. The web session is plain HTTP, so the password is visible to anyone on the LAN.
+
 ## Continue with the web UI or pc28xx
 
-Open `http://192.168.2.18` and log in as `admin`. The session is plain HTTP.
-
-`pc28xx` refuses to start when the password is empty. Set a password in the Easy Setup Wizard, or later from the web UI, before the first `pc28xx` command. Then:
+Open `http://192.168.2.18` and log in as `admin` with the password from the previous section.
 
 ```text
 pc28xx --host 192.168.2.18 --user admin ip show
@@ -136,7 +148,7 @@ This erases the saved configuration. Use it when the address or password is unkn
 7. The Easy Setup Wizard starts. Answer `N` to keep the factory address, or complete the wizard with the address you want.
 8. The switch is still Unmanaged after this erase, including when the wizard was completed. Hold the Managed Mode button until it reboots into Managed mode.
 
-The factory login is then `admin` with no password, at 192.168.2.1/24 if the wizard was skipped. Continue with [Assign the address from the console](#assign-the-address-from-the-console) or the web UI.
+The factory login is then `admin` with no password, at 192.168.2.1/24 if the wizard was skipped. The web UI on software 1.0.0.45 rejected that empty password, so set one with [Set the login from the console](#set-the-login-from-the-console) before using the page or `pc28xx`. Continue with [Assign the address from the console](#assign-the-address-from-the-console) when the wizard was skipped.
 
 `restore-defaults` from `console#` also returns the device to the factory configuration. It is available only after you already have a Managed-mode console session.
 
