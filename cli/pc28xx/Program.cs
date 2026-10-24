@@ -90,8 +90,10 @@ BindParse(Add(port, "set", "Change port settings. With no options this resubmits
 });
 Option<int> accessVlan = new("--vlan") { Description = "Access VLAN", Required = true };
 BindParse(Add(port, "access", "Make ports untagged members of one VLAN and set their PVID", portName, accessVlan), (device, session, token, parse) =>
-    PlanEach(device, session, "Preparing port change…", PortName.ParseSelection(parse.GetValue(portName)), port =>
-        device.Vlans.PlanAccessAsync(port, parse.GetValue(accessVlan), token)));
+    Plan(device, session, "Preparing port change…", () => device.Vlans.PlanAccessAsync(
+        PortName.ParseSelection(parse.GetValue(portName)),
+        parse.GetValue(accessVlan),
+        token)));
 
 Command lag = Add(root, "lag", "Link aggregation");
 Argument<string> channel = new("channel") { Description = "LAG, range, or list (ch1-ch8, ch1-ch3)" };
@@ -742,6 +744,7 @@ static async Task<int> Plan(SwitchDevice device, CliSession session, string stat
     return await Apply(device, session, plan).ConfigureAwait(false);
 }
 
+// Each callback reads the device before any step runs. A shared form, such as VLAN membership, has to be planned once for the whole selection.
 static Task<int> PlanEach(SwitchDevice device, CliSession session, string status, IReadOnlyList<PortName> ports, Func<PortName, Task<ChangePlan>> planOne)
 {
     return Plan(device, session, status, async () =>

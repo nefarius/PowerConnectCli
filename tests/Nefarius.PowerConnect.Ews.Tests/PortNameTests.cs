@@ -41,6 +41,8 @@ public sealed class PortNameTests
     [InlineData("g1-ch2")]
     [InlineData("1-8")]
     [InlineData("g1-")]
+    [InlineData("g1-g4-g6")]
+    [InlineData("-g1")]
     [InlineData("nope")]
     public void BadRangesThrow(string text)
     {
