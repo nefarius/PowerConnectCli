@@ -1,5 +1,7 @@
 using System.Text.Json;
 
+using ModelContextProtocol;
+
 using Nefarius.PowerConnect.Cli.Mcp;
 using Nefarius.PowerConnect.Ews.Changes;
 
@@ -70,6 +72,46 @@ public sealed class McpChangeRunnerTests
         Assert.Equal("unchanged", result.Status);
         Assert.False(result.Applied);
         Assert.Empty(result.Steps);
+    }
+
+    [Fact]
+    public async Task ApplyFailureReportsAnIndeterminateOutcomeWithoutRetrying()
+    {
+        int applied = 0;
+        ChangePlan plan = new ChangePlan();
+        plan.Add(new ChangeStep(
+            "First",
+            destructive: false,
+            Array.Empty<FieldDiff>(),
+            _ =>
+            {
+                applied++;
+                return Task.CompletedTask;
+            },
+            _ => Task.FromResult<string?>("read-back failed")));
+        plan.Add(new ChangeStep(
+            "Second",
+            destructive: false,
+            Array.Empty<FieldDiff>(),
+            _ =>
+            {
+                applied++;
+                return Task.CompletedTask;
+            },
+            null));
+
+        McpException exception = await Assert.ThrowsAsync<McpException>(() => new McpChangeRunner().RunAsync(
+            plan,
+            apply: true,
+            iUnderstand: true,
+            requireAcknowledgement: false,
+            CancellationToken.None));
+
+        Assert.Equal(1, applied);
+        Assert.Contains("indeterminate", exception.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("re-read", exception.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("read-back failed", exception.Message);
+        Assert.DoesNotContain("1 step", exception.Message, StringComparison.OrdinalIgnoreCase);
     }
 
     private static ChangePlan Plan(bool destructive, Action apply, params (string field, string before, string after)[] diffs)

@@ -182,7 +182,9 @@ internal sealed class FakePowerConnectSessions : IPowerConnectSessions
         return Targets;
     }
 
-    public Task<T> ExecuteAsync<T>(string alias, Func<IPowerConnectSession, CancellationToken, Task<T>> action, CancellationToken cancellationToken)
+    public int ActiveSessions { get; private set; }
+
+    public async Task<T> ExecuteAsync<T>(string alias, Func<IPowerConnectSession, CancellationToken, Task<T>> action, CancellationToken cancellationToken)
     {
         if (!alias.Equals("core", StringComparison.OrdinalIgnoreCase))
         {
@@ -190,7 +192,15 @@ internal sealed class FakePowerConnectSessions : IPowerConnectSessions
         }
 
         Aliases.Add(alias);
-        return action(Session, cancellationToken);
+        ActiveSessions++;
+        try
+        {
+            return await action(Session, cancellationToken).ConfigureAwait(false);
+        }
+        finally
+        {
+            ActiveSessions--;
+        }
     }
 }
 
@@ -204,6 +214,8 @@ internal sealed class RecordingRunner : IMcpChangeRunner
 
     public bool RequireAcknowledgement { get; private set; }
 
+    public Action? OnRun { get; set; }
+
     public Task<McpChangeResult> RunAsync(
         ChangePlan plan,
         bool apply,
@@ -211,6 +223,7 @@ internal sealed class RecordingRunner : IMcpChangeRunner
         bool requireAcknowledgement,
         CancellationToken cancellationToken)
     {
+        OnRun?.Invoke();
         Plan = plan;
         Apply = apply;
         IUnderstand = iUnderstand;

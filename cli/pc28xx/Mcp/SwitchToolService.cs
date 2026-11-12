@@ -48,8 +48,8 @@ internal sealed class SwitchToolService
                 throw new FormatException("VLAN name is required.");
             }
 
-            ChangePlan plan = await Use(alias, (session, token) => session.PlanCreateVlanAsync(id, name.Trim(), token), cancellationToken).ConfigureAwait(false);
-            return await _runner.RunAsync(plan, apply, iUnderstand: false, requireAcknowledgement: false, cancellationToken).ConfigureAwait(false);
+            string vlanName = name.Trim();
+            return await ApplyPlanAsync(alias, apply, iUnderstand: false, requireAcknowledgement: false, (session, token) => session.PlanCreateVlanAsync(id, vlanName, token), cancellationToken).ConfigureAwait(false);
         }, cancellationToken);
     }
 
@@ -58,8 +58,7 @@ internal sealed class SwitchToolService
         return Guard(async () =>
         {
             RequireVlan(id, allowDefault: false);
-            ChangePlan plan = await Use(alias, (session, token) => session.PlanDeleteVlanAsync(id, token), cancellationToken).ConfigureAwait(false);
-            return await _runner.RunAsync(plan, apply, iUnderstand: false, requireAcknowledgement: false, cancellationToken).ConfigureAwait(false);
+            return await ApplyPlanAsync(alias, apply, iUnderstand: false, requireAcknowledgement: false, (session, token) => session.PlanDeleteVlanAsync(id, token), cancellationToken).ConfigureAwait(false);
         }, cancellationToken);
     }
 
@@ -85,11 +84,14 @@ internal sealed class SwitchToolService
                 throw new FormatException("Name at least one port in tagged, untagged, forbidden, or none.");
             }
 
-            ChangePlan plan = await Use(
+            RejectOverlappingPorts(taggedPorts, untaggedPorts, forbiddenPorts, removedPorts);
+            return await ApplyPlanAsync(
                 alias,
+                apply,
+                iUnderstand: false,
+                requireAcknowledgement: false,
                 (session, token) => session.PlanSetVlanAsync(id, taggedPorts, untaggedPorts, forbiddenPorts, removedPorts, token),
                 cancellationToken).ConfigureAwait(false);
-            return await _runner.RunAsync(plan, apply, iUnderstand: false, requireAcknowledgement: false, cancellationToken).ConfigureAwait(false);
         }, cancellationToken);
     }
 
@@ -140,7 +142,7 @@ internal sealed class SwitchToolService
                 throw new FormatException("PVID must be between 1 and 4094.");
             }
 
-            ChangePlan plan = await Use(alias, async (session, token) =>
+            return await ApplyPlanAsync(alias, apply, iUnderstand: false, requireAcknowledgement: false, async (session, token) =>
             {
                 ChangePlan combined = new ChangePlan();
                 foreach (PortName port in selection)
@@ -150,7 +152,6 @@ internal sealed class SwitchToolService
 
                 return combined;
             }, cancellationToken).ConfigureAwait(false);
-            return await _runner.RunAsync(plan, apply, iUnderstand: false, requireAcknowledgement: false, cancellationToken).ConfigureAwait(false);
         }, cancellationToken);
     }
 
@@ -160,8 +161,7 @@ internal sealed class SwitchToolService
         {
             IReadOnlyList<PortName> selection = McpValues.RequiredPorts(ports);
             RequireVlan(vlan, allowDefault: true);
-            ChangePlan plan = await Use(alias, (session, token) => session.PlanAccessVlanAsync(selection, vlan, token), cancellationToken).ConfigureAwait(false);
-            return await _runner.RunAsync(plan, apply, iUnderstand: false, requireAcknowledgement: false, cancellationToken).ConfigureAwait(false);
+            return await ApplyPlanAsync(alias, apply, iUnderstand: false, requireAcknowledgement: false, (session, token) => session.PlanAccessVlanAsync(selection, vlan, token), cancellationToken).ConfigureAwait(false);
         }, cancellationToken);
     }
 
@@ -228,7 +228,7 @@ internal sealed class SwitchToolService
                 throw new FormatException("Set at least one port field.");
             }
 
-            ChangePlan plan = await Use(alias, async (session, token) =>
+            return await ApplyPlanAsync(alias, apply, iUnderstand: false, requireAcknowledgement: false, async (session, token) =>
             {
                 ChangePlan combined = new ChangePlan();
                 foreach (PortName port in selection)
@@ -238,7 +238,6 @@ internal sealed class SwitchToolService
 
                 return combined;
             }, cancellationToken).ConfigureAwait(false);
-            return await _runner.RunAsync(plan, apply, iUnderstand: false, requireAcknowledgement: false, cancellationToken).ConfigureAwait(false);
         }, cancellationToken);
     }
 
@@ -261,8 +260,7 @@ internal sealed class SwitchToolService
                 throw new FormatException("Asset tag is required.");
             }
 
-            ChangePlan plan = await Use(alias, (session, token) => session.PlanAssetTagAsync(tag, token), cancellationToken).ConfigureAwait(false);
-            return await _runner.RunAsync(plan, apply, iUnderstand: false, requireAcknowledgement: false, cancellationToken).ConfigureAwait(false);
+            return await ApplyPlanAsync(alias, apply, iUnderstand: false, requireAcknowledgement: false, (session, token) => session.PlanAssetTagAsync(tag, token), cancellationToken).ConfigureAwait(false);
         }, cancellationToken);
     }
 
@@ -280,8 +278,7 @@ internal sealed class SwitchToolService
         return Guard(async () =>
         {
             string normalized = McpValues.SecureMode(mode);
-            ChangePlan plan = await Use(alias, (session, token) => session.PlanSecureModeAsync(normalized, token), cancellationToken).ConfigureAwait(false);
-            return await _runner.RunAsync(plan, apply, iUnderstand, requireAcknowledgement: normalized == "unmanaged", cancellationToken).ConfigureAwait(false);
+            return await ApplyPlanAsync(alias, apply, iUnderstand, requireAcknowledgement: normalized == "unmanaged", (session, token) => session.PlanSecureModeAsync(normalized, token), cancellationToken).ConfigureAwait(false);
         }, cancellationToken);
     }
 
@@ -295,8 +292,7 @@ internal sealed class SwitchToolService
         return Guard(async () =>
         {
             bool enabled = McpValues.OnOff(state);
-            ChangePlan plan = await Use(alias, (session, token) => session.PlanJumboAsync(enabled, token), cancellationToken).ConfigureAwait(false);
-            return await _runner.RunAsync(plan, apply, iUnderstand: false, requireAcknowledgement: false, cancellationToken).ConfigureAwait(false);
+            return await ApplyPlanAsync(alias, apply, iUnderstand: false, requireAcknowledgement: false, (session, token) => session.PlanJumboAsync(enabled, token), cancellationToken).ConfigureAwait(false);
         }, cancellationToken);
     }
 
@@ -304,8 +300,7 @@ internal sealed class SwitchToolService
     {
         return Guard(async () =>
         {
-            ChangePlan plan = await Use(alias, (session, token) => session.PlanResetAsync(token), cancellationToken).ConfigureAwait(false);
-            return await _runner.RunAsync(plan, apply, iUnderstand, requireAcknowledgement: true, cancellationToken).ConfigureAwait(false);
+            return await ApplyPlanAsync(alias, apply, iUnderstand, requireAcknowledgement: true, (session, token) => session.PlanResetAsync(token), cancellationToken).ConfigureAwait(false);
         }, cancellationToken);
     }
 
@@ -345,14 +340,28 @@ internal sealed class SwitchToolService
                 mutations[field.Key] = field.Value ?? "";
             }
 
-            ChangePlan plan = await Use(alias, (session, token) => session.PlanRawSetAsync(path, mutations, token), cancellationToken).ConfigureAwait(false);
-            return await _runner.RunAsync(plan, apply, iUnderstand, requireAcknowledgement: true, cancellationToken).ConfigureAwait(false);
+            return await ApplyPlanAsync(alias, apply, iUnderstand, requireAcknowledgement: true, (session, token) => session.PlanRawSetAsync(path, mutations, token), cancellationToken).ConfigureAwait(false);
         }, cancellationToken);
     }
 
     private Task<T> Use<T>(string alias, Func<IPowerConnectSession, CancellationToken, Task<T>> action, CancellationToken cancellationToken)
     {
         return _sessions.ExecuteAsync(NormalizeAlias(alias), action, cancellationToken);
+    }
+
+    private Task<McpChangeResult> ApplyPlanAsync(
+        string alias,
+        bool apply,
+        bool iUnderstand,
+        bool requireAcknowledgement,
+        Func<IPowerConnectSession, CancellationToken, Task<ChangePlan>> load,
+        CancellationToken cancellationToken)
+    {
+        return Use(alias, async (session, token) =>
+        {
+            ChangePlan plan = await load(session, token).ConfigureAwait(false);
+            return await _runner.RunAsync(plan, apply, iUnderstand, requireAcknowledgement, token).ConfigureAwait(false);
+        }, cancellationToken);
     }
 
     private static async Task<T> Guard<T>(Func<Task<T>> action, CancellationToken cancellationToken)
@@ -403,6 +412,59 @@ internal sealed class SwitchToolService
             throw new FormatException("A page name is required.");
         }
 
-        return page.Trim();
+        string trimmed = page.Trim();
+        if (HasLeadingDoubleSeparator(trimmed))
+        {
+            throw new FormatException("Page path must name a switch page.");
+        }
+
+        return trimmed;
+    }
+
+    private static bool HasLeadingDoubleSeparator(string page)
+    {
+        if (page.Length == 0 || !IsPathSeparator(page[0]))
+        {
+            return false;
+        }
+
+        int index = 1;
+        while (index < page.Length && (char.IsControl(page[index]) || char.IsWhiteSpace(page[index])))
+        {
+            index++;
+        }
+
+        return index < page.Length && IsPathSeparator(page[index]);
+    }
+
+    private static bool IsPathSeparator(char value)
+    {
+        return value is '/' or '\\';
+    }
+
+    private static void RejectOverlappingPorts(
+        IReadOnlyList<PortName> tagged,
+        IReadOnlyList<PortName> untagged,
+        IReadOnlyList<PortName> forbidden,
+        IReadOnlyList<PortName> removed)
+    {
+        Dictionary<string, string> owners = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        RejectGroup(owners, tagged, "tagged");
+        RejectGroup(owners, untagged, "untagged");
+        RejectGroup(owners, forbidden, "forbidden");
+        RejectGroup(owners, removed, "none");
+    }
+
+    private static void RejectGroup(Dictionary<string, string> owners, IReadOnlyList<PortName> ports, string group)
+    {
+        foreach (PortName port in ports)
+        {
+            if (owners.TryGetValue(port.Name, out string? existing))
+            {
+                throw new FormatException("Port '" + port.Name + "' is listed in both " + existing + " and " + group + ".");
+            }
+
+            owners[port.Name] = group;
+        }
     }
 }

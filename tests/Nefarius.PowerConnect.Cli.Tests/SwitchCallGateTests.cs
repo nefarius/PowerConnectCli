@@ -24,13 +24,21 @@ public sealed class SwitchCallGateTests
             await release.Task;
             return 1;
         }, CancellationToken.None);
-        await Task.WhenAll(firstEntered.Task, secondEntered.Task);
+        Task<int>? queued = null;
+        try
+        {
+            Task entered = Task.WhenAll(firstEntered.Task, secondEntered.Task);
+            Assert.True(await Task.WhenAny(entered, Task.Delay(TimeSpan.FromSeconds(5))) == entered, "core and edge did not overlap.");
 
-        Task<int> queued = gate.RunAsync("CORE", _ => Task.FromResult(2), CancellationToken.None);
-        await Task.Delay(50);
-        Assert.False(queued.IsCompleted);
+            queued = gate.RunAsync("CORE", _ => Task.FromResult(2), CancellationToken.None);
+            await Task.Delay(50);
+            Assert.False(queued.IsCompleted);
+        }
+        finally
+        {
+            release.TrySetResult();
+        }
 
-        release.TrySetResult();
-        Assert.Equal(new[] { 1, 1, 2 }, await Task.WhenAll(core, edge, queued));
+        Assert.Equal(new[] { 1, 1, 2 }, await Task.WhenAll(core, edge, queued!).WaitAsync(TimeSpan.FromSeconds(5)));
     }
 }

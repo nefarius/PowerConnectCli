@@ -141,10 +141,29 @@ public sealed class McpStdioSmokeTests
 
         start.Environment.Remove(McpCommand.TargetsFileVariable);
         using Process process = Process.Start(start) ?? throw new InvalidOperationException("dotnet did not start.");
-        string stdout = process.StandardOutput.ReadToEnd();
-        string stderr = process.StandardError.ReadToEnd();
-        Assert.True(process.WaitForExit(20000), "pc28xx did not exit.");
-        return new ProcessResult(process.ExitCode, stdout, stderr);
+        Task<string> stdoutTask = process.StandardOutput.ReadToEndAsync();
+        Task<string> stderrTask = process.StandardError.ReadToEndAsync();
+        bool exited = process.WaitForExit(20000);
+        if (!exited)
+        {
+            try
+            {
+                process.Kill(entireProcessTree: true);
+            }
+            catch (InvalidOperationException)
+            {
+            }
+
+            process.WaitForExit(5000);
+        }
+
+        if (!Task.WaitAll(new Task[] { stdoutTask, stderrTask }, TimeSpan.FromSeconds(5)))
+        {
+            throw new TimeoutException("pc28xx output was not collected.");
+        }
+
+        Assert.True(exited, "pc28xx did not exit.");
+        return new ProcessResult(process.ExitCode, stdoutTask.Result, stderrTask.Result);
     }
 
     private static string CliDll()

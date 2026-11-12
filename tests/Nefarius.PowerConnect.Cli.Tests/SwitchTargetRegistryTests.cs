@@ -90,6 +90,26 @@ public sealed class SwitchTargetRegistryTests : IDisposable
         Assert.DoesNotContain(Secret, missing.Message);
     }
 
+    [Fact]
+    public void RejectsCaptureDirectories()
+    {
+        SwitchTargetException exception = Assert.Throws<SwitchTargetException>(() => SwitchTargetRegistry.Load(Write("""
+            {
+              "switches": [
+                {
+                  "alias": "core",
+                  "host": "192.168.2.17",
+                  "passwordEnvironmentVariable": "PC28XX_CORE_PASSWORD",
+                  "captureDirectory": "/tmp/super-secret-password"
+                }
+              ]
+            }
+            """)));
+
+        Assert.Contains("captureDirectory is disabled", exception.Message);
+        Assert.DoesNotContain(Secret, exception.Message);
+    }
+
     [Theory]
     [InlineData("""{ "switches": [] }""", "at least one")]
     [InlineData("""{ "switches": [ { "alias": "core", "host": "192.168.2.17" } ] }""", "passwordEnvironmentVariable")]

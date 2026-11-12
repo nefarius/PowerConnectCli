@@ -22,8 +22,6 @@ internal sealed class SwitchTarget
 
     public double LoginRetryDelaySeconds { get; init; } = 2;
 
-    public string? CaptureDirectory { get; init; }
-
     public bool Verbose { get; init; }
 
     public SwitchTargetInfo Describe()
@@ -52,7 +50,6 @@ internal sealed class SwitchTargetRegistry
         "timeoutSeconds",
         "loginRetries",
         "loginRetryDelaySeconds",
-        "captureDirectory",
         "verbose"
     };
 
@@ -168,7 +165,7 @@ internal sealed class SwitchTargetRegistry
             Timeout = TimeSpan.FromSeconds(target.TimeoutSeconds),
             LoginRetries = target.LoginRetries,
             LoginRetryDelay = TimeSpan.FromSeconds(target.LoginRetryDelaySeconds),
-            CaptureDirectory = target.CaptureDirectory
+            CaptureDirectory = null
         };
     }
 
@@ -196,6 +193,12 @@ internal sealed class SwitchTargetRegistry
             {
                 throw new SwitchTargetException(
                     "Switch targets must not contain passwords. Set passwordEnvironmentVariable to the name of an environment variable.");
+            }
+
+            if (property.Name.Equals("captureDirectory", StringComparison.OrdinalIgnoreCase))
+            {
+                throw new SwitchTargetException(
+                    "captureDirectory is disabled because captured HTML can still contain passwords, RADIUS keys, and SNMP communities.");
             }
 
             if (!KnownProperties.Any(name => name.Equals(property.Name, StringComparison.OrdinalIgnoreCase)))
@@ -236,12 +239,6 @@ internal sealed class SwitchTargetRegistry
             throw new SwitchTargetException("loginRetryDelaySeconds for switch '" + alias + "' must be a non-negative number of seconds.");
         }
 
-        string? capture = OptionalString(item, "captureDirectory");
-        if (capture != null && string.IsNullOrWhiteSpace(capture))
-        {
-            throw new SwitchTargetException("captureDirectory for switch '" + alias + "' is empty.");
-        }
-
         string user = OptionalString(item, "user")?.Trim() ?? "admin";
         if (user.Length == 0)
         {
@@ -257,7 +254,6 @@ internal sealed class SwitchTargetRegistry
             TimeoutSeconds = timeout,
             LoginRetries = retries,
             LoginRetryDelaySeconds = delay,
-            CaptureDirectory = string.IsNullOrWhiteSpace(capture) ? null : capture,
             Verbose = OptionalBool(item, "verbose") ?? false
         };
     }

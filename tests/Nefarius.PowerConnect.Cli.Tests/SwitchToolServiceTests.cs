@@ -21,6 +21,7 @@ public sealed class SwitchToolServiceTests
     [Fact]
     public async Task MapsPortRangesAndSettingsBeforePlanning()
     {
+        _runner.OnRun = () => Assert.Equal(1, _sessions.ActiveSessions);
         await _service.SetPortsAsync(" core ", "g1-g2,g4", admin: "down", description: null, speed: 100, duplex: null, autoNegotiation: "off", flowControl: null, mdix: null, backPressure: null, apply: false, CancellationToken.None);
 
         Assert.Equal(new[] { "core" }, _sessions.Aliases);
@@ -58,6 +59,47 @@ public sealed class SwitchToolServiceTests
         Assert.Contains("up or down", exception.Message);
         Assert.Empty(_sessions.Session.Calls);
         Assert.Null(_runner.Plan);
+    }
+
+    [Fact]
+    public async Task RejectsAPortListedInMoreThanOneMembershipGroup()
+    {
+        McpException exception = await Assert.ThrowsAsync<McpException>(() => _service.SetVlanAsync("core", 20, tagged: "g1", untagged: "g1-g2", forbidden: null, none: null, apply: true, CancellationToken.None));
+
+        Assert.Contains("g1", exception.Message);
+        Assert.Contains("tagged", exception.Message);
+        Assert.Contains("untagged", exception.Message);
+        Assert.Empty(_sessions.Session.Calls);
+    }
+
+    [Theory]
+    [InlineData("//config/vlan_member.htm")]
+    [InlineData("\\\\server\\share")]
+    [InlineData("/\\config/vlan_member.htm")]
+    [InlineData("/ \t/config/vlan_member.htm")]
+    public async Task RejectsNetworkStylePagePaths(string page)
+    {
+        McpException get = await Assert.ThrowsAsync<McpException>(() => _service.RawGetAsync("core", "  " + page, CancellationToken.None));
+        McpException set = await Assert.ThrowsAsync<McpException>(() => _service.RawSetAsync(
+            "core",
+            page + "  ",
+            new Dictionary<string, string> { ["sysName$query"] = "lab" },
+            apply: false,
+            iUnderstand: false,
+            CancellationToken.None));
+
+        Assert.Contains("switch page", get.Message);
+        Assert.Contains("switch page", set.Message);
+        Assert.Empty(_sessions.Aliases);
+    }
+
+    [Fact]
+    public async Task AcceptsOrdinarySwitchPages()
+    {
+        await _service.RawGetAsync("core", "  /config/vlan_member.htm  ", CancellationToken.None);
+        await _service.RawGetAsync("core", "vlan_member.htm", CancellationToken.None);
+
+        Assert.Equal(new[] { "/config/vlan_member.htm", "vlan_member.htm" }, _sessions.Session.Calls.Select(call => (string)call.Arguments[0]!));
     }
 
     [Fact]

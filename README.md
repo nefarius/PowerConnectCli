@@ -130,7 +130,7 @@ Switch names and passwords stay outside the model. A JSON file lists aliases, an
 }
 ```
 
-`user` defaults to `admin`. `timeoutSeconds` defaults to 30, `loginRetries` to 3, and `loginRetryDelaySeconds` to 2. Optional `captureDirectory` and `verbose` match `--capture-dir` and `--verbose`. Verbose HTTP logs are written to standard error, with the same password redaction as the CLI.
+`user` defaults to `admin`. `timeoutSeconds` defaults to 30, `loginRetries` to 3, and `loginRetryDelaySeconds` to 2. Optional `verbose` matches `--verbose` and writes HTTP logs to standard error. `captureDirectory` is rejected: captured HTML can still contain passwords, RADIUS keys, and SNMP communities.
 
 Cursor starts one `pc28xx mcp` process. The targets file can name every switch, and each password is its own environment variable:
 

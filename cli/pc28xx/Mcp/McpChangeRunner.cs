@@ -1,5 +1,7 @@
 using System.Globalization;
 
+using ModelContextProtocol;
+
 using Nefarius.PowerConnect.Ews.Changes;
 
 namespace Nefarius.PowerConnect.Cli.Mcp;
@@ -57,17 +59,31 @@ internal sealed class McpChangeRunner : IMcpChangeRunner
         }
 
         ChangeExecutor executor = new ChangeExecutor();
-        int status = await executor.ExecuteAsync(
-            plan,
-            new ChangeExecutionOptions
-            {
-                DryRun = !apply,
-                Yes = apply,
-                IUnderstand = iUnderstand,
-                ConfirmAsync = null,
-                WriteLine = _ => { }
-            },
-            cancellationToken).ConfigureAwait(false);
+        int status;
+        try
+        {
+            status = await executor.ExecuteAsync(
+                plan,
+                new ChangeExecutionOptions
+                {
+                    DryRun = !apply,
+                    Yes = apply,
+                    IUnderstand = iUnderstand,
+                    ConfirmAsync = null,
+                    WriteLine = _ => { }
+                },
+                cancellationToken).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw;
+        }
+        catch (Exception exception) when (apply)
+        {
+            McpErrors.TryDescribe(exception, out string detail);
+            throw new McpException(
+                "Applying the change failed and the outcome is indeterminate. Earlier steps may already have changed the switch; re-read it before acting. " + detail);
+        }
 
         if (!apply)
         {
