@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Text;
 
 using Nefarius.PowerConnect.Cli;
+using Nefarius.PowerConnect.Cli.Mcp;
 using Nefarius.PowerConnect.Ews;
 using Nefarius.PowerConnect.Ews.Changes;
 using Nefarius.PowerConnect.Ews.Dhcp;
@@ -13,6 +14,11 @@ using Nefarius.PowerConnect.Ews.Security;
 using Nefarius.PowerConnect.Ews.Snapshot;
 
 using Spectre.Console;
+
+if (McpCommand.IsDirectInvocation(args))
+{
+    return await McpCommand.RunAsync(args).ConfigureAwait(false);
+}
 
 RootCommand root = new("pc28xx drives a Dell PowerConnect 28xx web UI. Writes are shown and applied only after confirmation.");
 CliHost.AddGlobals(root);
@@ -668,6 +674,14 @@ CliCompletions.Lags(channel);
 CliCompletions.Ports(greenPort, source, dest, macPort);
 CliCompletions.PortList(dot1xPort);
 CliCompletions.PortList(tagged, untagged, forbidden, none, memberPorts, groupPorts);
+
+Option<string?> targetsFile = new("--targets-file")
+{
+    Description = "JSON file of switch aliases. Defaults to PC28XX_MCP_TARGETS_FILE",
+    Recursive = false
+};
+Command mcp = Add(root, "mcp", "Serve VLAN, port, system, and raw tools over stdio MCP.", targetsFile);
+mcp.SetAction((parse, token) => McpCommand.RunAsync(parse.GetValue(targetsFile), token));
 
 return await root.Parse(args).InvokeAsync().ConfigureAwait(false);
 

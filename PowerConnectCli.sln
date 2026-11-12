@@ -15,6 +15,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{0AB3BF05
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nefarius.PowerConnect.Ews.Tests", "tests\Nefarius.PowerConnect.Ews.Tests\Nefarius.PowerConnect.Ews.Tests.csproj", "{00A8FDC8-BFA1-447F-9430-60E1C93A1ADD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nefarius.PowerConnect.Cli.Tests", "tests\Nefarius.PowerConnect.Cli.Tests\Nefarius.PowerConnect.Cli.Tests.csproj", "{511D5F7B-661E-4734-94E1-796CB1081675}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -61,6 +63,18 @@ Global
 		{00A8FDC8-BFA1-447F-9430-60E1C93A1ADD}.Release|x64.Build.0 = Release|Any CPU
 		{00A8FDC8-BFA1-447F-9430-60E1C93A1ADD}.Release|x86.ActiveCfg = Release|Any CPU
 		{00A8FDC8-BFA1-447F-9430-60E1C93A1ADD}.Release|x86.Build.0 = Release|Any CPU
+		{511D5F7B-661E-4734-94E1-796CB1081675}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{511D5F7B-661E-4734-94E1-796CB1081675}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{511D5F7B-661E-4734-94E1-796CB1081675}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{511D5F7B-661E-4734-94E1-796CB1081675}.Debug|x64.Build.0 = Debug|Any CPU
+		{511D5F7B-661E-4734-94E1-796CB1081675}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{511D5F7B-661E-4734-94E1-796CB1081675}.Debug|x86.Build.0 = Debug|Any CPU
+		{511D5F7B-661E-4734-94E1-796CB1081675}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{511D5F7B-661E-4734-94E1-796CB1081675}.Release|Any CPU.Build.0 = Release|Any CPU
+		{511D5F7B-661E-4734-94E1-796CB1081675}.Release|x64.ActiveCfg = Release|Any CPU
+		{511D5F7B-661E-4734-94E1-796CB1081675}.Release|x64.Build.0 = Release|Any CPU
+		{511D5F7B-661E-4734-94E1-796CB1081675}.Release|x86.ActiveCfg = Release|Any CPU
+		{511D5F7B-661E-4734-94E1-796CB1081675}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -69,5 +83,6 @@ Global
 		{A86C2CA6-4B27-4CF9-80F0-E7F467AC2ECA} = {3A8DF596-E814-FECC-DD4B-D8EF8AAC1A0D}
 		{8E6572AB-54ED-415E-BCCE-96084D1D5DA2} = {342A349A-D343-8551-4064-2E2800C39E13}
 		{00A8FDC8-BFA1-447F-9430-60E1C93A1ADD} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
+		{511D5F7B-661E-4734-94E1-796CB1081675} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 	EndGlobalSection
 EndGlobal
