@@ -413,12 +413,41 @@ internal sealed class SwitchToolService
         }
 
         string trimmed = page.Trim();
-        if (HasLeadingDoubleSeparator(trimmed))
+        if (HasLeadingDoubleSeparator(trimmed) || IsSchemeQualifiedAbsoluteUrl(trimmed))
         {
             throw new FormatException("Page path must name a switch page.");
         }
 
         return trimmed;
+    }
+
+    private static bool IsSchemeQualifiedAbsoluteUrl(string page)
+    {
+        if (page.Length == 0 || !IsSchemeStart(page[0]))
+        {
+            return false;
+        }
+
+        int index = 1;
+        while (index < page.Length && IsSchemeCharacter(page[index]))
+        {
+            index++;
+        }
+
+        return index + 2 < page.Length
+               && page[index] == ':'
+               && IsPathSeparator(page[index + 1])
+               && IsPathSeparator(page[index + 2]);
+    }
+
+    private static bool IsSchemeStart(char value)
+    {
+        return value is (>= 'A' and <= 'Z') or (>= 'a' and <= 'z');
+    }
+
+    private static bool IsSchemeCharacter(char value)
+    {
+        return IsSchemeStart(value) || value is (>= '0' and <= '9') or '+' or '-' or '.';
     }
 
     private static bool HasLeadingDoubleSeparator(string page)

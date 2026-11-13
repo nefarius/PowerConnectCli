@@ -77,6 +77,10 @@ public sealed class SwitchToolServiceTests
     [InlineData("\\\\server\\share")]
     [InlineData("/\\config/vlan_member.htm")]
     [InlineData("/ \t/config/vlan_member.htm")]
+    [InlineData("http://192.0.2.1/config/vlan_member.htm")]
+    [InlineData("https://192.0.2.1/config/vlan_member.htm")]
+    [InlineData("HTTP://switch.example/config/vlan_member.htm")]
+    [InlineData("file:///config/vlan_member.htm")]
     public async Task RejectsNetworkStylePagePaths(string page)
     {
         McpException get = await Assert.ThrowsAsync<McpException>(() => _service.RawGetAsync("core", "  " + page, CancellationToken.None));
@@ -98,8 +102,11 @@ public sealed class SwitchToolServiceTests
     {
         await _service.RawGetAsync("core", "  /config/vlan_member.htm  ", CancellationToken.None);
         await _service.RawGetAsync("core", "vlan_member.htm", CancellationToken.None);
+        await _service.RawGetAsync("core", "/config/vlan_member.htm?Query:dot1qVlanIndex=20", CancellationToken.None);
 
-        Assert.Equal(new[] { "/config/vlan_member.htm", "vlan_member.htm" }, _sessions.Session.Calls.Select(call => (string)call.Arguments[0]!));
+        Assert.Equal(
+            new[] { "/config/vlan_member.htm", "vlan_member.htm", "/config/vlan_member.htm?Query:dot1qVlanIndex=20" },
+            _sessions.Session.Calls.Select(call => (string)call.Arguments[0]!));
     }
 
     [Fact]
