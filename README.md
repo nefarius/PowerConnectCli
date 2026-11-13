@@ -102,9 +102,57 @@ On an interactive terminal, `pc28xx` shows a spinner on standard error while it 
 
 ### Commands
 
-`vlan`, `vlan port`, `port`, `port access`, `lag`, `lag members`, `green-ethernet`, `storm-control`, `mirror`, `mac-table`, `stp`, `stp port`, `multicast`, `multicast group`, `multicast forward-all`, `igmp-snooping`, `dot1x`, `dot1x hosts`, `dot1x users`, `system`, `ip`, `diag`, `users`, `radius`, `snmp`, `file`, `dhcp-server`, `jumbo-frames`, `stats`, `qos`, `config`, `raw`.
+`vlan`, `vlan port`, `port`, `port access`, `lag`, `lag members`, `green-ethernet`, `storm-control`, `mirror`, `mac-table`, `stp`, `stp port`, `multicast`, `multicast group`, `multicast forward-all`, `igmp-snooping`, `dot1x`, `dot1x hosts`, `dot1x users`, `system`, `ip`, `diag`, `users`, `radius`, `snmp`, `file`, `dhcp-server`, `jumbo-frames`, `stats`, `qos`, `config`, `raw`, `mcp`.
+
+`mcp` does not talk to the switch by itself. It serves the [MCP server](#mcp-server) on standard input and output.
 
 `raw get <page>` and `raw set <page> --set field=value` replay any page the typed commands do not cover. On this firmware QoS `basic` and `advanced` both enable the global QoS mode; `disabled` turns it off.
+
+## MCP server
+
+`pc28xx mcp` is a stdio Model Context Protocol server for the same switch client. Standard output carries JSON-RPC only. Logs and startup errors go to standard error. Tool arguments supply confirmation, so the server never waits on an interactive prompt.
+
+Switch names and passwords stay outside the model. A JSON file lists aliases, and each alias names the environment variable that holds its password. Pass `--targets-file` or set `PC28XX_MCP_TARGETS_FILE`.
+
+```json
+{
+  "switches": [
+    {
+      "alias": "core",
+      "host": "192.168.2.17",
+      "user": "admin",
+      "passwordEnvironmentVariable": "PC28XX_CORE_PASSWORD",
+      "timeoutSeconds": 30,
+      "loginRetries": 3,
+      "loginRetryDelaySeconds": 2
+    }
+  ]
+}
+```
+
+`user` defaults to `admin`. `timeoutSeconds` defaults to 30, `loginRetries` to 3, and `loginRetryDelaySeconds` to 2. Optional `verbose` matches `--verbose` and writes HTTP logs to standard error. `captureDirectory` is rejected: captured HTML can still contain passwords, RADIUS keys, and SNMP communities.
+
+Cursor starts one `pc28xx mcp` process. The targets file can name every switch, and each password is its own environment variable:
+
+```json
+{
+  "mcpServers": {
+    "powerconnect": {
+      "command": "pc28xx",
+      "args": ["mcp", "--targets-file", "/home/me/.config/pc28xx/switches.json"],
+      "env": {
+        "PC28XX_CORE_PASSWORD": "the web UI password"
+      }
+    }
+  }
+}
+```
+
+`list_switches` returns the aliases, hosts, and users. Every other tool takes `switch` set to one of those aliases. A call logs in, does one operation, and logs out. Calls that share an alias run one at a time; different aliases can run together.
+
+The tools cover VLANs (`vlan_list`, `vlan_show`, `vlan_create`, `vlan_delete`, `vlan_set`, `vlan_port_list`, `vlan_port_show`, `vlan_port_set`, `vlan_access`), copper ports (`port_list`, `port_show`, `port_set`), and system operations (`system_asset`, `system_versions`, `system_set_asset_tag`, `system_secure_mode`, `system_set_secure_mode`, `system_jumbo`, `system_set_jumbo`, `system_reset`). `raw_get` reads any page with password, RADIUS key, and SNMP community fields replaced by `***`. `raw_set` plans a field write.
+
+A write returns that redacted plan. The server posts it only when `apply` is true. Reset, a change to `unmanaged` secure mode, and every raw write also require `i_understand` to be true. The switch still speaks plain HTTP, so the password and every setting travel in cleartext on the LAN.
 
 ## Protocol
 
@@ -144,6 +192,10 @@ This application benefits from these awesome projects ❤ (appearance in no spec
 
 - [System.CommandLine](https://github.com/dotnet/command-line-api)
 - [Spectre.Console](https://spectreconsole.net/)
+
+### MCP
+
+- [MCP C# SDK](https://github.com/modelcontextprotocol/csharp-sdk)
 
 ### Logging
 
